@@ -6,6 +6,7 @@ export default async function ThemeRouter({
   params,
 }: { params: Promise<{ projectSlug: string; slug?: string[] }>; }) {
   const { projectSlug, slug } = await params;
+  console.log("slug: ", slug);
 
   const pageName = (Array.isArray(slug) ? slug.join("/") : slug) || "home";
   const project = await fetchProject(projectSlug);

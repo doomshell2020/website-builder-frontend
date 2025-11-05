@@ -9,13 +9,20 @@ export async function middleware(request: NextRequest) {
   const role = cookies.get("role")?.value;
 
   // ==========================================================
-  // 🏠 Extract domain + subdomain info
+  // 🏠 Extract domain, subdomain, and normalize www
   // ==========================================================
   const rawHost = request.headers.get("host") || "";
-  const host = rawHost.split(":")[0]; // strip port
+  const host = rawHost.split(":")[0]; // remove port number (e.g., localhost:3000 → localhost)
   const isLocal = host === "localhost" || host === "127.0.0.1";
 
-  // List of allowed root domains (supports both base + subdomains)
+  // ✅ Redirect www. → non-www (SEO-friendly)
+  if (host.startsWith("www.")) {
+    const nonWwwUrl = new URL(request.url);
+    nonWwwUrl.host = host.replace("www.", "");
+    return NextResponse.redirect(nonWwwUrl);
+  }
+
+  // Define allowed base domains
   const baseDomains = [
     "webbuilder.local",
     "lvh.me",
@@ -25,35 +32,36 @@ export async function middleware(request: NextRequest) {
     "navlokcolonizers.com",
   ];
 
-  // Match known base domain
+  // Find base domain match
   const baseDomain = baseDomains.find((d) => host.endsWith(d));
 
-  // Extract subdomain
-  const subdomain =
+  // Extract subdomain (e.g., demo.webbuilder.local → demo)
+  let subdomain =
     baseDomain && host !== baseDomain
       ? host.replace(`.${baseDomain}`, "")
       : null;
 
-  // Derive the main "project name"
-  // If it's a subdomain → use it
-  // If it's a top-level domain (like navlokcolonizers.com) → use the domain prefix (navlokcolonizers)
+  // Ignore "www" explicitly
+  if (subdomain === "www") subdomain = null;
+
+  // Derive the project slug:
+  // - subdomain if exists (e.g., demo)
+  // - or base domain prefix (e.g., navlokcolonizers)
+  // - or first path segment (for localhost/projectSlug)
   let projectSlug: string | null = null;
 
   if (subdomain) {
     projectSlug = subdomain;
   } else if (baseDomain) {
     const parts = baseDomain.split(".");
-    // e.g. "navlokcolonizers.com" → "navlokcolonizers"
-    // e.g. "webbuilder.local" → "webbuilder"
-    projectSlug = parts[0];
+    projectSlug = parts[0]; // e.g., navlokcolonizers.com → "navlokcolonizers"
   } else if (isLocal) {
-    // For localhost/projectName
     const firstSegment = pathname.split("/").filter(Boolean)[0];
     projectSlug = firstSegment || null;
   }
 
   // ==========================================================
-  // 🚫 Skip Next.js internals & public/static routes
+  // 🚫 Skip Next.js internals & static files
   // ==========================================================
   if (
     pathname.startsWith("/_next") ||
@@ -73,7 +81,7 @@ export async function middleware(request: NextRequest) {
       const loginUrl = new URL("/administrator", request.url);
       const response = NextResponse.redirect(loginUrl);
 
-      // Clear cookies
+      // Clear cookies on logout
       for (const cookie of cookies.getAll()) {
         response.cookies.set(cookie.name, "", { path: "/", maxAge: 0 });
       }
@@ -101,12 +109,12 @@ export async function middleware(request: NextRequest) {
   }
 
   // ==========================================================
-  // 🌐 Handle Subdomain or Domain-based Project Routing
+  // 🌐 Domain/Subdomain → /site/[projectSlug] Rewrite
   // ==========================================================
   if (projectSlug && projectSlug !== "www") {
     const url = request.nextUrl.clone();
 
-    // If local, remove project slug from the path
+    // Remove slug prefix for localhost URLs
     const newPath =
       isLocal && pathname.startsWith(`/${projectSlug}`)
         ? pathname.replace(`/${projectSlug}`, "")
@@ -117,11 +125,11 @@ export async function middleware(request: NextRequest) {
   }
 
   // ==========================================================
-  // ✅ Default — Allow normal routes
+  // ✅ Default — Allow all other routes
   // ==========================================================
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!_next|.*\\..*).*)"], // ignore static assets
+  matcher: ["/((?!_next|.*\\..*).*)"], // Ignore static files
 };
