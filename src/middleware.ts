@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
   const rawHost = request.headers.get("host") || "";
   const host = rawHost.split(":")[0]; // remove port (e.g., localhost:3000 → localhost)
 
-  const baseDomains = ["webbuilder.local", "lvh.me", "doomshell.com", "website-builder-frontend-three.vercel.app"];
+  const baseDomains = ["webbuilder.local", "lvh.me", "doomshell.com", "localhost","website-builder-frontend-three.vercel.app"];
   const baseDomain = baseDomains.find((d) => host.endsWith(d));
   const subdomain = baseDomain ? host.replace(`.${baseDomain}`, "") : null;
 
@@ -33,7 +33,7 @@ export async function middleware(request: NextRequest) {
   ) {
     return NextResponse.next();
   }
-  if (subdomain == "doomshell.com" || subdomain == "website-builder-frontend-three.vercel.app") {
+  if (subdomain == "doomshell.com" || subdomain == "website-builder-frontend-three.vercel.app" || subdomain == "localhost") {
     return NextResponse.next();
   }
 
