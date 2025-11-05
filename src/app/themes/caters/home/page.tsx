@@ -5,7 +5,6 @@ import HeroSlider from "../slider/page";
 import { useRouter } from "next/navigation";
 import { User } from "@/types/user";
 import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/Button";
 import { motion, useAnimation, Variants } from "framer-motion";
 import { findGalleryBySlug } from "@/services/gallery.service";
@@ -20,8 +19,6 @@ export default function Home({ project }: DefaultHomeProps) {
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [hasAnimated, setHasAnimated] = useState(false);
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [isAnimating, setIsAnimating] = useState(false);
     const controls = useAnimation();
     const [ref, inView] = useInView({ threshold: 0.3, triggerOnce: true });
 
@@ -195,54 +192,6 @@ export default function Home({ project }: DefaultHomeProps) {
         hidden: { opacity: 0, y: 30 },
         visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
     };
-
-    const testimonialsData = [
-        {
-            name: "Sandeep Joshi",
-            role: "CEO, Tech Solutions",
-            image: "https://c.animaapp.com/mhfz0577zdQtqk/img/image-60-3.png",
-            text: "Jaipur Food Caterers catered our annual corporate gala, and it was fantastic! From live food stations to gourmet delicacies, everything was perfect. Their professionalism and hospitality stood out.",
-        },
-        {
-            name: "Rajesh Mehta",
-            role: "Business Consultant",
-            image: "https://c.animaapp.com/mhfz0577zdQtqk/img/image-61-3.png",
-            text: "Jaipur Food Caterers made our corporate event a huge success! The food was fresh, flavorful, and beautifully presented. Their professional service ensured a seamless experience. Highly recommended!",
-        },
-        {
-            name: "Priya Sharma",
-            role: "Event Planner",
-            image: "https://c.animaapp.com/mhfz0577zdQtqk/img/image-62-3.png",
-            text: "Jaipur Food Caterers exceeded expectations! Delicious cuisine, elegant presentation, and flawless service made the wedding celebration unforgettable. A truly outstanding experience!",
-        },
-        {
-            name: "Ankit Verma",
-            role: "Marketing Manager",
-            image: "https://c.animaapp.com/mhfz0577zdQtqk/img/image-63-3.png",
-            text: "For our office inauguration, Jaipur Food Caterers delivered an exceptional experience. The variety of dishes and impeccable service impressed all our guests. Looking forward to booking them again!",
-        },
-    ];
-
-    const goToNext = () => {
-        if (isAnimating) return;
-        setIsAnimating(true);
-        setCurrentIndex((prev) => (prev + 1) % testimonialsData.length);
-        setTimeout(() => setIsAnimating(false), 500);
-    };
-
-    const goToPrevious = () => {
-        if (isAnimating) return;
-        setIsAnimating(true);
-        setCurrentIndex((prev) =>
-            prev === 0 ? testimonialsData.length - 1 : prev - 1
-        );
-        setTimeout(() => setIsAnimating(false), 500);
-    };
-
-    useEffect(() => {
-        const interval = setInterval(goToNext, 5000);
-        return () => clearInterval(interval);
-    }, [currentIndex]);
 
     return (
         <div>
