@@ -251,12 +251,12 @@ const LoginScreen = () => {
       </div>
 
       {/* Right bottom - V3 reCAPTCHA */}
-      <ReCAPTCHA
+      {/* <ReCAPTCHA
         className="z-[99]"
         ref={recaptchaRef}
         size="invisible"
         sitekey={SITE_KEY}
-      />
+      /> */}
     </div>
   );
 };
