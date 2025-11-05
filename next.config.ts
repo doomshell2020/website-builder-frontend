@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: false,
   devIndicators: false,
   images: {
-    domains: ["192.168.0.77"],
+    domains: [process.env.NEXT_PUBLIC_IMAGE_URL],
   },
   typescript: {
     ignoreBuildErrors: true, // ✅ stop TS layout prop errors

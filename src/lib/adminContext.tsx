@@ -29,7 +29,8 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     const fetchAdminProfile = async () => {
       try {
         const res = await AdminProfile();
-        // console.log("🟢 Admin Profile Response:", res.result);
+        console.log("🟢 Admin Profile Response:", res);
+
         if (!isActive) return;
         const { id, name } = res?.result || {};
         setId(id);
