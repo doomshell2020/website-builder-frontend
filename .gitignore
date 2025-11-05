@@ -1,0 +1,45 @@
+node_modules
+
+deploy.sh
+
+#.env
+.env.*
+
+# .env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# build output
+.next/
+
+# test results
+test-results/
+Dockerfile.local
+docker-compose.local.yml
+jquery-global.ts
+
+SWC cache
+.swc/
+
+# lock files
+package-lock.json
+yarn.lock
+
+# misc
+*.log
+
+# cache directories
+.cache/
+
+#dist/
+dist/
+
+#build/
+build/
+
+# Playwright
+/playwright-report/
+/blob-report/
+/playwright/.cache/

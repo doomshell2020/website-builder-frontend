@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  doomshell-staging-app:
+    container_name: doomshell-staging-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: ${BUILD_TARGET:-production}
+    ports:
+      - "${HOST_PORT}:${PORT}"  # host:container port mapping
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${PORT:-3001}
+    restart: unless-stopped

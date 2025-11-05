@@ -1,0 +1,524 @@
+"use client";
+
+import { useMemo, useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+    Info, Trash2, ToggleRight, ToggleLeft, Edit, Plus,
+    CornerRightDown, CircleAlert, CircleCheckBig
+} from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { formatDate } from "@/lib/date";
+import Swal from "sweetalert2";
+import { getAllUsers, deleteUser, updateUserStatus, searchUsers, approveUser } from "@/services/userService";
+import PaginatedDataTable from "@/components/PaginatedDataTablet";
+import { User } from "@/types/user";
+import { Button } from "@/components/ui/Button";
+import { exportToExcel } from "@/lib/exportToExcel";
+import { exportToPdf } from "@/lib/exportToPdf";
+import Image from "next/image";
+import { Input } from "@/components/ui/Input";
+import Loader from "@/components/ui/loader";
+
+const UsersListPage = () => {
+
+    const router = useRouter();
+    const [open, setOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [allData, setAllData] = useState<User[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const [totalRows, setTotalRows] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [filteredData, setFilteredData] = useState<User[]>([]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)
+            ) { setOpen(false); }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => { document.removeEventListener("mousedown", handleClickOutside); };
+    }, []);
+
+    const [search, setsearch] = useState<{
+        searchTerm: string;
+        fromDate: Date | null;
+        toDate: Date | null;
+    }>({
+        searchTerm: "",
+        fromDate: null,
+        toDate: null,
+    });
+
+    const handleReset = () => {
+        setsearch({
+            searchTerm: "",
+            fromDate: null,
+            toDate: null,
+        });
+        setSearchQuery("");
+        setPage(1);
+        setActiveSearch({ searchTerm: "", fromDate: "", toDate: "" });
+    };
+
+    const [activeSearch, setActiveSearch] = useState<{ searchTerm: string; fromDate?: string; toDate?: string }>({
+        searchTerm: "",
+        fromDate: "",
+        toDate: "",
+    });
+
+    const handleSearch = () => {
+        setPage(1);
+        const formattedFrom = search.fromDate
+            ? `${search.fromDate.getFullYear()}-${String(search.fromDate.getMonth() + 1).padStart(2, "0")}-${String(search.fromDate.getDate()).padStart(2, "0")}`
+            : "";
+
+        const formattedTo = search.toDate
+            ? `${search.toDate.getFullYear()}-${String(search.toDate.getMonth() + 1).padStart(2, "0")}-${String(search.toDate.getDate()).padStart(2, "0")}`
+            : "";
+
+        setActiveSearch({
+            searchTerm: search.searchTerm || "",
+            fromDate: formattedFrom,
+            toDate: formattedTo,
+        });
+    };
+
+    const fetchData = useCallback(
+        async (searchParams = activeSearch, currentPage = page, currentLimit = limit) => {
+            try {
+                setLoading(true);
+                const isSearchActive =
+                    searchParams &&
+                    (searchParams.searchTerm.trim() !== "" ||
+                        (searchParams.fromDate && searchParams.fromDate !== "") ||
+                        (searchParams.toDate && searchParams.toDate !== ""));
+
+                const res = isSearchActive
+                    ? await searchUsers(searchParams, currentPage, currentLimit)
+                    : await getAllUsers(currentPage, currentLimit);
+
+                const result = res?.result;
+                const data: User[] = Array.isArray(result?.data) ? result.data : [];
+                // console.log("data: ", data);
+                setAllData(data);
+                setFilteredData(data);
+                setTotalRows(result?.total || 0);
+                setTotalPages(result?.totalPages || 1);
+            } catch (error) {
+                console.error("Failed to fetch users:", error);
+            } finally {
+                setLoading(false);
+            }
+        },
+        [activeSearch, page, limit]
+    );
+
+    useEffect(() => {
+        fetchData(activeSearch, page, limit);
+    }, [fetchData, activeSearch, page, limit]);
+
+    const handleDelete = async (id: number) => {
+        const result = await Swal.fire({
+            title: "Are you sure",
+            text: "You want to delete this user ?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#506ae5",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!",
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await deleteUser(id); // Uncomment when implemented
+                Swal.fire("Deleted!", "User has been deleted.", "success");
+                fetchData();
+            } catch {
+                Swal.fire("Error!", "Failed to delete user.", "error");
+            }
+        }
+    };
+
+    const handleClick = () => {
+        setIsLoading(true);
+        router.push("/admin/users/add");
+    };
+
+    const handleExport = () => {
+        if (filteredData.length === 0) {
+            Swal.fire("Error!", "No user data available to export.", "error");
+            return;
+        }
+        const exportData = filteredData.map((row) => ({
+            "User Name": row.name || "N/A",
+            "Company Name": row.company_name || "N/A",
+            "Email": row.email || "N/A",
+            "Mobile No": row.mobile_no || "N/A",
+            "Status": row.status || "N/A",
+            "Facebook": row.fburl || "N/A",
+            "Twitter": row.xurl || "N/A",
+            "Instagram": row.instaurl || "N/A",
+            "LinkedIn": row.linkedinurl || "N/A",
+            "Youtube": row.yturl || "N/A",
+            "Address": row.address1 || "N/A",
+            "Created": row.createdAt || "N/A",
+        }));
+        exportToExcel(exportData, "user_report");
+    };
+
+    const handleExportPDF = () => {
+        if (filteredData.length === 0) {
+            Swal.fire("Error!", "No user data available to Generate PDF.", "error",);
+            return;
+        }
+        exportToPdf(filteredData, "user_report", 'User Report');
+    };
+
+    const columns = useMemo(
+        () => [
+            {
+                name: "S.No",
+                selector: (_: User, index: number) =>
+                    ((page - 1) * limit + index + 1).toString(),
+                width: "5%",
+            },
+            {
+                name: "Name",
+                cell: (row: User) => (
+                    <button
+                        onClick={() => router.push(`/admin/users/view/${row.id}`)}
+                        className="flex items-center space-x-2 text-blue-600 hover:underline"
+                    >
+                        <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                            {row.image &&
+                                row.image !== undefined &&
+                                row.image !== "undefined" ? (
+                                <Image
+                                    src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${row.image}`}
+                                    alt={row.name || "Profile"}
+                                    width={32}
+                                    height={32}
+                                    className="object-cover w-full h-full"
+                                />
+                            ) : (
+                                <Image
+                                    src="/assest/image/defaultUser.webp"
+                                    alt={row.name || "Profile"}
+                                    width={32}
+                                    height={32}
+                                    className="object-cover w-full h-full"
+                                />
+                            )}
+                        </div>
+                        <span>{row.name || "N/A"}</span>
+                    </button>
+                ),
+                selector: (row: User) => row.name || "N/A",
+                sortable: true,
+            },
+            {
+                name: "Email",
+                selector: (row: User) => row.email || "N/A",
+                sortable: true,
+            },
+            {
+                name: "Mobile",
+                selector: (row: User) => (row.mobile_no ? String(row.mobile_no) : "N/A"),
+                width: "12%",
+                sortable: true,
+            },
+            {
+                name: "Role",
+                selector: (row: User) => (row?.roleData ? String(row?.roleData?.name) : "N/A"),
+                width: "10%",
+                sortable: true,
+            },
+            {
+                name: "Created",
+                selector: (row: User) =>
+                    row.createdAt ? formatDate(row.createdAt, "DD-MM-YYYY hh:mm A") : "—",
+                width: "15%", // You might want to increase width
+                sortable: true,
+            },
+            {
+                name: "Approval",
+                cell: (row: User) => (
+                    <div className="flex space-x-3 items-center w-full justify-center">
+                        {row?.roleData?.id === 2 && ( // ✅ Show only if role ID is 2
+                            <div
+                                className={`${row.approval === "Y" ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+                                    }`}
+                                title={
+                                    row.approval === "Y"
+                                        ? "Already approved"
+                                        : "Click to approve this user"
+                                }
+                                onClick={async () => {
+                                    if (row.approval === "Y") return;
+
+                                    try {
+                                        const result = await Swal.fire({
+                                            title: "Are you sure?",
+                                            text: "You want to approve this user?",
+                                            icon: "warning",
+                                            showCancelButton: true,
+                                            confirmButtonColor: "#506ae5",
+                                            cancelButtonColor: "#d33",
+                                            confirmButtonText: "Yes, approve!",
+                                        });
+
+                                        if (!result.isConfirmed) return;
+
+                                        try {
+                                            const response: any = await approveUser(row.id!.toString(), {
+                                                approval: "Y",
+                                                newSchema: row.company_name!.toString(),
+                                                role: row?.roleData?.id,
+                                            });
+
+                                            if (response?.status === 400) {
+                                                Swal.fire("Error", response?.message || "Failed to approve user", "error");
+                                                return;
+                                            }
+
+                                            Swal.fire("Approved", "User has been approved successfully", "success");
+                                            await fetchData();
+                                        } catch (apiError: any) {
+                                            Swal.fire(
+                                                "Error",
+                                                apiError?.response?.data?.message || apiError?.message || "Something went wrong while approving",
+                                                "error"
+                                            );
+                                        }
+                                    } catch (outerError: any) {
+                                        Swal.fire("Error", "Unexpected error occurred. Please try again later.", "error");
+                                    }
+                                }}
+                            >
+                                {row.approval === "Y" ? (
+                                    <CircleCheckBig size={20} className="text-green-500" />
+                                ) : (
+                                    <CircleAlert size={20} className="text-red-500" />
+                                )}
+                            </div>
+                        )}
+                    </div>
+                ),
+                width: "6%",
+            },
+            {
+                name: "Actions",
+                cell: (row: User) => (
+                    <div className="flex space-x-3 items-center">
+                        {/* Status toggle - implement updateStatusEnjoyer when available */}
+                        <div
+                            className="cursor-pointer"
+                            title={`Click to mark as ${row.status == "Y" ? "Inactive" : "Active"}`}
+                            onClick={async () => {
+                                // TODO: Implement updateUserStatus
+                                const result = await Swal.fire({
+                                    title: "Are you sure",
+                                    text: "You want to update this user's status?",
+                                    icon: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#506ae5",
+                                    cancelButtonColor: "#d33",
+                                    confirmButtonText: "Yes, update it!",
+                                });
+
+                                if (result.isConfirmed) {
+                                    await updateUserStatus(row.id!.toString(), { status: row.status == "Y" ? "N" : "Y", });
+                                    Swal.fire("updated", `User has been successfully ${row.status === "Y" ? "deactivated" : "activated"}.
+`, "success",);
+                                }
+                                fetchData();
+                            }}>
+                            {row.status == "Y" ? (
+                                <ToggleRight size={20} className="text-green-500" />
+                            ) : (
+                                <ToggleLeft size={20} className="text-red-500" />
+                            )}
+                        </div>
+                        {/* <button
+                            title="View"
+                            onClick={() => router.push(`/users/view/${row.id}`)}
+                        >
+                            <Info size={18} color="blue" />
+                        </button> */}
+                        <button
+                            title="Edit"
+                            onClick={() => router.push(`/admin/users/update/${row.id}`)}
+                        >
+                            <Edit size={18} color="green" />
+                        </button>
+                        <button title="Delete" onClick={() => handleDelete(row.id!)}>
+                            <Trash2 size={16} color="red" />
+                        </button>
+                    </div>
+                ),
+                width: "10%",
+            },
+        ],
+        [page, limit],
+    );
+
+    const isDisabled =
+        search.searchTerm.trim() === "" &&
+        !search.fromDate &&
+        !search.toDate;
+
+    return (
+        <div className="min-h-screen">
+            <main className="max-w-10xl py-2">
+                <div className="border shadow-xl p-2">
+                    <div className="min-h-screen bg-gray-50">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-medium text-gray-800">
+                                User Manager
+                            </h2>
+                        </div>
+                        <header className="bg-white shadow-sm border-b">
+                            <div className="mx-auto px-4 sm:px-6 lg:px-4 bg-white rounded-lg shadow-sm border py-4 px-4">
+                                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                                    <div className="flex md:col-span-3">
+                                        <Input
+                                            type="text"
+                                            placeholder="Search by name / email"
+                                            className="h-10 text-black text-sm border max-w-[220px] border-gray-200 rounded-[5px] px-3"
+                                            value={search.searchTerm}
+                                            onChange={(e) =>
+                                                setsearch((prev) => ({
+                                                    ...prev,
+                                                    searchTerm: e.target.value,
+                                                }))
+                                            }
+                                        />
+
+                                        <div className="w-full flex gap-1 ml-4 min-w-[200px] max-w-[260px] ">
+                                            <DatePicker
+                                                selected={search.fromDate}
+                                                maxDate={search.toDate}
+                                                onChange={(date: Date | null) =>
+                                                    setsearch((prev) => ({ ...prev, fromDate: date }))
+                                                }
+                                                placeholderText="From Date"
+                                                className="w-full text-sm h-10 px-2 border border-gray-200 shadow-lg rounded-[5px] text-black"
+                                                dateFormat="dd/MM/yyyy"
+                                            />
+
+                                            <DatePicker
+                                                selected={search.toDate}
+                                                minDate={search.fromDate}
+                                                onChange={(date: Date | null) =>
+                                                    setsearch((prev) => ({ ...prev, toDate: date }))
+                                                }
+                                                placeholderText="To Date"
+                                                className="w-full text-sm h-10 px-2 border border-gray-200 shadow-lg rounded-[5px] text-black"
+                                                dateFormat="dd/MM/yyyy"
+                                            />
+                                        </div>
+
+                                        <div className="w-full flex gap-2 ml-4">
+                                            <Button
+                                                onClick={handleSearch}
+                                                disabled={isDisabled}
+                                                className={`max-w-[30] text-white rounded-[5px] 
+    ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-700"}`}  >
+                                                Search
+                                            </Button>
+                                            <Button
+                                                onClick={handleReset}
+                                                disabled={isDisabled}
+                                                // variant="outline"
+                                                className={`max-w-[30] text-white rounded-[5px] 
+    ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-yellow-600 hover:bg-yellow-700"}`} >
+                                                Reset
+                                            </Button>
+                                        </div>
+                                    </div>
+
+
+
+                                    <div className="flex justify-end relative">
+                                        <div
+                                            className="relative inline-block text-left"
+                                            ref={dropdownRef}
+                                        >
+                                            <Button
+                                                onClick={() => setOpen((prev) => !prev)}
+                                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                            >
+                                                Export <CornerRightDown />
+                                            </Button>
+
+                                            {open && (
+                                                <div className="absolute right-0 mt-2 w-auto bg-white border rounded shadow-lg z-10 flex flex-col gap-1 p-1">
+                                                    <Button
+                                                        onClick={() => {
+                                                            setOpen(false);
+                                                            handleExportPDF();
+                                                        }}
+                                                        className="text-left px-4 py-2 text-black rounded hover:bg-red-500 hover:text-white"
+                                                    >
+                                                        Download PDF
+                                                    </Button>
+                                                    <Button
+                                                        onClick={() => {
+                                                            setOpen(false);
+                                                            handleExport();
+                                                        }}
+                                                        className="text-left px-4 py-2 text-black rounded hover:bg-green-500 hover:text-white"
+                                                    >
+                                                        Export to Excel
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="ml-2">
+                                            <Button
+                                                title="Add Users"
+                                                onClick={handleClick}
+                                                className="min-w-[80px] p-2 rounded-[5px] bg-blue-600 text-white hover:bg-blue-700"
+                                            >
+                                                {isLoading ? (
+                                                    <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                                                ) : (
+                                                    <>
+                                                        Add <Plus className="h-5 w-5 text-white" />
+                                                    </>
+                                                )}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </header>
+
+                        <div className="relative">
+                            {loading ? (<Loader />)
+                                : (<PaginatedDataTable
+                                    title="Users"
+                                    columns={columns}
+                                    data={filteredData}
+                                    page={page}
+                                    totalCount={totalRows}
+                                    itemsPerPage={limit}
+                                    onPageChange={setPage}
+                                    onPerPageChange={setLimit}
+                                />)
+                            }
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    );
+};
+
+export default UsersListPage;
