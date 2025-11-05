@@ -15,8 +15,8 @@ export default async function ThemeRouter({
   const themeName =
     project?.result?.Theme?.name?.toLowerCase().replace(/\s+/g, "-") ?? "default";
 
-  console.log("ProjectDetail: ", ProjectDetail);
-  console.log("themeName: ", themeName);
+  // console.log("ProjectDetail: ", ProjectDetail);
+  // console.log("themeName: ", themeName);
 
   try {
     // ✅ Load Layout and Page dynamically

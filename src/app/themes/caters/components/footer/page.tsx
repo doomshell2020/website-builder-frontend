@@ -25,11 +25,18 @@ export default function Footer({ project }: DefaultProps) {
       <div className="flex flex-col md:flex-row md:flex-wrap items-start justify-between gap-8  pt-16 md:pt-[100px] pb-10 md:pb-[70px] px-6 md:px-10 w-full bg-[#c2302e]">
         {/* Logo + Description */}
         <div className="flex flex-col w-full md:w-[312px] items-center md:items-start justify-center gap-6 text-center md:text-left">
-          <img
-            className="w-[140px] md:w-[155px] h-auto object-cover"
-            alt="Jaipur Food Caterers Logo"
-            src="https://c.animaapp.com/mhfz0577zdQtqk/img/image-77-4.png"
-          />
+          <div className="flex items-center">
+            <Link href="/" className="flex items-center gap-2">
+              {/* <div className="max-h-14 w-auto max-w-[150px] flex items-center"> */}
+              <img
+                src={`${process.env.NEXT_PUBLIC_IMAGE_URL || "http://localhost:5000/uploads/"}${project?.company_logo}`}
+                alt={project?.company_name || "logo"}
+                className="w-[140px] md:w-[155px] h-auto object-cover"
+              />
+              {/* </div> */}
+            </Link>
+          </div>
+
           <p className="font-semibold text-white leading-normal text-base md:text-[16px]">
             Jaipur Food Caterers is a unit of Prabhu Narayan Halwai. Jaipur
             Food Caterers is a brand name of 100% pure vegetable catering

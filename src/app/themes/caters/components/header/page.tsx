@@ -42,11 +42,15 @@ export default function Header({ project }: DefaultProps) {
       <div className="flex items-center justify-between px-6 py-3 lg:px-10">
         {/* Logo */}
         <div className="flex items-center">
-          <img
-            className="w-[150px] h-auto object-contain"
-            alt="Navlok Logo"
-            src="https://c.animaapp.com/mhfz0577zdQtqk/img/image-31-4.png"
-          />
+          <Link href="/" className="flex items-center gap-2">
+            {/* <div className="max-h-14 w-auto max-w-[150px] flex items-center"> */}
+            <img
+              src={`${process.env.NEXT_PUBLIC_IMAGE_URL || "http://localhost:5000/uploads/"}${project?.company_logo}`}
+              alt={project?.company_name || "logo"}
+              className="max-h-14 w-auto object-contain"
+            />
+            {/* </div> */}
+          </Link>
         </div>
 
         {/* Desktop Navigation */}

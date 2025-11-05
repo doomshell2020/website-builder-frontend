@@ -14,13 +14,9 @@ export async function middleware(request: NextRequest) {
   const rawHost = request.headers.get("host") || "";
   const host = rawHost.split(":")[0]; // remove port (e.g., localhost:3000 → localhost)
 
-  const baseDomains = ["webbuilder.local", "lvh.me", "doomshell.com"];
+  const baseDomains = ["webbuilder.local", "lvh.me", "doomshell.com", "https://website-builder-frontend-three.vercel.app/"];
   const baseDomain = baseDomains.find((d) => host.endsWith(d));
   const subdomain = baseDomain ? host.replace(`.${baseDomain}`, "") : null;
-
-  console.log("baseDomains :", baseDomains);
-  console.log("baseDomain: ", baseDomain);
-  console.log("subdomain: ", subdomain);
 
   const isLocal = host === "localhost" || host === "127.0.0.1";
 
@@ -88,7 +84,7 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
 
     console.log();
-    
+
 
     // Remove project slug from pathname if on localhost
     const newPath =
