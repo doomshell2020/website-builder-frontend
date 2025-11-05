@@ -47,55 +47,55 @@ const LoginScreen = () => {
 
     try {
 
-      try {
-        // 🚀 1️⃣ Execute reCAPTCHA v3
-        const reCAPTCHAtoken = await recaptchaRef.current?.executeAsync();
-        recaptchaRef.current?.reset();
+      // try {
+      //   // 🚀 1️⃣ Execute reCAPTCHA v3
+      //   const reCAPTCHAtoken = await recaptchaRef.current?.executeAsync();
+      //   recaptchaRef.current?.reset();
 
-        // ⚠️ 2️⃣ Token missing → domain/key not configured correctly
-        if (!reCAPTCHAtoken) {
-          SwalError({
-            title: "reCAPTCHA Not Configured",
-            message:
-              "reCAPTCHA verification failed to load. This site key may not be registered for this domain.",
-          });
-          return;
-        }
+      //   // ⚠️ 2️⃣ Token missing → domain/key not configured correctly
+      //   if (!reCAPTCHAtoken) {
+      //     SwalError({
+      //       title: "reCAPTCHA Not Configured",
+      //       message:
+      //         "reCAPTCHA verification failed to load. This site key may not be registered for this domain.",
+      //     });
+      //     return;
+      //   }
 
-        // 🔐 3️⃣ Verify reCAPTCHA token with backend
-        const { data: recaptchaRes } = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL_LOCAL}reCAPTCHA/verify-recaptcha`,
-          { reCAPTCHAtoken }
-        );
+      //   // 🔐 3️⃣ Verify reCAPTCHA token with backend
+      //   const { data: recaptchaRes } = await axios.post(
+      //     `${process.env.NEXT_PUBLIC_API_URL_LOCAL}reCAPTCHA/verify-recaptcha`,
+      //     { reCAPTCHAtoken }
+      //   );
 
-        // ❌ 4️⃣ Handle verification or configuration errors
-        if (recaptchaRes?.errorCodes?.includes("invalid-input-secret")) {
-          SwalError({
-            title: "Invalid reCAPTCHA Configuration",
-            message:
-              "This reCAPTCHA site key or secret key is invalid for the current domain.",
-          });
-          return;
-        }
+      //   // ❌ 4️⃣ Handle verification or configuration errors
+      //   if (recaptchaRes?.errorCodes?.includes("invalid-input-secret")) {
+      //     SwalError({
+      //       title: "Invalid reCAPTCHA Configuration",
+      //       message:
+      //         "This reCAPTCHA site key or secret key is invalid for the current domain.",
+      //     });
+      //     return;
+      //   }
 
-        if (!recaptchaRes?.success && !recaptchaRes?.message) {
-          SwalError({
-            title: "Bot Detected!",
-            message:
-              "reCAPTCHA verification failed. Please refresh the page and try again.",
-          });
-          return;
-        }
+      //   if (!recaptchaRes?.success && !recaptchaRes?.message) {
+      //     SwalError({
+      //       title: "Bot Detected!",
+      //       message:
+      //         "reCAPTCHA verification failed. Please refresh the page and try again.",
+      //     });
+      //     return;
+      //   }
 
-      } catch (err: any) {
-        // 🧱 Handles both network & execution errors
-        console.error("reCAPTCHA Error:", err);
-        SwalError({
-          title: "Verification Error",
-          message:
-            "Unable to verify reCAPTCHA. Please ensure the correct domain and try again.",
-        });
-      }
+      // } catch (err: any) {
+      //   // 🧱 Handles both network & execution errors
+      //   console.error("reCAPTCHA Error:", err);
+      //   SwalError({
+      //     title: "Verification Error",
+      //     message:
+      //       "Unable to verify reCAPTCHA. Please ensure the correct domain and try again.",
+      //   });
+      // }
 
       // ✅ Proceed with login if verified
       const response: any = await AdminLogin(data as { email: string; password: string });
