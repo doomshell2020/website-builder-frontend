@@ -9,34 +9,61 @@ export async function middleware(request: NextRequest) {
   const role = cookies.get("role")?.value;
 
   // ==========================================================
-  // 🏠 Get host and subdomain
+  // 🏠 Extract domain + subdomain info
   // ==========================================================
   const rawHost = request.headers.get("host") || "";
-  const host = rawHost.split(":")[0]; // remove port (e.g., localhost:3000 → localhost)
-
-  const baseDomains = ["webbuilder.local", "lvh.me", "doomshell.com", "localhost", "website-builder-frontend-three.vercel.app", "navlokcolonizers"];
-  const baseDomain = baseDomains.find((d) => host.endsWith(d));
-  const subdomain = baseDomain ? host.replace(`.${baseDomain}`, "") : null;
-
+  const host = rawHost.split(":")[0]; // strip port
   const isLocal = host === "localhost" || host === "127.0.0.1";
 
+  // List of allowed root domains (supports both base + subdomains)
+  const baseDomains = [
+    "webbuilder.local",
+    "lvh.me",
+    "doomshell.com",
+    "localhost",
+    "website-builder-frontend-three.vercel.app",
+    "navlokcolonizers.com",
+  ];
+
+  // Match known base domain
+  const baseDomain = baseDomains.find((d) => host.endsWith(d));
+
+  // Extract subdomain
+  const subdomain =
+    baseDomain && host !== baseDomain
+      ? host.replace(`.${baseDomain}`, "")
+      : null;
+
+  // Derive the main "project name"
+  // If it's a subdomain → use it
+  // If it's a top-level domain (like navlokcolonizers.com) → use the domain prefix (navlokcolonizers)
+  let projectSlug: string | null = null;
+
+  if (subdomain) {
+    projectSlug = subdomain;
+  } else if (baseDomain) {
+    const parts = baseDomain.split(".");
+    // e.g. "navlokcolonizers.com" → "navlokcolonizers"
+    // e.g. "webbuilder.local" → "webbuilder"
+    projectSlug = parts[0];
+  } else if (isLocal) {
+    // For localhost/projectName
+    const firstSegment = pathname.split("/").filter(Boolean)[0];
+    projectSlug = firstSegment || null;
+  }
+
   // ==========================================================
-  // 🚫 Skip Next.js internals, static files, and auth pages
+  // 🚫 Skip Next.js internals & public/static routes
   // ==========================================================
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
     pathname.startsWith("/assets") ||
-    // pathname.startsWith("/administrator") ||
     pathname.startsWith("/public") ||
     pathname === "/favicon.ico"
   ) {
     return NextResponse.next();
   }
-  if (subdomain == "doomshell.com" || subdomain == "navlokcolonizers.com" || subdomain == "website-builder-frontend-three.vercel.app" || subdomain == "localhost") {
-    return NextResponse.next();
-  }
-  
 
   // ==========================================================
   // 🔒 Admin/User route protection
@@ -46,11 +73,10 @@ export async function middleware(request: NextRequest) {
       const loginUrl = new URL("/administrator", request.url);
       const response = NextResponse.redirect(loginUrl);
 
-      // clear all cookies on logout
+      // Clear cookies
       for (const cookie of cookies.getAll()) {
         response.cookies.set(cookie.name, "", { path: "/", maxAge: 0 });
       }
-
       return response;
     }
 
@@ -75,19 +101,12 @@ export async function middleware(request: NextRequest) {
   }
 
   // ==========================================================
-  // 🌐 Handle Subdomain or Localhost Routing
+  // 🌐 Handle Subdomain or Domain-based Project Routing
   // ==========================================================
-  if (
-    (baseDomain && subdomain && subdomain !== "www") ||
-    (isLocal && pathname.split("/").filter(Boolean).length > 0)
-  ) {
-    const projectSlug = subdomain || pathname.split("/")[0];
+  if (projectSlug && projectSlug !== "www") {
     const url = request.nextUrl.clone();
 
-    console.log();
-
-
-    // Remove project slug from pathname if on localhost
+    // If local, remove project slug from the path
     const newPath =
       isLocal && pathname.startsWith(`/${projectSlug}`)
         ? pathname.replace(`/${projectSlug}`, "")
@@ -98,7 +117,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // ==========================================================
-  // ✅ Default — Allow public routes
+  // ✅ Default — Allow normal routes
   // ==========================================================
   return NextResponse.next();
 }
