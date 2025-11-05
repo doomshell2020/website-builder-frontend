@@ -36,6 +36,7 @@ export async function middleware(request: NextRequest) {
   if (subdomain == "doomshell.com" || subdomain == "navlokcolonizers.com" || subdomain == "website-builder-frontend-three.vercel.app" || subdomain == "localhost") {
     return NextResponse.next();
   }
+  
 
   // ==========================================================
   // 🔒 Admin/User route protection
