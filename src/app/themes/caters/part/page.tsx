@@ -3,6 +3,8 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+
 import { User } from "@/types/user";
 interface DefaultProps { project?: User; };
 
@@ -39,9 +41,32 @@ const fadeInUp = (delay = 0) => ({
         opacity: 1, y: 0, transition: { duration: 0.8, delay },
     },
 });
+const feature = [
+  {
+    src: "https://jaipurfoodcaterers.com/wp-content/uploads/2024/08/howItWorkImg3.png   ",
+    title: "Hygiene and Safety",
+    description:
+      "At Jaipur Food Caterers, we prioritize hygiene and safety with fresh ingredients, sanitized kitchens & strict quality checks for a safe and delicious experience.",
+  },
+  {
+    src: "https://jaipurfoodcaterers.com/wp-content/uploads/2024/08/howItWorkImg2.png",
+    title: "Time-Saving",
+    description:
+      "Jaipur Food Caterers saves your time with seamless catering services, from menu planning to setup, ensuring a hassle-free and delicious experience.",
+  },
+  {
+    src: "https://jaipurfoodcaterers.com/wp-content/uploads/2024/08/howItWorkImg1.png",
+    title: "Professional Service",
+    description:
+      "Jaipur Food Caterers delivers professional service with expert chefs, trained staff, and seamless execution to make your event smooth and stress-free.",
+  },
+];
 
-export default function About({ project }: DefaultProps) {
-
+export default function SubService({ project }: DefaultProps) {
+ const { ref, inView } = useInView({
+    threshold: 0.2,
+    triggerOnce: true,
+  });
     return (
         <div>
             <section className="relative w-full">
@@ -50,7 +75,7 @@ export default function About({ project }: DefaultProps) {
                     <img
                         className="w-full h-full object-cover"
                         alt="About Us Banner"
-                        src="https://c.animaapp.com/mhfz0577zdQtqk/img/image-74.png"
+                        src="https://jaipurfoodcaterers.com/wp-content/uploads/2024/08/birthdayEventPgBnr-1.jpg"
                     />
                     <div className="absolute inset-0 bg-black/50" />
                 </div>
@@ -65,7 +90,7 @@ export default function About({ project }: DefaultProps) {
                         viewport={{ once: true }}
                         className="[font-family:'Roboto',Helvetica]  font-bold text-white text-3xl md:text-5xl lg:text-[42px] leading-tight mb-4"
                     >
-                        About Us
+                       Birthday
                     </motion.h1>
 
                     {/* Subtitle Animation */}
@@ -76,8 +101,7 @@ export default function About({ project }: DefaultProps) {
                         viewport={{ once: true }}
                         className="font-manrope font-semibold text-white text-lg md:text-xl max-w-xl"
                     >
-                        Exceptional Catering, Custom Menus &amp; Flawless Service for Every
-                        Occasion!
+                        Make your birthday special with delicious catering, fresh food & custom menus!
                     </motion.p>
                 </div>
             </section>
@@ -95,7 +119,7 @@ export default function About({ project }: DefaultProps) {
                         <img
                             className="w-full max-w-[530px] h-auto object-cover rounded-2xl shadow-md"
                             alt="Jaipur Food Caterers catering services"
-                            src="https://c.animaapp.com/mhfz0577zdQtqk/img/image-35-1.png"
+                            src="https://jaipurfoodcaterers.com/wp-content/uploads/2024/08/weddingEventSecImg.jpg"
                         />
                     </motion.div>
 
@@ -108,7 +132,7 @@ export default function About({ project }: DefaultProps) {
                             viewport={{ once: true }}
                             className="font-[Satisfy] text-[#c2302e] text-2xl"
                         >
-                            About Us
+                            Birthday Party
                         </motion.p>
 
                         <motion.h2
@@ -118,7 +142,7 @@ export default function About({ project }: DefaultProps) {
                             viewport={{ once: true }}
                             className="font-roboto font-bold text-2xl sm:text-3xl md:text-4xl text-black leading-snug"
                         >
-                            Welcome to <br className="hidden sm:block" /> Jaipur Food Caterers
+                          Enhance Your Birthday Event with Jaipur Food Caterers
                         </motion.h2>
 
                         <motion.p
@@ -126,40 +150,52 @@ export default function About({ project }: DefaultProps) {
                             initial="hidden"
                             whileInView="visible"
                             viewport={{ once: true }}
-                            className="text-base sm:text-lg md:text-xl text-black font-inter leading-relaxed"
+                            className="text-base sm:text-lg md:text-xl text-black font-inter leading-relaxed space-y-4"
                         >
-                            Jaipur Food Caterers is a unit of Prabhu Narayan Halwai — a brand
-                            name of 100% pure vegetarian catering serving valuable customers
-                            since 1974. Founded by Sh. Prabhu Narayan Ji, renowned for his
-                            halwai food preparation, we have been the heart of Rajasthan for
-                            over 40 years. Our master chefs from across India curate multi-cuisine
-                            menus for every occasion — from Indian, Chinese, and Continental to
-                            Italian — blending tradition with taste.
+                           <div> Make your birthday celebration unforgettable with <span className="text-black font-bold"> Jaipur Food Caterers</span>
+                           ! We offer a delicious range of customized menus, from kids’ favorites to gourmet delights, ensuring a delightful experience for guests of all ages. Our expert chefs use fresh, high-quality ingredients to prepare mouthwatering dishes that add flavor to your special day. Whether it’s a small gathering or a grand celebration, our beautifully presented food and seamless service make every moment enjoyable.
+                            </div>
+                              <div> At <span className="text-black font-bold"> Jaipur Food Caterers</span>
+                              we take care of everything, from menu planning to setup, so you can focus on making memories. Our professional team ensures a hassle-free experience with themed setups, live food stations, and personalized service to match your party’s vibe. Let us bring taste, quality, and excellence to your birthday celebration with catering that leaves a lasting impression!
+                            </div>
                         </motion.p>
                     </div>
                 </div>
 
-                {/* --- Second Paragraph --- */}
-                <motion.div
-                    variants={fadeInUp(0.6)}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    className="max-w-6xl w-full px-2"
-                >
-                    <p className="text-sm sm:text-base md:text-lg text-black font-inter leading-relaxed">
-                        Now, we’re bringing our unmatched range to you — wherever you are —
-                        because great taste knows no boundaries. India is known for its
-                        hospitality and traditional warmth, which begins with catering
-                        services. At Jaipur Food Caterers, we use only the finest ingredients
-                        and uphold the belief that food made with love should never be
-                        compromised. Our commitment to quality and timely delivery defines our
-                        reputation as reliable caterers across India. We are proud to have
-                        served fresh, nourishing experiences for over four decades — from our
-                        in-house manufacturing to our fully equipped catering facilities.
-                    </p>
-                </motion.div>
+               
             </section>
+              <section
+      ref={ref}
+      className="w-full bg-gradient-to-b from-white to-[#fff8f8] py-16 px-6 flex flex-col items-center"
+    >
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl w-full">
+        {feature.map((item, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 60 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, delay: index * 0.2 }}
+            className="bg-white rounded-2xl shadow-md p-8 text-center hover:shadow-xl transition-all duration-300"
+          >
+            <div className="flex flex-col items-center justify-center">
+              <div className="mb-5">
+                <img
+                  src={item.src}
+                  alt={item.title}
+                  width={90}
+                  height={90}
+                  className="object-contain"
+                />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                {item.title}
+              </h3>
+              <p className="text-gray-600 leading-relaxed">{item.description}</p>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </section>
 
             <section className="flex flex-col items-center justify-center gap-10 px-6 sm:px-10 lg:px-20 pt-16 pb-10 w-full bg-white rounded-t-[40px] overflow-hidden">
                 <div className=" relative flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-20 w-full max-w-[1400px]">

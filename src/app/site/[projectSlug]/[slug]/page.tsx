@@ -15,6 +15,9 @@ export default async function ThemeRouter({
   const themeName =
     project?.result?.Theme?.name?.toLowerCase().replace(/\s+/g, "-") ?? "default";
 
+  console.log("ProjectDetail: ", ProjectDetail);
+  console.log("themeName: ", themeName);
+
   try {
     // ✅ Load Layout and Page dynamically
     const ThemeLayout = (await import(`@/app/themes/${themeName}/layout`)).default;
@@ -24,7 +27,9 @@ export default async function ThemeRouter({
     try {
       ThemePage = (await import(`@/app/themes/${themeName}/${pageName}/page`)).default;
     } catch (pageErr) {
+
       console.warn(`Page '${pageName}' not found for theme '${themeName}', using StaticPage fallback.`);
+
       ThemePage = () => <StaticPageFallback company={project?.result?.company_name} slug={pageName} />;
     }
 

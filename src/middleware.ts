@@ -18,9 +18,9 @@ export async function middleware(request: NextRequest) {
   const baseDomain = baseDomains.find((d) => host.endsWith(d));
   const subdomain = baseDomain ? host.replace(`.${baseDomain}`, "") : null;
 
-  // console.log("baseDomains :", baseDomains);
-  // console.log("baseDomain: ", baseDomain);
-  // console.log("subdomain: ", subdomain);
+  console.log("baseDomains :", baseDomains);
+  console.log("baseDomain: ", baseDomain);
+  console.log("subdomain: ", subdomain);
 
   const isLocal = host === "localhost" || host === "127.0.0.1";
 
