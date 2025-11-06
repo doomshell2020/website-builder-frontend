@@ -9,7 +9,8 @@ export async function middleware(request: NextRequest) {
   const role = cookies.get("role")?.value;
 
   const host = request.headers.get("host") || "";
-  const isLocal = host.includes("localhost") || host.includes("127.0.0.1");
+  const isLocal =
+    host.includes("localhost") || host.includes("127.0.0.1");
 
   const baseDomains = [
     "baaraat.com",
@@ -18,11 +19,11 @@ export async function middleware(request: NextRequest) {
     "localhost",
   ];
 
-  // Detect base domain and subdomain
+  // Detect main/base domain
   const baseDomain = baseDomains.find((d) => host.endsWith(d));
   const subdomain = baseDomain ? host.replace(`.${baseDomain}`, "") : null;
 
-  // 🚫 Skip static assets & API routes
+  // =� Skip static assets & API routes
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
@@ -32,20 +33,21 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // ✅ Allow /admin, /administrator, /user ONLY on www.baaraat.com
+  //  Allow /admin, /administrator, /user ONLY on main domain (baaraat.com)
   if (
     (pathname.startsWith("/admin") ||
       pathname.startsWith("/administrator") ||
       pathname.startsWith("/user")) &&
-    host !== "www.baaraat.com"
+    host !== "baaraat.com"
   ) {
+    // Other domains/subdomains trying to access admin => redirect to their homepage
     const homeUrl = new URL("/", request.url);
     return NextResponse.redirect(homeUrl);
   }
 
-  // 🔒 Auth check for admin/user routes on www.baaraat.com
+  // = Auth check for admin/user on main domain
   if (
-    host === "www.baaraat.com" &&
+    host === "baaraat.com" &&
     (pathname.startsWith("/admin") ||
       pathname.startsWith("/administrator") ||
       pathname.startsWith("/user"))
@@ -60,15 +62,12 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 🌐 Handle tenant subdomain sites
+  // < Handle subdomain-based tenant sites
   if (
-    (baseDomain &&
-      subdomain &&
-      subdomain !== "www" &&
-      host !== "www.baaraat.com") ||
+    (baseDomain && subdomain && subdomain !== "www" && host !== "baaraat.com") ||
     isLocal
   ) {
-    // ✅ Allow special dev/preview hosts to pass through normally
+    // Special: allow vercel preview and dev hostnames to pass normally
     if (
       subdomain === "webbuilder" ||
       host === "website-builder-frontend-three.vercel.app" ||
@@ -77,7 +76,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
-    // Rewrite subdomain requests to /site/{projectSlug}
+    // Rewrite subdomain traffic to /site/{projectSlug}
     const projectSlug = subdomain || pathname.split("/")[0];
     const newPath =
       isLocal && pathname.startsWith(`/${projectSlug}`)
