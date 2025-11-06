@@ -33,16 +33,16 @@ export async function middleware(request: NextRequest) {
   }
 
   // Admin pages → only on main domain
-// ✅ Allow /admin, /administrator, /user on main and local dev domains
-if (
-  (pathname.startsWith("/admin") ||
-    pathname.startsWith("/administrator") ||
-    pathname.startsWith("/user")) &&
-  !["baaraat.com", "www.baaraat.com", "webbuilder.local:3000", "localhost:3000"].includes(host)
-) {
-  const homeUrl = new URL("/", request.url);
-  return NextResponse.redirect(homeUrl);
-}
+  // ✅ Allow /admin, /administrator, /user on main and local dev domains
+  if (
+    (pathname.startsWith("/admin") ||
+      pathname.startsWith("/administrator") ||
+      pathname.startsWith("/user")) &&
+    !["baaraat.com", "www.baaraat.com", "webbuilder.local:3000", "localhost:3000"].includes(host)
+  ) {
+    const homeUrl = new URL("/", request.url);
+    return NextResponse.redirect(homeUrl);
+  }
 
   // Auth check (main domain only)
   if (
@@ -52,6 +52,11 @@ if (
       pathname.startsWith("/user"))
   ) {
     if (!token) {
+      // ✅ Avoid redirect loop
+      if (pathname === "/administrator") {
+        return NextResponse.next();
+      }
+
       const loginUrl = new URL("/administrator", request.url);
       const res = NextResponse.redirect(loginUrl);
       cookies.getAll().forEach((c) =>
@@ -60,6 +65,7 @@ if (
       return res;
     }
   }
+
 
   // Subdomain or local site
   if (
