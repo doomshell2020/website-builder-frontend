@@ -11,9 +11,7 @@ export async function middleware(request: NextRequest) {
   const host = request.headers.get("host") || "";
   const isLocal = host.includes("localhost") || host.includes("127.0.0.1");
 
-  const baseDomains = [
-    "baaraat.com",
-    "doomshell.com",
+  const baseDomains = [    "baaraat.com",    "doomshell.com",
     "website-builder-frontend-three.vercel.app",
     "localhost",
   ];
