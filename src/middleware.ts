@@ -5,8 +5,9 @@ export async function middleware(request: NextRequest) {
   const { nextUrl, cookies } = request;
   const pathname = nextUrl.pathname;
 
-  const token = cookies.get("admin_token")?.value;
-  const host = request.headers.get("host") || "";
+  // ✅ Use x-forwarded-host (Vercel uses this)
+  const forwardedHost = request.headers.get("x-forwarded-host");
+  const host = forwardedHost || request.headers.get("host") || "";
   const isLocal = host.includes("localhost") || host.includes("127.0.0.1");
 
   const baseDomains = [
@@ -19,7 +20,9 @@ export async function middleware(request: NextRequest) {
   const baseDomain = baseDomains.find((d) => host.endsWith(d));
   const subdomain = baseDomain ? host.replace(`.${baseDomain}`, "") : null;
 
-  // 🚫 Skip static & API routes
+  const token = cookies.get("admin_token")?.value;
+
+  // Skip static & API routes
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
@@ -41,20 +44,21 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // ✅ Allow admin only on www.baaraat.com
+  // ✅ Only allow admin routes on www.baaraat.com
   if (isAdminRoute && host !== "www.baaraat.com") {
     const homeUrl = new URL("/", request.url);
     return NextResponse.redirect(homeUrl);
   }
 
-  // 🔒 Auth check on admin routes (www.baaraat.com)
-  if (host === "www.baaraat.com" && isAdminRoute && !token) {
+  // 🛑 Prevent redirect loop on /administrator (login page)
+  if (pathname === "/administrator") {
+    return NextResponse.next();
+  }
+
+  // 🔒 Require token for other admin routes
+  if (isAdminRoute && !token) {
     const loginUrl = new URL("/administrator", request.url);
-    const response = NextResponse.redirect(loginUrl);
-    cookies.getAll().forEach((c) =>
-      response.cookies.set(c.name, "", { path: "/", maxAge: 0 })
-    );
-    return response;
+    return NextResponse.redirect(loginUrl);
   }
 
   // 🌐 Handle tenant subdomains
@@ -65,7 +69,6 @@ export async function middleware(request: NextRequest) {
       host !== "www.baaraat.com") ||
     isLocal
   ) {
-    // Allow Vercel preview / special dev domains
     if (
       subdomain === "webbuilder" ||
       host === "website-builder-frontend-three.vercel.app" ||
