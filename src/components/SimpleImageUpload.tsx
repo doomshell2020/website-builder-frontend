@@ -32,7 +32,7 @@ export default function ImageUpload({
             "image/tiff",
             "image/webp",
         ];
-        const maxSize = 1 * 1024 * 1024; // 2 MB
+        const maxSize = 1 * 1024 * 1024; // 1 MB
 
         if (!validTypes.includes(file.type)) {
             SwalError({
@@ -46,7 +46,7 @@ export default function ImageUpload({
         if (file.size > maxSize) {
             SwalError({
                 title: "File Too Large",
-                message: "Please upload an image smaller than 2 MB.",
+                message: "Please upload an image smaller than 1 MB.",
             });
             e.target.value = "";
             return;
