@@ -4,73 +4,72 @@ import type { NextRequest } from "next/server";
 export async function middleware(request: NextRequest) {
   const { nextUrl, cookies } = request;
   const pathname = nextUrl.pathname;
+  const token = cookies.get("admin_token")?.value;
 
-  // ✅ Use x-forwarded-host (Vercel uses this)
-  const forwardedHost = request.headers.get("x-forwarded-host");
-  const host = forwardedHost || request.headers.get("host") || "";
-  const isLocal = host.includes("localhost") || host.includes("127.0.0.1");
+  const host = request.headers.get("host") || "";
+  const isLocal =
+    host.includes("localhost") ||
+    host.includes("127.0.0.1") ||
+    host.includes("webbuilder.local");
 
   const baseDomains = [
     "baaraat.com",
     "doomshell.com",
     "website-builder-frontend-three.vercel.app",
     "localhost",
+    "webbuilder.local",
   ];
 
   const baseDomain = baseDomains.find((d) => host.endsWith(d));
   const subdomain = baseDomain ? host.replace(`.${baseDomain}`, "") : null;
 
-  const token = cookies.get("admin_token")?.value;
-
-  // Skip static & API routes
+  // Skip assets & API
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
-    pathname.startsWith("/public") ||
     pathname === "/favicon.ico"
   ) {
     return NextResponse.next();
   }
 
-  const isAdminRoute =
-    pathname.startsWith("/admin") ||
+  // Admin pages → only on main domain
+// ✅ Allow /admin, /administrator, /user on main and local dev domains
+if (
+  (pathname.startsWith("/admin") ||
     pathname.startsWith("/administrator") ||
-    pathname.startsWith("/user");
+    pathname.startsWith("/user")) &&
+  !["baaraat.com", "www.baaraat.com", "webbuilder.local:3000", "localhost:3000"].includes(host)
+) {
+  const homeUrl = new URL("/", request.url);
+  return NextResponse.redirect(homeUrl);
+}
 
-  // 🧭 Redirect baaraat.com → www.baaraat.com (only once)
-  if (host === "baaraat.com") {
-    const url = request.nextUrl.clone();
-    url.host = "www.baaraat.com";
-    return NextResponse.redirect(url);
-  }
-
-  // ✅ Only allow admin routes on www.baaraat.com
-  if (isAdminRoute && host !== "www.baaraat.com") {
-    const homeUrl = new URL("/", request.url);
-    return NextResponse.redirect(homeUrl);
-  }
-
-  // 🛑 Prevent redirect loop on /administrator (login page)
-  if (pathname === "/administrator") {
-    return NextResponse.next();
-  }
-
-  // 🔒 Require token for other admin routes
-  if (isAdminRoute && !token) {
-    const loginUrl = new URL("/administrator", request.url);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // 🌐 Handle tenant subdomains
+  // Auth check (main domain only)
   if (
-    (baseDomain &&
-      subdomain &&
-      subdomain !== "www" &&
-      host !== "www.baaraat.com") ||
+    (host === "baaraat.com" || host === "www.baaraat.com") &&
+    (pathname.startsWith("/admin") ||
+      pathname.startsWith("/administrator") ||
+      pathname.startsWith("/user"))
+  ) {
+    if (!token) {
+      const loginUrl = new URL("/administrator", request.url);
+      const res = NextResponse.redirect(loginUrl);
+      cookies.getAll().forEach((c) =>
+        res.cookies.set(c.name, "", { path: "/", maxAge: 0 })
+      );
+      return res;
+    }
+  }
+
+  // Subdomain or local site
+  if (
+    (baseDomain && subdomain && subdomain !== "www" && !host.includes("baaraat.com")) ||
     isLocal
   ) {
+    // ✅ Allow these domains directly
     if (
       subdomain === "webbuilder" ||
+      host === "webbuilder.local:3000" ||
       host === "website-builder-frontend-three.vercel.app" ||
       host === "www.navlokcolonizers.com"
     ) {
