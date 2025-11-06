@@ -238,7 +238,7 @@ const LoginScreen = () => {
             <div className="flex items-center gap-3 justify-center">
               <img
                 src="/assest/image/logo_white.png" // fallback
-                alt="Bigbash"
+                alt="websitebuilder"
                 className="min-h-12 max-h-24"
               />
             </div>

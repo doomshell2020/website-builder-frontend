@@ -32,6 +32,7 @@ export default function Testimonials({ project }: DefaultProps) {
                 setTestimonialData(testimonialsData);
                 return;
             }
+            
             try {
                 const res: any = await fetchTestimonials(project.company_name);
                 const data = res?.result?.data || res?.result || res;

@@ -41,34 +41,36 @@ const fadeInUp = (delay = 0) => ({
         opacity: 1, y: 0, transition: { duration: 0.8, delay },
     },
 });
+
 const feature = [
-  {
-    src: "https://jaipurfoodcaterers.com/wp-content/uploads/2024/08/howItWorkImg3.png   ",
-    title: "Hygiene and Safety",
-    description:
-      "At Jaipur Food Caterers, we prioritize hygiene and safety with fresh ingredients, sanitized kitchens & strict quality checks for a safe and delicious experience.",
-  },
-  {
-    src: "https://jaipurfoodcaterers.com/wp-content/uploads/2024/08/howItWorkImg2.png",
-    title: "Time-Saving",
-    description:
-      "Jaipur Food Caterers saves your time with seamless catering services, from menu planning to setup, ensuring a hassle-free and delicious experience.",
-  },
-  {
-    src: "https://jaipurfoodcaterers.com/wp-content/uploads/2024/08/howItWorkImg1.png",
-    title: "Professional Service",
-    description:
-      "Jaipur Food Caterers delivers professional service with expert chefs, trained staff, and seamless execution to make your event smooth and stress-free.",
-  },
+    {
+        src: "https://jaipurfoodcaterers.com/wp-content/uploads/2024/08/howItWorkImg3.png   ",
+        title: "Hygiene and Safety",
+        description:
+            "At Jaipur Food Caterers, we prioritize hygiene and safety with fresh ingredients, sanitized kitchens & strict quality checks for a safe and delicious experience.",
+    },
+    {
+        src: "https://jaipurfoodcaterers.com/wp-content/uploads/2024/08/howItWorkImg2.png",
+        title: "Time-Saving",
+        description:
+            "Jaipur Food Caterers saves your time with seamless catering services, from menu planning to setup, ensuring a hassle-free and delicious experience.",
+    },
+    {
+        src: "https://jaipurfoodcaterers.com/wp-content/uploads/2024/08/howItWorkImg1.png",
+        title: "Professional Service",
+        description:
+            "Jaipur Food Caterers delivers professional service with expert chefs, trained staff, and seamless execution to make your event smooth and stress-free.",
+    },
 ];
 
 export default function SubService({ project }: DefaultProps) {
- const { ref, inView } = useInView({
-    threshold: 0.2,
-    triggerOnce: true,
-  });
+    const { ref, inView } = useInView({
+        threshold: 0.2,
+        triggerOnce: true,
+    });
     return (
         <div>
+
             <section className="relative w-full">
                 {/* --- Background Image with Overlay --- */}
                 <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden">
@@ -90,7 +92,7 @@ export default function SubService({ project }: DefaultProps) {
                         viewport={{ once: true }}
                         className="[font-family:'Roboto',Helvetica]  font-bold text-white text-3xl md:text-5xl lg:text-[42px] leading-tight mb-4"
                     >
-                       Birthday
+                        Birthday
                     </motion.h1>
 
                     {/* Subtitle Animation */}
@@ -142,7 +144,7 @@ export default function SubService({ project }: DefaultProps) {
                             viewport={{ once: true }}
                             className="font-roboto font-bold text-2xl sm:text-3xl md:text-4xl text-black leading-snug"
                         >
-                          Enhance Your Birthday Event with Jaipur Food Caterers
+                            Enhance Your Birthday Event with Jaipur Food Caterers
                         </motion.h2>
 
                         <motion.p
@@ -152,50 +154,51 @@ export default function SubService({ project }: DefaultProps) {
                             viewport={{ once: true }}
                             className="text-base sm:text-lg md:text-xl text-black font-inter leading-relaxed space-y-4"
                         >
-                           <div> Make your birthday celebration unforgettable with <span className="text-black font-bold"> Jaipur Food Caterers</span>
-                           ! We offer a delicious range of customized menus, from kids’ favorites to gourmet delights, ensuring a delightful experience for guests of all ages. Our expert chefs use fresh, high-quality ingredients to prepare mouthwatering dishes that add flavor to your special day. Whether it’s a small gathering or a grand celebration, our beautifully presented food and seamless service make every moment enjoyable.
+                            <div> Make your birthday celebration unforgettable with <span className="text-black font-bold"> Jaipur Food Caterers</span>
+                                ! We offer a delicious range of customized menus, from kids’ favorites to gourmet delights, ensuring a delightful experience for guests of all ages. Our expert chefs use fresh, high-quality ingredients to prepare mouthwatering dishes that add flavor to your special day. Whether it’s a small gathering or a grand celebration, our beautifully presented food and seamless service make every moment enjoyable.
                             </div>
-                              <div> At <span className="text-black font-bold"> Jaipur Food Caterers</span>
-                              we take care of everything, from menu planning to setup, so you can focus on making memories. Our professional team ensures a hassle-free experience with themed setups, live food stations, and personalized service to match your party’s vibe. Let us bring taste, quality, and excellence to your birthday celebration with catering that leaves a lasting impression!
+                            <div> At <span className="text-black font-bold"> Jaipur Food Caterers</span>
+                                we take care of everything, from menu planning to setup, so you can focus on making memories. Our professional team ensures a hassle-free experience with themed setups, live food stations, and personalized service to match your party’s vibe. Let us bring taste, quality, and excellence to your birthday celebration with catering that leaves a lasting impression!
                             </div>
                         </motion.p>
                     </div>
                 </div>
 
-               
+
             </section>
-              <section
-      ref={ref}
-      className="w-full bg-gradient-to-b from-white to-[#fff8f8] py-16 px-6 flex flex-col items-center"
-    >
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl w-full">
-        {feature.map((item, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 60 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: index * 0.2 }}
-            className="bg-white rounded-2xl shadow-md p-8 text-center hover:shadow-xl transition-all duration-300"
-          >
-            <div className="flex flex-col items-center justify-center">
-              <div className="mb-5">
-                <img
-                  src={item.src}
-                  alt={item.title}
-                  width={90}
-                  height={90}
-                  className="object-contain"
-                />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                {item.title}
-              </h3>
-              <p className="text-gray-600 leading-relaxed">{item.description}</p>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </section>
+
+            <section
+                ref={ref}
+                className="w-full bg-gradient-to-b from-white to-[#fff8f8] py-16 px-6 flex flex-col items-center"
+            >
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl w-full">
+                    {feature.map((item, index) => (
+                        <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 60 }}
+                            animate={inView ? { opacity: 1, y: 0 } : {}}
+                            transition={{ duration: 0.7, delay: index * 0.2 }}
+                            className="bg-white rounded-2xl shadow-md p-8 text-center hover:shadow-xl transition-all duration-300"
+                        >
+                            <div className="flex flex-col items-center justify-center">
+                                <div className="mb-5">
+                                    <img
+                                        src={item.src}
+                                        alt={item.title}
+                                        width={90}
+                                        height={90}
+                                        className="object-contain"
+                                    />
+                                </div>
+                                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                                    {item.title}
+                                </h3>
+                                <p className="text-gray-600 leading-relaxed">{item.description}</p>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+            </section>
 
             <section className="flex flex-col items-center justify-center gap-10 px-6 sm:px-10 lg:px-20 pt-16 pb-10 w-full bg-white rounded-t-[40px] overflow-hidden">
                 <div className=" relative flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-20 w-full max-w-[1400px]">
@@ -281,6 +284,7 @@ export default function SubService({ project }: DefaultProps) {
                     </div>
                 </div>
             </section>
+
         </div>
     );
 };

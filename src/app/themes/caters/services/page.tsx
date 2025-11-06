@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useRef } from "react";
-import { motion, useInView, Variants } from "framer-motion";
-import { useRouter } from "next/navigation";
+import React from "react";
+import { motion, Variants } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { User } from "@/types/user";
 interface DefaultProps { project?: User; };
@@ -63,12 +62,13 @@ export default function Service({ project }: DefaultProps) {
     const fadeUp: Variants = {
         hidden: { opacity: 0, y: 40 },
         visible: (delay = 0) => ({
-            opacity: 1, y: 0,
-            transition: { delay, duration: 0.6, ease: "easeOut", },
+            opacity: 1, y: 0, transition: { delay, duration: 0.6, ease: "easeOut", },
         }),
     };
+
     return (
         <div>
+
             <section className="relative w-full h-[60vh] md:h-[80vh] flex items-center justify-center overflow-hidden">
                 {/* --- Background Image --- */}
                 <img

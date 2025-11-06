@@ -2,6 +2,7 @@
 import "./caters.css";
 import Header from "./components/header/page";
 import Footer from "./components/footer/page";
+import Testimonials from "./testimonials/page";
 
 export default function Layout({ children, project, }: { children: React.ReactNode; project: any; }) {
   return (
@@ -9,6 +10,7 @@ export default function Layout({ children, project, }: { children: React.ReactNo
       <Header project={project} />
       <main className="flex-1">{children}</main>
       <Footer project={project} />
+      <Testimonials project={project} />
     </div>
   );
 };
@@ -39,4 +41,4 @@ export default function Layout({ children, project, }: { children: React.ReactNo
 //       <Footer project={project} />
 //     </div>
 //   );
-// }
+// };

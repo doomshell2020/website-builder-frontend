@@ -37,7 +37,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
         setName(name);
       } catch (error: any) {
         console.error("🔴 Admin Profile Error:", error?.message || error);
-        // logout?.();
+        logout?.();
       } finally {
         if (isActive) setLoading(false);
       }
