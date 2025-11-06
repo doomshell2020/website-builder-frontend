@@ -32,7 +32,7 @@ export default function ImageUpload({
             "image/tiff",
             "image/webp",
         ];
-        const maxSize = 2 * 1024 * 1024; // 2 MB
+        const maxSize = 1 * 1024 * 1024; // 2 MB
 
         if (!validTypes.includes(file.type)) {
             SwalError({
