@@ -11,7 +11,6 @@ import { WebsiteTypeAttribute } from "@/types/theme";
 import { Button } from "@/components/ui/Button";
 import Loader from '@/components/ui/loader'
 
-
 export default function websiteTypeListPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -146,9 +145,18 @@ export default function websiteTypeListPage() {
             >
               <Edit size={18} color="green" />
             </button>
-            <button title="Delete" onClick={() => handleDelete(row.id)}>
-              <Trash2 size={16} color="red" />
+            <button
+              title={row?.Users?.length > 0 ? "Theme in use — cannot delete" : "Delete"}
+              onClick={() => handleDelete(row.id)}
+              disabled={row?.Users?.length > 0}
+              style={{
+                opacity: row?.Users?.length > 0 ? 0.5 : 1,
+                cursor: row?.Users?.length > 0 ? "not-allowed" : "pointer",
+              }}
+            >
+              <Trash2 size={16} color={row?.Users?.length > 0 ? "gray" : "red"} />
             </button>
+
           </div>
         ),
         width: "10%",

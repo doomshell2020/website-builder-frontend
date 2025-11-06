@@ -233,8 +233,8 @@ const UsersListPage = () => {
                 sortable: true,
             },
             {
-                name: "Role",
-                selector: (row: User) => (row?.roleData ? String(row?.roleData?.name) : "N/A"),
+                name: "Company",
+                selector: (row: User) => (row?.company_name ? String(row?.company_name) : "N/A"),
                 width: "10%",
                 sortable: true,
             },

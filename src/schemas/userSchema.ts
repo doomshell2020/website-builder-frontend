@@ -53,7 +53,6 @@ export const userSchema = z.object({
         message: "Enter up to 4 valid Indian landline numbers, comma-separated",
     }),
     status: z.union([z.literal("Y"), z.literal("N")]).optional(),
-    role: z.enum(["2", "3"]).optional(),
     image: z.string().nullable().optional(),
     fburl: z.string().url("Invalid Facebook URL").nullable().optional().or(z.literal("")),
     xurl: z.string().url("Invalid Twitter URL").nullable().optional().or(z.literal("")),
@@ -135,9 +134,6 @@ export const addUserSchema = z.object({
         message: "Enter up to 4 valid Indian landline numbers, comma-separated",
     }),
     status: z.union([z.literal("Y"), z.literal("N")]).optional(),
-    role: z.string().refine((val) => val === "2" || val === "3", {
-        message: "Please select a role",
-    }),
     website_type: z.string()
         .min(1, { message: "Please select a Theme" }),
     image: z.any().optional().refine(
@@ -165,13 +161,6 @@ export const addUserSchema = z.object({
 });
 
 export const updateUserSchema = addUserSchema.partial().extend({
-    role: z
-        .string()
-        .optional()
-        .refine(
-            (val) => !val || val === "3" || val === "4",
-            { message: "Please select a valid role" }
-        ),
     image: z
         .any()
         .optional()

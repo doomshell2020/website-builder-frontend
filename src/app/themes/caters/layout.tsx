@@ -9,8 +9,8 @@ export default function Layout({ children, project, }: { children: React.ReactNo
     <div className="min-h-screen flex flex-col" id="caters-theme">
       <Header project={project} />
       <main className="flex-1">{children}</main>
-      <Footer project={project} />
       <Testimonials project={project} />
+      <Footer project={project} />
     </div>
   );
 };

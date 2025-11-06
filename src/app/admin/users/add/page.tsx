@@ -75,7 +75,6 @@ export default function AddUser() {
             formData.append("email", data.email);
             formData.append("password", data.password);
             formData.append("company_name", data.company_name);
-            formData.append("role", data.role);
             formData.append("website_type", data.website_type);
             formData.append("mobile_no", data.mobile_no.trim());
             formData.append("office_no", data.office_no.trim());
@@ -376,33 +375,6 @@ export default function AddUser() {
                             )}
                         </div>
 
-                        {/* Role */}
-                        <div className="flex flex-col">
-                            {/* Role Selection */}
-                            <Label htmlFor="role" className="mb-1 font-medium">
-                                Role <span className="text-red-600">*</span>
-                            </Label>
-                            <div className="relative">
-                                <select
-                                    id="role"
-                                    {...register("role")}
-                                    className="w-full py-2 pl-3 pr-8 text-sm text-gray-800 bg-transparent border border-gray-300 rounded-lg appearance-none dark:bg-dark-900 h-9 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 cursor-pointer"
-                                    defaultValue="" // Always start empty for proper validation
-                                >
-                                    <option value="" disabled>--Select Role--</option>
-                                    <option value="2">Tenant</option>
-                                    <option value="3">User</option>
-                                </select>
-                                <ChevronDown
-                                    size={16}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
-                                />
-                            </div>
-                            {typeof errors?.role?.message === "string" && (
-                                <p className="text-red-600 text-sm mt-1">{errors.role.message}</p>
-                            )}
-                        </div>
-
                         {/* Mobile */}
                         <div className="flex flex-col">
                             <Label htmlFor="mobile_no" className="mb-1 font-medium">
@@ -651,7 +623,7 @@ export default function AddUser() {
                         {/** Address */}
                         <div className="flex flex-col">
                             <Label htmlFor="address1" className="mb-1 font-medium">
-                                Address <span className="text-red-600">*</span>
+                                Current Address <span className="text-red-600">*</span>
                             </Label>
                             <Textarea
                                 id="address1"

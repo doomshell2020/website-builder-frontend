@@ -6,6 +6,7 @@ export interface WebsiteTypeAttribute {
     status?: string;
     createdAt?: Date;
     updatedAt?: Date;
+    Users?:any;
     res?: any;
     result?: any;
 };

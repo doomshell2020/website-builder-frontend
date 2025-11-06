@@ -618,7 +618,7 @@ export default function UpdateUser() {
                             {/** Address 1 */}
                             <div className="flex flex-col">
                                 <Label htmlFor="address1" className="mb-1 font-medium">
-                                    Address <span className="text-red-600">*</span>
+                                    Current Address <span className="text-red-600">*</span>
                                 </Label>
                                 <Textarea
                                     id="address1"
