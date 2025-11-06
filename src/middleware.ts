@@ -9,12 +9,21 @@ export async function middleware(request: NextRequest) {
   const role = cookies.get("role")?.value;
 
   const host = request.headers.get("host") || "";
-  const baseDomains = ["baaraat.com", "doomshell.com", "website-builder-frontend-three.vercel.app", "localhost"];
+  const isLocal =
+    host.includes("localhost") || host.includes("127.0.0.1");
+
+  const baseDomains = [
+    "baaraat.com",
+    "doomshell.com",
+    "website-builder-frontend-three.vercel.app",
+    "localhost",
+  ];
+
+  // Detect main/base domain
   const baseDomain = baseDomains.find((d) => host.endsWith(d));
   const subdomain = baseDomain ? host.replace(`.${baseDomain}`, "") : null;
-  const isLocal = host.includes("localhost") || host.includes("127.0.0.1");
 
-  // Skip static files or API calls
+  // 🚫 Skip static assets & API routes
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
@@ -24,18 +33,50 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Handle admin/user authentication
-  if (pathname.startsWith("/admin") || pathname.startsWith("/user")) {
+  // ✅ Allow /admin, /administrator, /user ONLY on main domain (baaraat.com)
+  if (
+    (pathname.startsWith("/admin") ||
+      pathname.startsWith("/administrator") ||
+      pathname.startsWith("/user")) &&
+    host !== "baaraat.com"
+  ) {
+    // Other domains/subdomains trying to access admin => redirect to their homepage
+    const homeUrl = new URL("/", request.url);
+    return NextResponse.redirect(homeUrl);
+  }
+
+  // 🔒 Auth check for admin/user on main domain
+  if (
+    host === "baaraat.com" &&
+    (pathname.startsWith("/admin") ||
+      pathname.startsWith("/administrator") ||
+      pathname.startsWith("/user"))
+  ) {
     if (!token) {
       const loginUrl = new URL("/administrator", request.url);
       const response = NextResponse.redirect(loginUrl);
-      cookies.getAll().forEach((c) => response.cookies.set(c.name, "", { path: "/", maxAge: 0 }));
+      cookies.getAll().forEach((c) =>
+        response.cookies.set(c.name, "", { path: "/", maxAge: 0 })
+      );
       return response;
     }
   }
 
-  // 🌐 Handle Subdomain (tenant) requests
-  if ((baseDomain && subdomain && subdomain !== "www") || isLocal) {
+  // 🌐 Handle subdomain-based tenant sites
+  if (
+    (baseDomain && subdomain && subdomain !== "www" && host !== "baaraat.com") ||
+    isLocal
+  ) {
+    // Special: allow vercel preview and dev hostnames to pass normally
+    if (
+      subdomain === "webbuilder" ||
+      host === "website-builder-frontend-three.vercel.app" ||
+      host === "www.navlokcolonizers.com"
+    ) {
+      return NextResponse.next();
+    }
+
+    // Rewrite subdomain traffic to /site/{projectSlug}
     const projectSlug = subdomain || pathname.split("/")[0];
     const newPath =
       isLocal && pathname.startsWith(`/${projectSlug}`)
@@ -51,5 +92,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next|.\\..).*)"],
+  matcher: ["/((?!_next|.*\\..*).*)"],
 };
