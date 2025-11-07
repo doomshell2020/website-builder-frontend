@@ -13,7 +13,6 @@ import Loader from "@/components/ui/loader";
 import { Facebook, Twitter, Instagram, Linkedin, Youtube, } from "lucide-react";
 import DomainSetup from "@/components/domains/CustomDomainSetup";
 
-
 const UsersViewPage = () => {
     const router = useRouter();
     const { id } = useParams();

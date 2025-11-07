@@ -555,26 +555,38 @@ const UsersListPage = () => {
                 </div>
             </main>
             {openCustomDomainSetup && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                    <div className="bg-white rounded-2xl shadow-lg w-full max-w-2xl p-6 relative animate-fadeIn">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+                    {/* Scroll container */}
+                    <div className="relative w-full max-w-2xl max-h-[80vh] overflow-y-auto bg-white rounded-2xl shadow-xl p-6 animate-fadeIn">
                         {/* Close button */}
                         <button
                             onClick={() => setOpenCustomDomainSetup(false)}
-                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 transition"
                         >
                             ✕
                         </button>
 
-                        <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        {/* Header */}
+                        <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
                             🌐 Custom Domain Setup
                         </h2>
 
-                        {selectedUserId && (
-                            <DomainSetup userId={Array.isArray(selectedUserId) ? selectedUserId[0] : selectedUserId} />
-                        )}
+                        {/* Scrollable Content */}
+                        <div className="space-y-4">
+                            {selectedUserId && (
+                                <DomainSetup
+                                    userId={
+                                        Array.isArray(selectedUserId)
+                                            ? selectedUserId[0]
+                                            : selectedUserId
+                                    }
+                                />
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
+
 
         </div>
     );
