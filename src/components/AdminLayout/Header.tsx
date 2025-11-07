@@ -41,8 +41,6 @@ const Header = () => {
     setIsProfileOpen(false);
   };
 
-
-
   const handleLogout = async () => {
     const result = await Swal.fire({
       title: "Are you sure",
@@ -88,7 +86,7 @@ const Header = () => {
               <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-50">
                 <div className="py-2">
                   <Link
-                    href="#"
+                    href="#myaccount"
                     className="block px-4 py-2 text-sm hover:bg-blue-500 text-gray-900 transition-colors"
                     onClick={handleAccountClick}
                   >
@@ -96,7 +94,7 @@ const Header = () => {
                   </Link>
 
                   <Link
-                    href="#"
+                    href="#logout"
                     className="block px-4 py-2 text-sm hover:bg-blue-500 text-gray-900"
                     onClick={handleLogout}
                   >
@@ -114,119 +112,3 @@ const Header = () => {
 };
 
 export default Header;
-
-
-{/**
-"use client";
-
-import { useState, useContext, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { ChevronDown, User } from "lucide-react";
-import Navigation from "@/components/ui/Navigation";
-import Link from "next/link";
-import Logo from '@/components/Logo';
-import { logout, removeAuthToken, getRole } from "@/lib/auth";
-import { AdminProfile } from '../../services/admin.service'
-import { AdminContext } from "@/lib/adminContext";
-
-const Header = () => {
-  const router = useRouter();
-  const { name, id, loading } = useContext(AdminContext);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const profileRef = useRef<HTMLDivElement>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
-
-  // const [id, setId] = useState(0);
-  // const [name2, setName] = useState<string | null>(null);
-  // useEffect(() => {
-  //   AdminProfile()
-  //     .then((res) => {
-  //       setId(res.data.result.id);
-  //       setName(res.data.result.name);
-  //     })
-  //     .catch((err) => {
-  //       if (err?.response?.data?.status === false) {
-  //         logout();
-  //       }
-  //     });
-  // }, [router]);
-
-  useEffect(() => {
-    const role = getRole?.(); // assuming this returns '1' or '2'
-    setUserRole(role);
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        profileRef.current &&
-        !profileRef.current.contains(event.target as Node)
-      ) {
-        setIsProfileOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  return (
-    <>
-      <header className="bg-[#293042] text-xs p-4 border-b">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            <Logo className="justify-center" />
-          </div>
-          <div className="relative" ref={profileRef}>
-            <button
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="flex items-center space-x-2 text-blue-600"
-            >
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                <User size={16} className="text-white" />
-              </div>
-              <span className="text-white outline-none hover:underline hover:decoration-white">
-                {name}
-              </span>
-              <ChevronDown size={16} className="text-white" />
-            </button>
-
-            {isProfileOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-50">
-                <div className="py-2">
-                  <Link
-                    href="#"
-                    className="block px-4 py-2 text-sm hover:bg-blue-500 text-gray-900 transition-colors"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (!userRole) return; // optional guard
-                      router.push(
-                        userRole === '1'
-                          ? `/admin/myaccount/edit/${id}`
-                          : `/user/myaccount/edit/${id}`
-                      );
-                      setIsProfileOpen(false);
-                    }}
-                  >
-                    My Account
-                  </Link>
-
-                  <Link
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      logout();
-                    }}
-                    className="block px-4 py-2 text-sm hover:bg-blue-500 text-gray-900"
-                  >
-                    Logout
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
-      <Navigation />
-    </>
-  );
-};
-
-export default Header;
-*/}

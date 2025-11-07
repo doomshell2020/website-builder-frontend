@@ -20,15 +20,25 @@ export const getUserById = async (id: string): Promise<{ result: User }> => {
   return response.data;
 };
 
-export const fetchProject = async (company_name: string): Promise<any> => {
+export const fetchProject = async (identifier: string): Promise<any> => {
   try {
-    const response = await API.get(`/company/view-company/${company_name}`);
-    return response.data;  // { status: true, result: {...} }
+    // 🧠 Detect if identifier is a domain (contains a dot)
+    const isDomain = identifier.includes(".");
+
+    const endpoint = isDomain
+      ? `/company/view-company-by-domain/${identifier}`
+      : `/company/view-company/${identifier}`;
+
+    const response = await API.get(endpoint);
+
+    return response.data; // Expected: { status: true, result: {...} }
   } catch (error: any) {
-    return { status: false, message: error?.response?.data?.message || "Project not found" };
+    return {
+      status: false,
+      message: error?.response?.data?.message || "Project not found",
+    };
   }
 };
-
 
 export const searchUsers = async (
   params: { searchParams?: string; fromDate?: string; toDate?: string }, page: number, limit: number,

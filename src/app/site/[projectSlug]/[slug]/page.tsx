@@ -1,37 +1,41 @@
+// site/[projectSlug]/[slug]/page.tsx
 import NotFoundPage from "@/app/not-found";
 import { fetchProject } from "@/services/userService";
 import StaticPageFallback from "@/components/StaticPageFallback";
 
 export default async function ThemeRouter({
   params,
-}: { params: Promise<{ projectSlug: string; slug?: string[] }>; }) {
+}: {
+  params: Promise<{ projectSlug: string; slug?: string[] }>;
+}) {
   const { projectSlug, slug } = await params;
-  console.log("slug: ", slug);
 
   const pageName = (Array.isArray(slug) ? slug.join("/") : slug) || "home";
+
+  // 1️⃣ Fetch project
   const project = await fetchProject(projectSlug);
   if (!project?.status) return <NotFoundPage />;
 
   const ProjectDetail = project.result;
   const themeName =
-    project?.result?.Theme?.name?.toLowerCase().replace(/\s+/g, "-") ?? "default";
-
-  // console.log("ProjectDetail: ", ProjectDetail);
-  // console.log("themeName: ", themeName);
+    ProjectDetail?.Theme?.slug?.trim()
+      ? ProjectDetail.Theme.slug.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
+      : "default";
 
   try {
-    // ✅ Load Layout and Page dynamically
+    // 2️⃣ Load Layout + Theme Page
     const ThemeLayout = (await import(`@/app/themes/${themeName}/layout`)).default;
 
-    let ThemePage: any;
-
+    let ThemePage;
     try {
       ThemePage = (await import(`@/app/themes/${themeName}/${pageName}/page`)).default;
     } catch (pageErr) {
-
-      console.warn(`Page '${pageName}' not found for theme '${themeName}', using StaticPage fallback.`);
-
-      ThemePage = () => <StaticPageFallback company={project?.result?.company_name} slug={pageName} />;
+      console.warn(
+        `⚠️ Page '${pageName}' not found in theme '${themeName}', using fallback.`
+      );
+      ThemePage = () => (
+        <StaticPageFallback company={ProjectDetail.company_name} slug={pageName} />
+      );
     }
 
     return (
@@ -40,7 +44,7 @@ export default async function ThemeRouter({
       </ThemeLayout>
     );
   } catch (err) {
-    console.error("Theme or layout not found:", err);
+    console.error("❌ Theme or layout not found:", err);
     return <NotFoundPage />;
   }
 }

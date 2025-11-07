@@ -7,95 +7,99 @@ export async function middleware(request: NextRequest) {
   const token = cookies.get("admin_token")?.value;
 
   const host = request.headers.get("host") || "";
+  const cleanHost = host.split(":")[0]; // strip :3000
   const isLocal =
     host.includes("localhost") ||
     host.includes("127.0.0.1") ||
     host.includes("webbuilder.local");
 
-  const baseDomains = [
-    "baaraat.com",
-    "doomshell.com",
-    "website-builder-frontend-three.vercel.app",
-    "localhost",
-    "webbuilder.local",
-  ];
+  // ------------------ Domain setup ------------------
+  const MAIN_DOMAIN = "baaraat.com";
+  const LOCAL_DEV_DOMAIN = "webbuilder.local";
+  const VERCEL_DOMAIN = "website-builder-frontend-three.vercel.app";
+  const LOCAL_DOMAINS = ["localhost:3000", "webbuilder.local:3000"];
 
-  const baseDomain = baseDomains.find((d) => host.endsWith(d));
-  const subdomain = baseDomain ? host.replace(`.${baseDomain}`, "") : null;
+  const baseDomains = [MAIN_DOMAIN, VERCEL_DOMAIN, LOCAL_DEV_DOMAIN, ...LOCAL_DOMAINS];
+  const baseDomain = baseDomains.find((d) => cleanHost.endsWith(d));
+  const subdomain = baseDomain ? cleanHost.replace(`.${baseDomain}`, "") : null;
 
-  // Skip assets & API
+  // ------------------ Skip static assets ------------------
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
-    pathname === "/favicon.ico"
+    pathname === "/favicon.ico" ||
+    pathname.startsWith("/images") ||
+    pathname.startsWith("/uploads")
   ) {
     return NextResponse.next();
   }
 
-  // Admin pages → only on main domain
-  // ✅ Allow /admin, /administrator, /user on main and local dev domains
+  // ------------------ Allow main domains home & admin access ------------------
   if (
-    (pathname.startsWith("/admin") ||
-      pathname.startsWith("/administrator") ||
-      pathname.startsWith("/user")) &&
-    !["baaraat.com", "www.baaraat.com", "webbuilder.local:3000", "localhost:3000"].includes(host)
+    cleanHost === MAIN_DOMAIN ||
+    cleanHost === `www.${MAIN_DOMAIN}` ||
+    cleanHost === LOCAL_DEV_DOMAIN ||
+    LOCAL_DOMAINS.includes(host)
   ) {
-    const homeUrl = new URL("/", request.url);
-    return NextResponse.redirect(homeUrl);
-  }
-
-  // Auth check (main domain only)
-  if (
-    (host === "baaraat.com" || host === "www.baaraat.com") &&
-    (pathname.startsWith("/admin") ||
-      pathname.startsWith("/administrator") ||
-      pathname.startsWith("/user"))
-  ) {
-    if (!token) {
-      // ✅ Avoid redirect loop
-      if (pathname === "/administrator") {
-        return NextResponse.next();
-      }
-
-      const loginUrl = new URL("/administrator", request.url);
-      const res = NextResponse.redirect(loginUrl);
-      cookies.getAll().forEach((c) =>
-        res.cookies.set(c.name, "", { path: "/", maxAge: 0 })
-      );
-      return res;
-    }
-  }
-
-
-  // Subdomain or local site
-  if (
-    (baseDomain && subdomain && subdomain !== "www" && !host.includes("baaraat.com")) ||
-    isLocal
-  ) {
-    // ✅ Allow these domains directly
+    // ✅ Admin route auth check
     if (
-      subdomain === "webbuilder" ||
-      host === "webbuilder.local:3000" ||
-      host === "website-builder-frontend-three.vercel.app" ||
-      host === "www.navlokcolonizers.com"
+      pathname.startsWith("/admin") ||
+      pathname.startsWith("/administrator") ||
+      pathname.startsWith("/user")
     ) {
-      return NextResponse.next();
+      if (!token && pathname !== "/administrator") {
+        const loginUrl = new URL("/administrator", request.url);
+        const res = NextResponse.redirect(loginUrl);
+
+        // clear all cookies if unauthenticated
+        cookies.getAll().forEach((c) =>
+          res.cookies.set(c.name, "", { path: "/", maxAge: 0 })
+        );
+        return res;
+      }
     }
 
-    const projectSlug = subdomain || pathname.split("/")[0];
-    const newPath =
-      isLocal && pathname.startsWith(`/${projectSlug}`)
-        ? pathname.replace(`/${projectSlug}`, "")
-        : pathname;
+    // ✅ Home route `/` or any public path — allow free access
+    return NextResponse.next();
+  }
 
+  // ------------------ Subdomains for projects ------------------
+  // Example: jaipurfoodcaterers.webbuilder.local / navlok.baaraat.com
+  if (
+    (baseDomain === MAIN_DOMAIN || baseDomain === LOCAL_DEV_DOMAIN) &&
+    subdomain &&
+    subdomain !== "www"
+  ) {
+    // console.log("🌀 Rewriting for subdomain:", subdomain);
     const url = request.nextUrl.clone();
-    url.pathname = `/site/${projectSlug}${newPath}`;
+    url.pathname = `/site/${subdomain}${pathname}`;
+    // console.log("➡️ Rewrite to:", url.pathname);
     return NextResponse.rewrite(url);
   }
 
+  // ------------------ Custom external domains ------------------
+  // Example: jaipurfoodcaterers.com → acts like jaipurfoodcaterers.baaraat.com
+  if (
+    !baseDomain &&
+    !cleanHost.endsWith(MAIN_DOMAIN) &&
+    !cleanHost.endsWith(VERCEL_DOMAIN) &&
+    !cleanHost.endsWith(LOCAL_DEV_DOMAIN)
+  ) {
+    const projectSlug = cleanHost.replace(/^www\./, "").split(".")[0].toLowerCase();
+    const url = request.nextUrl.clone();
+    url.pathname = `/site/${projectSlug}${pathname}`;
+    return NextResponse.rewrite(url);
+  }
+
+  // ------------------ Vercel / fallback handling ------------------
+  if (isLocal || host === VERCEL_DOMAIN || LOCAL_DOMAINS.includes(host)) {
+    return NextResponse.next();
+  }
+
+  // Default
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!_next|.*\\..*).*)"],
+  matcher: ["/((?!_next|api|favicon.ico|images|uploads|.*\\..*).*)"],
 };
