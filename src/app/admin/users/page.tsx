@@ -17,8 +17,11 @@ import { Button } from "@/components/ui/Button";
 import { exportToExcel } from "@/lib/exportToExcel";
 import { exportToPdf } from "@/lib/exportToPdf";
 import Image from "next/image";
+import Link from "next/link";
 import { Input } from "@/components/ui/Input";
 import Loader from "@/components/ui/loader";
+import DomainSetup from "@/components/domains/CustomDomainSetup";
+
 
 const UsersListPage = () => {
 
@@ -34,6 +37,10 @@ const UsersListPage = () => {
     const [totalPages, setTotalPages] = useState(0);
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredData, setFilteredData] = useState<User[]>([]);
+    const [openCustomDomainSetup, setOpenCustomDomainSetup] = useState(false);
+    const [selectedUserId, setSelectedUserId] = useState<string | number | null>(null);
+
+
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -226,23 +233,53 @@ const UsersListPage = () => {
                 selector: (row: User) => row.email || "N/A",
                 sortable: true,
             },
+            // {
+            //     name: "Mobile",
+            //     selector: (row: User) => (row.mobile_no ? String(row.mobile_no) : "N/A"),
+            //     width: "12%",
+            //     sortable: true,
+            // },
             {
-                name: "Mobile",
-                selector: (row: User) => (row.mobile_no ? String(row.mobile_no) : "N/A"),
-                width: "12%",
+                name: "Subdomain",
+                selector: (row: User) => row?.company_name ? `https://${row.company_name}.baaraat.com` : "N/A",
+                cell: (row: User) =>
+                    row?.company_name ? (
+                        <Link
+                            href={`https://${row.company_name}.baaraat.com`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline"
+                        >
+                            {`${row.company_name}.baaraat.com`}
+                        </Link>
+                    ) : (
+                        "N/A"
+                    ),
+                width: "16%",
                 sortable: true,
             },
             {
-                name: "Company",
-                selector: (row: User) => (row?.company_name ? String(row?.company_name) : "N/A"),
-                width: "10%",
-                sortable: true,
+                name: "Custom Domain",
+                cell: (row: User) => (
+                    <button
+                        onClick={() => {
+                            setSelectedUserId(row.id);
+                            setOpenCustomDomainSetup(true);
+                        }}
+                        className="inline-flex items-center justify-center gap-1 rounded-md bg-gradient-to-r from-blue-600 to-blue-500 text-white text-sm font-medium px-4 py-1.5 shadow hover:from-blue-700 hover:to-blue-600 transition-all duration-200"
+                    >
+                        <span className="text-lg font-bold leading-none">+</span>
+                        Custom Domain
+                    </button>
+                ),
+                width: "15%",
+                sortable: false,
             },
             {
                 name: "Created",
                 selector: (row: User) =>
                     row.createdAt ? formatDate(row.createdAt, "DD-MM-YYYY hh:mm A") : "—",
-                width: "15%", // You might want to increase width
+                width: "12%", // You might want to increase width
                 sortable: true,
             },
             {
@@ -517,6 +554,28 @@ const UsersListPage = () => {
                     </div>
                 </div>
             </main>
+            {openCustomDomainSetup && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                    <div className="bg-white rounded-2xl shadow-lg w-full max-w-2xl p-6 relative animate-fadeIn">
+                        {/* Close button */}
+                        <button
+                            onClick={() => setOpenCustomDomainSetup(false)}
+                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+                        >
+                            ✕
+                        </button>
+
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                            🌐 Custom Domain Setup
+                        </h2>
+
+                        {selectedUserId && (
+                            <DomainSetup userId={Array.isArray(selectedUserId) ? selectedUserId[0] : selectedUserId} />
+                        )}
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };

@@ -11,6 +11,7 @@ import Image from "next/image";
 import { formatDate } from "@/lib/date";
 import Loader from "@/components/ui/loader";
 import { Facebook, Twitter, Instagram, Linkedin, Youtube, } from "lucide-react";
+import DomainSetup from "@/components/domains/CustomDomainSetup";
 
 const UsersViewPage = () => {
     const router = useRouter();
@@ -207,6 +208,14 @@ const UsersViewPage = () => {
                                                         No social links provided
                                                     </p>
                                                 )}
+                                            </div>
+                                            {/* 🌐 Custom Domain Setup Section */}
+                                            <div className="mt-8 border-t pt-6">
+                                                <h2 className="text-md font-semibold text-gray-700 mb-4 flex items-center">
+                                                    🌐 Custom Domain Setup
+                                                </h2>
+                                                {/* <DomainSetup userId={id} /> */}
+                                                <DomainSetup userId={Array.isArray(id) ? id[0] : id} />;
                                             </div>
                                         </div>
                                     );

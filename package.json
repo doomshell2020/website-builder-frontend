@@ -44,6 +44,7 @@
     "@radix-ui/react-tooltip": "^1.1.4",
     "@reduxjs/toolkit": "^2.8.2",
     "@tanstack/react-query": "^5.56.2",
+    "@vercel/sdk": "^1.17.0",
     "axios": "^1.9.0",
     "bootstrap": "^5.3.7",
     "class-variance-authority": "^0.7.1",
