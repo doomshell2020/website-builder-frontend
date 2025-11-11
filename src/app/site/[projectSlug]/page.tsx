@@ -6,9 +6,8 @@ export default async function ProjectEntry({ params }: { params: { projectSlug: 
   const { projectSlug } = await params;
 
   // 1️⃣ Fetch project data (by slug or domain)
-  const project = await fetchProject(projectSlug);  
+  const project = await fetchProject(projectSlug);
   if (!project?.status) return <NotFoundPage />;
-
   const ProjectDetail = project.result;
 
   // 2️⃣ Resolve theme name safely

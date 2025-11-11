@@ -2,8 +2,8 @@
 import type { NextConfig } from "next";
 
 const imageDomains =
-  process.env.BUILD_TARGET === 'development'
-    ? ['localhost', '127.0.0.1']
+  process.env.BUILD_TARGET == 'development'
+    ? ['localhost', '127.0.0.1', '192.168.0.77']
     : [process.env.NEXT_PUBLIC_IMAGE_URL || 'baaraat.com'];
 
 const nextConfig: NextConfig = {

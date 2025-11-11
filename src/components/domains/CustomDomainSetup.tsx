@@ -242,7 +242,7 @@ export default function CustomDomainSetup({ userId }: CustomDomainSetupProps) {
                 <tr>
                   <td className="p-2 border">CNAME</td>
                   <td className="p-2 border">www</td>
-                  <td className="p-2 border">cname.vercel-dns.com</td>
+                  <td className="p-2 border">2debca2989ac041b.vercel-dns-017.com.</td>
                 </tr>
               </tbody>
             </table>

@@ -16,7 +16,10 @@ export interface User {
   roleData?: any;
   role?: string;
   websiteType?: any;
+  Theme?: any;
   company_name?: string | null;
+  subdomain?: string | null;
+  schema_name?: string | null;
   company_logo?: string | null;
   gstin?: string | null;
   image?: string | null;

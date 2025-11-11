@@ -28,16 +28,13 @@ export default function ImageUpload({
             "image/jpeg",
             "image/jpg",
             "image/png",
-            "image/gif",
-            "image/tiff",
-            "image/webp",
         ];
         const maxSize = 1 * 1024 * 1024; // 1 MB
 
         if (!validTypes.includes(file.type)) {
             SwalError({
                 title: "Invalid File Type",
-                message: "Only JPG, JPEG, PNG, GIF, TIFF, and WEBP images are allowed.",
+                message: "Only JPG, or JPEG images are allowed.",
             });
             e.target.value = "";
             return;
@@ -46,7 +43,7 @@ export default function ImageUpload({
         if (file.size > maxSize) {
             SwalError({
                 title: "File Too Large",
-                message: "Please upload an image smaller than 1 MB.",
+                message: `Please upload an image smaller than ${maxSize} MB.`,
             });
             e.target.value = "";
             return;
@@ -68,19 +65,6 @@ export default function ImageUpload({
 
     return (
         <>
-            {/* Simple Image Preview */}
-            {/* {preview && (
-                <div className="mb-2">
-                    <Image
-                        src={preview}
-                        alt="Selected"
-                        width={150}
-                        height={150}
-                        className="object-cover border rounded"
-                    />
-                </div>
-            )} */}
-
             {/* File Input */}
             <input
                 type="file"

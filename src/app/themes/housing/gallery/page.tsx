@@ -29,7 +29,7 @@ export default function HousingGallery({ project }: DefaultProps) {
 
     useEffect(() => {
         const fetchGalleryImages = async () => {
-            if (!project?.company_name) {
+            if (!project?.schema_name) {
                 setImagePreviews(fallbackImages);
                 setLoading(false);
                 return;
@@ -38,7 +38,7 @@ export default function HousingGallery({ project }: DefaultProps) {
             setLoading(true);
 
             try {
-                const res: any = await findGalleryBySlug(project.company_name, "gallery");
+                const res: any = await findGalleryBySlug(project.schema_name, "gallery");
                 const data = res?.result || res;
                 let imgs: string[] = [];
                 if (data?.images) {

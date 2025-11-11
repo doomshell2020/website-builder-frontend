@@ -1,0 +1,289 @@
+"use client";
+
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+import { User } from "@/types/user";
+interface DefaultProps { project?: User; };
+
+const features = [
+    {
+        icon: "https://c.animaapp.com/mhfz0577zdQtqk/img/image-68.png",
+        title: "High-Quality Ingredients",
+        description:
+            "We use fresh, high-quality ingredients to create delicious, flavorful dishes that elevate every event.",
+    },
+    {
+        icon: "https://c.animaapp.com/mhfz0577zdQtqk/img/image-69.png",
+        title: "Customized Setups",
+        description:
+            "Get beautifully customized setups tailored to your theme, creating a unique and memorable experience.",
+    },
+    {
+        icon: "https://c.animaapp.com/mhfz0577zdQtqk/img/image-70.png",
+        title: "Professional Service",
+        description:
+            "Experience top-notch professional service with expert chefs, trained staff, and seamless event execution.",
+    },
+    {
+        icon: "https://c.animaapp.com/mhfz0577zdQtqk/img/image-71.png",
+        title: "Tailored Menus",
+        description:
+            "Enjoy tailored menus crafted to suit your taste, preferences, and event theme for a perfect dining experience.",
+    },
+];
+
+const feature = [
+    {
+        src: "https://jaipurfoodcaterers.com/wp-content/uploads/2024/08/howItWorkImg3.png   ",
+        title: "Hygiene and Safety",
+        description:
+            "At Jaipur Food Caterers, we prioritize hygiene and safety with fresh ingredients, sanitized kitchens & strict quality checks for a safe and delicious experience.",
+    },
+    {
+        src: "https://jaipurfoodcaterers.com/wp-content/uploads/2024/08/howItWorkImg2.png",
+        title: "Time-Saving",
+        description:
+            "Jaipur Food Caterers saves your time with seamless catering services, from menu planning to setup, ensuring a hassle-free and delicious experience.",
+    },
+    {
+        src: "https://jaipurfoodcaterers.com/wp-content/uploads/2024/08/howItWorkImg1.png",
+        title: "Professional Service",
+        description:
+            "Jaipur Food Caterers delivers professional service with expert chefs, trained staff, and seamless execution to make your event smooth and stress-free.",
+    },
+];
+
+export default function Birthday() {
+
+    const fadeInUp = (delay = 0) => ({
+        hidden: { opacity: 0, y: 40 },
+        visible: {
+            opacity: 1, y: 0, transition: { duration: 0.8, delay },
+        },
+    });
+
+    const { ref, inView } = useInView({
+        threshold: 0.2,
+        triggerOnce: true,
+    });
+
+    return (
+        <div>
+            <section className="relative w-full">
+                {/* --- Background Image with Overlay --- */}
+                <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden">
+                    <img
+                        className="w-full h-full object-cover"
+                        alt="About Us Banner"
+                        src="https://jaipurfoodcaterers.com/wp-content/uploads/2024/08/birthdayEventPgBnr-1.jpg"
+                    />
+                    <div className="absolute inset-0 bg-black/50" />
+                </div>
+
+                {/* --- Content Section --- */}
+                <div className="absolute inset-0 flex flex-col justify-center items-center lg:items-start px-4 lg:px-24 text-center lg:text-left">
+                    {/* Heading Animation */}
+                    <motion.h1
+                        initial={{ opacity: 0, y: 40 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        viewport={{ once: true }}
+                        className="[font-family:'Roboto',Helvetica]  font-bold text-white text-3xl md:text-5xl lg:text-[42px] leading-tight mb-4"
+                    >
+                        Birthday
+                    </motion.h1>
+
+                    {/* Subtitle Animation */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 40 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.4 }}
+                        viewport={{ once: true }}
+                        className="font-manrope font-semibold text-white text-lg md:text-xl max-w-xl"
+                    >
+                        Make your birthday special with delicious catering, fresh food & custom menus!
+                    </motion.div>
+                </div>
+            </section>
+
+            <section className="flex flex-col items-center justify-center gap-10 px-6 md:px-10 lg:px-20 pt-16 pb-10 w-full bg-white rounded-t-[40px] overflow-hidden">
+                <div className="flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-20 w-full">
+                    {/* --- Image Section --- */}
+                    <motion.div
+                        variants={fadeInUp(0.1)}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        className="flex justify-center w-full lg:w-1/2"
+                    >
+                        <img
+                            className="w-full max-w-[530px] h-auto object-cover rounded-2xl shadow-md"
+                            alt="Jaipur Food Caterers catering services"
+                            src="https://jaipurfoodcaterers.com/wp-content/uploads/2024/08/weddingEventSecImg.jpg"
+                        />
+                    </motion.div>
+
+                    {/* --- Content Section --- */}
+                    <div className="flex flex-col w-full lg:w-1/2 gap-5">
+                        <motion.div
+                            variants={fadeInUp(0.2)}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            className="font-[Satisfy] text-[#c2302e] text-2xl"
+                        >
+                            Birthday Party
+                        </motion.div>
+
+                        <motion.h2
+                            variants={fadeInUp(0.3)}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            className="font-roboto font-bold text-2xl sm:text-3xl md:text-4xl text-black leading-snug"
+                        >
+                            Enhance Your Birthday Event with Jaipur Food Caterers
+                        </motion.h2>
+
+                        <motion.div
+                            variants={fadeInUp(0.4)}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            className="text-base sm:text-lg md:text-xl text-black font-inter leading-relaxed space-y-4"
+                        >
+                            <div> Make your birthday celebration unforgettable with <span className="text-black font-bold"> Jaipur Food Caterers</span>
+                                ! We offer a delicious range of customized menus, from kids’ favorites to gourmet delights, ensuring a delightful experience for guests of all ages. Our expert chefs use fresh, high-quality ingredients to prepare mouthwatering dishes that add flavor to your special day. Whether it’s a small gathering or a grand celebration, our beautifully presented food and seamless service make every moment enjoyable.
+                            </div>
+                            <div> At <span className="text-black font-bold"> Jaipur Food Caterers</span>
+                                we take care of everything, from menu planning to setup, so you can focus on making memories. Our professional team ensures a hassle-free experience with themed setups, live food stations, and personalized service to match your party’s vibe. Let us bring taste, quality, and excellence to your birthday celebration with catering that leaves a lasting impression!
+                            </div>
+                        </motion.div>
+                    </div>
+                </div>
+
+
+            </section>
+
+            <section
+                ref={ref}
+                className="w-full bg-gradient-to-b from-white to-[#fff8f8] py-16 px-6 flex flex-col items-center"
+            >
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl w-full">
+                    {feature.map((item, index) => (
+                        <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 60 }}
+                            animate={inView ? { opacity: 1, y: 0 } : {}}
+                            transition={{ duration: 0.7, delay: index * 0.2 }}
+                            className="bg-white rounded-2xl shadow-md p-8 text-center hover:shadow-xl transition-all duration-300"
+                        >
+                            <div className="flex flex-col items-center justify-center">
+                                <div className="mb-5">
+                                    <img
+                                        src={item.src}
+                                        alt={item.title}
+                                        width={90}
+                                        height={90}
+                                        className="object-contain"
+                                    />
+                                </div>
+                                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                                    {item.title}
+                                </h3>
+                                <p className="text-gray-600 leading-relaxed">{item.description}</p>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+            </section>
+
+            <section className="flex flex-col items-center justify-center gap-10 px-6 sm:px-10 lg:px-20 pt-16 pb-10 w-full bg-white rounded-t-[40px] overflow-hidden">
+                <div className=" relative flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-20 w-full max-w-[1400px]">
+                    {/* --- Image Section --- */}
+                    <motion.div
+                        variants={fadeInUp(0.1)}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        className="relative flex items-center justify-center w-full lg:w-1/2 px-4 sm:px-6 lg:px-8"
+                    >
+                        {/* Decorative background block */}
+                        <div className="absolute top-[-40px] left-0 sm:left-[-50px] md:left-[-80px] lg:left-[-100px] 
+                  w-[40%] sm:w-[35%] md:w-[50%] h-[85%] sm:h-[115%] 
+                  bg-[#c2302e] z-0 rounded-2xl transition-all duration-300" />
+
+                        {/* Main image */}
+                        <img
+                            className="relative w-full max-w-[400px] sm:max-w-[450px] md:max-w-[500px] lg:max-w-[400px] 
+               h-auto object-cover rounded-2xl shadow-md z-10"
+                            alt="Catering service showcase"
+                            src="https://c.animaapp.com/mhfz0577zdQtqk/img/image-72.png"
+                        />
+                    </motion.div>
+
+
+                    {/* --- Content Section --- */}
+                    <div className="flex flex-col items-start w-full lg:w-1/2 gap-6">
+                        <motion.div
+                            variants={fadeInUp(0.2)}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            className="font-[Satisfy] text-[#c2302e] text-2xl"
+                        >
+                            Why Choose Us
+                        </motion.div>
+
+                        <motion.h2
+                            variants={fadeInUp(0.3)}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            className="font-roboto font-bold text-2xl sm:text-3xl md:text-4xl text-black leading-snug"
+                        >
+                            20 Years of Experience <br className="hidden sm:block" /> in
+                            Catering Service
+                        </motion.h2>
+
+                        <div className="flex flex-col items-start justify-center gap-6 w-full">
+                            {features.map((feature, index) => (
+                                <motion.div
+                                    key={index}
+                                    variants={fadeInUp(0.4 + index * 0.2)}
+                                    initial="hidden"
+                                    whileInView="visible"
+                                    viewport={{ once: true }}
+                                    className="w-full"
+                                >
+                                    <Card className="w-full border-0 shadow-none bg-transparent">
+                                        <CardContent className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-8 w-full p-0">
+                                            <div className="flex items-center justify-center p-3 bg-[#c2302e] rounded-[35px] flex-shrink-0 w-[70px] h-[70px]">
+                                                <img
+                                                    className="w-[50px] h-[50px] object-contain"
+                                                    alt={feature.title}
+                                                    src={feature.icon}
+                                                />
+                                            </div>
+
+                                            <div className="flex flex-col items-start justify-center flex-1">
+                                                <h3 className="font-roboto font-semibold text-[#c2302e] text-xl sm:text-2xl md:text-3xl leading-normal">
+                                                    {feature.title}
+                                                </h3>
+                                                <p className="font-roboto text-black text-base sm:text-lg md:text-xl leading-relaxed">
+                                                    {feature.description}
+                                                </p>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    );
+};

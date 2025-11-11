@@ -5,8 +5,9 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter, useParams } from "next/navigation";
-import ProfileImageUpload from "@/components/ProfileImageUpload";
-import { logout, getRole } from "@/lib/auth";
+import CompanyLogoUpload from "@/components/CompanyLogoUpload";
+import { ChevronDown, HelpCircle } from 'lucide-react';
+import { Popover, PopoverTrigger, PopoverContent, } from "@/components/ui/popover";
 import { Label } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,8 +17,9 @@ import { getUserById } from "@/services/userService";
 import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
 import { updateUserSchema } from "@/schemas/userSchema";
 import { User } from "@/types/user";
+import { viewAllWebsiteType } from "@/services/theme.service";
+import { WebsiteTypeAttribute } from '@/types/theme';
 import Loader from '@/components/ui/loader'
-import ImageUpload from "@/components/SimpleImageUpload";
 type FormData = z.infer<typeof updateUserSchema>;
 
 export default function UpdateUser() {
@@ -30,6 +32,7 @@ export default function UpdateUser() {
         register,
         handleSubmit,
         setValue,
+        watch,
         reset,
         control,
         formState: { errors, isSubmitting },
@@ -40,59 +43,75 @@ export default function UpdateUser() {
         shouldFocusError: true,
     });
 
-    const [selectedImage, setSelectedImage] = useState<File | null>(null);
-    const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [selectedCompanyLogo, setSelectedCompanyLogo] = useState<File | null>(null);
     const [previewCompanyLogo, setPreviewCompanyLogo] = useState<string | null>(null);
+    const [websiteTypes, setWebsiteTypes] = useState<WebsiteTypeAttribute[]>([]);
 
-    const handleBack = () => {
-        router.back();
-    };
+    const handleBack = () => { router.back(); };
 
     useEffect(() => {
-        setLoading(true);
-        const fetchData = async () => {
-            if (!id) {
-                SwalError({ title: "Error", message: "OOPS Session expired. Login again." });
-                logout();
-            };
+        let isMounted = true;
+        const fetchAll = async () => {
             try {
-                const res: any = await getUserById(id);
-                const data: User = res?.result;
-                reset({
-                    name: data.name || "",
-                    email: data.email || "",
-                    company_name: data.company_name ? String(data.company_name) : "",
-                    mobile_no: data.mobile_no ? String(data.mobile_no) : "",
-                    office_no: data.office_no ? String(data.office_no) : "",
-                    fax_no: data.fax_no ? String(data.fax_no) : "",
-                    fburl: data.fburl || "",
-                    xurl: data.xurl || "",
-                    instaurl: data.instaurl || "",
-                    linkedinurl: data.linkedinurl || "",
-                    yturl: data.yturl || "",
-                    address1: data.address1 || "",
-                    address2: data.address2 || "",
-                    gstin: data.gstin || "",
-                    image: (`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.image}`) || "",
-                });
-                if (data?.image != null && data.image !== "") {
-                    setPreviewImage(`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.image}`);
-                }
-                if (data?.company_logo != null && data.company_logo !== "") {
-                    setPreviewCompanyLogo(`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.company_logo}`);
-                }
+                setLoading(true);
 
+                // ✅ Fetch both user and themes in parallel
+                const [userRes, themeRes] = await Promise.all([
+                    getUserById(id),
+                    viewAllWebsiteType(),
+                ]);
+
+                // ✅ Prepare theme list
+                const themeData: WebsiteTypeAttribute[] = Array.isArray(themeRes?.result?.data)
+                    ? themeRes.result.data
+                    : [];
+                if (isMounted) setWebsiteTypes(themeData);
+
+                // ✅ Prepare user data
+                const data: User = userRes?.result;
+
+                if (isMounted) {
+                    reset({
+                        name: data.name || "",
+                        email: data.email || "",
+                        company_name: data.company_name || "",
+                        schema_name: data.schema_name || "",
+                        subdomain: data.subdomain || "",
+                        mobile_no: data.mobile_no || "",
+                        office_no: data.office_no || "",
+                        fax_no: data.fax_no || "",
+                        fburl: data.fburl || "",
+                        xurl: data.xurl || "",
+                        instaurl: data.instaurl || "",
+                        linkedinurl: data.linkedinurl || "",
+                        yturl: data.yturl || "",
+                        address1: data.address1 || "",
+                        address2: data.address2 || "",
+                        gstin: data.gstin || "",
+                        // ✅ Convert to string — select options are string values
+                        website_type: data?.Theme?.id ? data.Theme.id.toString() : "",
+                    });
+
+                    if (data?.company_logo) {
+                        setPreviewCompanyLogo(`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.company_logo}`);
+                    }
+                }
             } catch (error) {
-                // console.log("error", error);
-                SwalError({ title: "Error", message: "Failed to load data." });
+                SwalError({
+                    title: "Error",
+                    message: "Failed to load user or theme data.",
+                });
+                handleBack();
             } finally {
                 setLoading(false);
             }
         };
-
-        fetchData();
+        fetchAll();
+        return () => { isMounted = false; };
     }, [id, reset]);
+
+
+    const selectedTheme = watch("website_type");
 
     const onSubmit = async (data: any) => {
         try {
@@ -110,7 +129,9 @@ export default function UpdateUser() {
             };
             appendIfValid("name", data.name);
             appendIfValid("email", data.email);
-            // appendIfValid("company_name", data.company_name);
+            appendIfValid("company_name", data.company_name);
+            // appendIfValid("schema_name", data.schema_name);
+            appendIfValid("subdomain", data.subdomain);
             appendIfValid("mobile_no", data.mobile_no);
             appendIfValid("office_no", data.office_no);
             appendIfValid("fax_no", data.fax_no);
@@ -122,11 +143,7 @@ export default function UpdateUser() {
             appendIfValid("address1", data.address1);
             appendIfValid("address2", data.address2);
             appendIfValid("gstin", data.gstin);
-
-            // ✅ Append files only if user selected new ones
-            if (selectedImage instanceof File && selectedImage.size > 0) {
-                formData.append("image", selectedImage);
-            }
+            appendIfValid("website_type", data.website_type);
             if (selectedCompanyLogo instanceof File && selectedCompanyLogo.size > 0) {
                 formData.append("company_logo", selectedCompanyLogo);
             }
@@ -145,10 +162,7 @@ export default function UpdateUser() {
         } catch (error: any) {
             SwalError({
                 title: "Failed!",
-                message:
-                    error?.response?.data?.message ||
-                    error?.message ||
-                    "Something went wrong.",
+                message: error?.response?.data?.message || error?.message || "Something went wrong.",
             });
         }
     };
@@ -168,483 +182,492 @@ export default function UpdateUser() {
                         onSubmit={handleSubmit(onSubmit)}
                         className="space-y-6 p-6 bg-white rounded-lg shadow-md"
                     >
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black">
+                        <div className="">
 
-                            {/** Profile */}
-                            <div className="col-span-full flex items-center gap-6 mb-4">
+                            {/* ---------------- PERSONAL INFO SECTION ---------------- */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black mt-4">
+                                <div className="col-span-1 md:col-span-2">
+                                    <h2 className="text-lg font-semibold text-gray-800 mb-2">Personal Information</h2>
+                                    <hr className="border-gray-300 mb-2" />
+                                </div>
 
-                                {/* Profile Preview */}
-                                {/* <div className="w-32 h-32 rounded-lg overflow-hidden flex items-center border-2 border-gray-300">
-                                    {previewImage ? (
-                                        <img
-                                            src={previewImage}
-                                            alt="Company Logo"
-                                            className="object-cover w-auto h-auto"
-                                        />
-                                    ) : (
-                                        <div className="flex items-center justify-center w-full h-full bg-gray-100 text-gray-400 text-sm">
-                                            No Logo
-                                        </div>
-                                    )}
-                                </div> */}
-                                {/* Profile Image */}
-                                <div className="relative w-32 h-32">
-                                    <Controller
-                                        name="image"
-                                        control={control}
-                                        rules={{ required: "Profile image is required" }}
-                                        render={({ field }) => (
-                                            <ProfileImageUpload
-                                                onFileSelect={(file) => {
-                                                    field.onChange(file);       // update React Hook Form
-                                                    setSelectedImage(file);     // update local state
-                                                    setPreviewImage(URL.createObjectURL(file));
-                                                }}
-                                                defaultImage={previewImage ?? " "}
-                                            />
-                                        )}
+                                {/* Name */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="name" className="mb-1 font-medium">
+                                        Customer Name <span className="text-red-600">*</span>
+                                    </Label>
+                                    <Input
+                                        id="name"
+                                        type="text"
+                                        placeholder="Enter Customer's Name"
+                                        {...register("name")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        onInput={(e: React.FormEvent<HTMLInputElement>) => {
+                                            const target = e.currentTarget;
+                                            // Replace anything that is not a letter or space
+                                            target.value = target.value.replace(/[^A-Za-z\s]/g, "");
+                                        }}
+                                        onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => {
+                                            const paste = e.clipboardData.getData("text");
+                                            if (/[^A-Za-z\s]/.test(paste)) {
+                                                e.preventDefault(); // block paste if it contains invalid chars
+                                            }
+                                        }}
                                     />
+                                    {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
                                 </div>
-                                {/* Upload Info / Message */}
-                                <div className="flex-1">
-                                    <p className="text-sm text-gray-600 leading-snug">
-                                        Upload only{" "}
-                                        <span className="font-medium text-gray-700">
-                                            JPG, JPEG, PNG, GIF, TIFF, or WEBP
-                                        </span>
-                                        . <br />
-                                        Max size: <span className="font-medium text-gray-700">2 MB</span>. <br />
-                                        Recommended: <span className="font-medium text-gray-700">128×128 px</span>.
-                                    </p>
-                                    {typeof errors?.image?.message === "string" && (
-                                        <p className="text-red-500 text-sm">{errors.image.message}</p>
-                                    )}
-                                </div>
-                                {/* Simple Image Preview */}
-                                <div className="w-32 h-32 rounded-2 overflow-hidden flex items-center border-2 border-gray-300">
-                                    {previewCompanyLogo ? (
-                                        <img
-                                            src={previewCompanyLogo}
-                                            alt="Company Logo"
-                                            className="object-cover w-auto h-auto"
-                                        />
-                                    ) : (
-                                        <div className="flex items-center justify-center w-full h-full bg-gray-100 text-gray-400 text-sm">
-                                            No Logo
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
 
-                            {/* Name */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="name" className="mb-1 font-medium">
-                                    Name <span className="text-red-600">*</span>
-                                </Label>
-                                <Input
-                                    id="name"
-                                    type="text"
-                                    placeholder="Name"
-                                    {...register("name")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    onInput={(e: React.FormEvent<HTMLInputElement>) => {
-                                        const target = e.currentTarget;
-                                        // Replace anything that is not a letter or space
-                                        target.value = target.value.replace(/[^A-Za-z\s]/g, "");
-                                    }}
-                                    onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => {
-                                        const paste = e.clipboardData.getData("text");
-                                        if (/[^A-Za-z\s]/.test(paste)) {
-                                            e.preventDefault(); // block paste if it contains invalid chars
-                                        }
-                                    }}
-                                />
-                                {errors.name && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-                                )}
-                            </div>
-
-                            {/* Company Logo */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="company_logo" className="mb-1 font-medium">
-                                    Company Logo <span className="text-red-600">*</span>
-                                </Label>
-                                <div className="">
-                                    <Controller
-                                        name="company_logo"
-                                        control={control}
-                                        rules={{ required: "Company logo is required" }}
-                                        render={({ field }) => (
-                                            <ImageUpload
-                                                defaultImage={previewCompanyLogo || "/default-placeholder.png"} // preview URL
-                                                onFileSelect={(file: File) => {
-                                                    field.onChange(file); // store File in React Hook Form
-                                                    setPreviewCompanyLogo(URL.createObjectURL(file)); // store preview string
-                                                    setSelectedCompanyLogo(file);
-                                                }}
-                                            />
-                                        )}
+                                {/* Mobile No */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="mobile_no" className="mb-1 font-medium">
+                                        Customer Mobile No. <span className="text-red-600">*</span>
+                                    </Label>
+                                    <Input
+                                        id="mobile_no"
+                                        type="text"
+                                        placeholder="Enter Customer's Mobile No."
+                                        {...register("mobile_no")}
+                                        maxLength={13}
+                                        onInput={(e) => {
+                                            let val = e.currentTarget.value;
+                                            if (val.startsWith("+")) {
+                                                val = "+" + val.slice(1).replace(/\D/g, "");
+                                            } else {
+                                                val = val.replace(/\D/g, "");
+                                            }
+                                            if (val.startsWith("+91")) {
+                                                val = "+91" + val.slice(3, 13);
+                                            } else {
+                                                val = val.slice(0, 10);
+                                            }
+                                            e.currentTarget.value = val;
+                                        }}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
+                                    {errors.mobile_no && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.mobile_no.message}</p>
+                                    )}
                                 </div>
-                                {typeof errors?.company_logo?.message === "string" && (
-                                    <p className="text-red-500 text-sm">{errors.company_logo.message}</p>
-                                )}
-                            </div>
 
-                            {/* Email */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="email" className="mb-1 font-medium">
-                                    Email <span className="text-red-600">*</span>
-                                </Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="Email"
-                                    disabled
-                                    {...register("email")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.email && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-                                )}
-                            </div>
-
-                            {/* Company Name */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="company_name" className="mb-1 font-medium">
-                                    Company Name <span className="text-red-600">*</span> (Be careful it's your db name)
-                                </Label>
-                                <Input
-                                    id="company_name"
-                                    type="text"
-                                    placeholder="Company Name"
-                                    disabled
-                                    {...register("company_name")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    maxLength={50}
-                                    onInput={(e: React.FormEvent<HTMLInputElement>) => {
-                                        const target = e.currentTarget;
-                                        // Allow only letters, underscore, and hyphen
-                                        target.value = target.value.replace(/[^A-Za-z_-]/g, "");
-                                    }}
-                                    onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => {
-                                        const paste = e.clipboardData.getData("text");
-                                        // Block paste if it contains invalid characters
-                                        if (/[^A-Za-z_-]/.test(paste)) {
-                                            e.preventDefault();
-                                        }
-                                    }}
-                                />
-                                {typeof errors?.company_name?.message === "string" && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.company_name.message}</p>
-                                )}
-                            </div>
-
-                            {/* GST no. */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="gstin" className="mb-1 font-medium">
-                                    GST No. (If you have)
-                                </Label>
-                                <Input
-                                    id="gstin"
-                                    type="text"
-                                    placeholder="GSTIN (e.g. 22AAAAA0000A1Z5)"
-                                    maxLength={15}
-                                    {...register("gstin")}
-                                    onChange={(e) => {
-                                        // Convert to uppercase & remove special characters
-                                        e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
-                                        register("gstin").onChange(e); // update React Hook Form state
-                                    }}
-                                    onPaste={(e) => {
-                                        e.preventDefault();
-                                        const pasted = e.clipboardData.getData("text").toUpperCase().trim();
-                                        const sanitized = pasted.replace(/[^A-Z0-9]/g, "");
-                                        e.currentTarget.value = sanitized.slice(0, 15);
-                                        register("gstin").onChange(e);
-                                    }}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {typeof errors?.gstin?.message === "string" && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.gstin.message}</p>
-                                )}
+                                {/* Email */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="email" className="mb-1 font-medium">
+                                        Email <span className="text-red-600">*</span>
+                                    </Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="Enter Email Address"
+                                        {...register("email")}
+                                        disabled
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+                                </div>
 
                             </div>
 
-                            {/* Mobile */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="mobile_no" className="mb-1 font-medium">
-                                    Mobile No. <span className="text-red-600">*</span>
-                                </Label>
-                                <Input
-                                    id="mobile_no"
-                                    type="text"
-                                    placeholder="Mobile number"
-                                    maxLength={13} // ensure max 10 digits
-                                    {...register("mobile_no")}
-                                    onInput={(e) => {
-                                        let val = e.currentTarget.value;
+                            {/* ---------------- COMPANY DETAILS SECTION ---------------- */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black mt-4">
+                                {/* Section Header (spans full width) */}
+                                <div className="col-span-1 md:col-span-2">
+                                    <h2 className="text-lg font-semibold text-gray-800 mb-2">Company Details</h2>
+                                    <hr className="border-gray-300 mb-2" />
+                                </div>
 
-                                        // Remove non-digits except optional + at the start
-                                        if (val.startsWith("+")) {
-                                            val = "+" + val.slice(1).replace(/\D/g, "");
-                                        } else {
-                                            val = val.replace(/\D/g, "");
-                                        }
+                                {/* Company Name */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="company_name" className="mb-1 font-medium">
+                                        Company Name <span className="text-red-600">*</span>
+                                    </Label>
+                                    <Input
+                                        id="company_name"
+                                        type="text"
+                                        placeholder="Enter Company Name"
+                                        {...register("company_name")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        maxLength={50}
+                                    />
+                                    {errors?.company_name?.message && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.company_name.message}</p>
+                                    )}
+                                </div>
 
-                                        // Handle possible formats
-                                        if (val.startsWith("+91")) {
-                                            val = "+91" + val.slice(3, 13); // Max 10 digits after +91
-                                            const numPart = val.slice(3);
-                                            if (numPart && !/^[6-9]/.test(numPart)) {
-                                                val = "+91"; // Reset if not starting with 6-9
+                                {/* Company Theme */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="website_type" className="mb-1 font-medium">
+                                        Select Company Theme <span className="text-red-600">*</span>
+                                    </Label>
+                                    <div className="relative">
+                                        <div className="relative">
+                                            <select
+                                                id="website_type"
+                                                {...register("website_type", { valueAsNumber: true })}
+                                                className="w-full py-2 pl-3 pr-8 text-sm text-gray-800 bg-transparent border border-gray-300 rounded-lg appearance-none dark:bg-dark-900 h-9 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 cursor-pointer"
+                                                defaultValue=""
+                                            >
+                                                <option value="" disabled>
+                                                    --Select Theme--
+                                                </option>
+                                                {websiteTypes.map((type) => (
+                                                    <option key={type.id} value={type.id}>
+                                                        {type.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <ChevronDown
+                                                size={16}
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+                                            />
+                                        </div>
+                                    </div>
+                                    {errors.website_type && (
+                                        <p className="text-red-600 text-sm mt-1">{errors.website_type.message}</p>
+                                    )}
+                                </div>
+
+                                {/* Database & Subdomain Name -- Company Logo */}
+                                <div className="flex flex-col col-span-1 md:col-span-2">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black">
+
+                                        {/* Left side: Database + Subdomain */}
+                                        <div className="grid grid-cols-1 md:grid-cols-1 gap-4 col-span-1">
+                                            {/* Database Name */}
+                                            <div className="flex flex-col">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <Label htmlFor="schema_name" className="font-medium">
+                                                        Company DB/Schema Name <span className="text-red-600">*</span>
+                                                    </Label>
+
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <HelpCircle className="text-red-600 cursor-pointer w-5 h-5" />
+                                                        </PopoverTrigger>
+
+                                                        <PopoverContent className="w-80 text-sm text-black bg-white rounded-lg shadow-md border p-4">
+                                                            <p className="font-semibold mb-2">Schema Naming Instructions:</p>
+                                                            <ul className="list-disc pl-4 space-y-1">
+                                                                <li>Use only lowercase letters, numbers, and underscores (_)</li>
+                                                                <li>Do not use spaces or special characters (like @, #, -, !)</li>
+                                                                <li>Keep the name short (under 63 characters)</li>
+                                                                <li>Make it unique for each company or tenant</li>
+                                                                <li>
+                                                                    Recommended format: <code>{`{company_name}_{id}`}</code>
+                                                                </li>
+                                                            </ul>
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                </div>
+
+                                                <Input
+                                                    id="schema_name"
+                                                    type="text"
+                                                    disabled
+                                                    placeholder="Enter Assigned Database (Schema) Name"
+                                                    {...register("schema_name")}
+                                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    maxLength={50}
+                                                />
+
+                                                {errors?.schema_name?.message && (
+                                                    <p className="text-red-500 text-sm mt-1">{errors.schema_name.message}</p>
+                                                )}
+                                            </div>
+
+                                            {/* Subdomain Name */}
+                                            <div className="flex flex-col">
+                                                <Label htmlFor="subdomain" className="mb-1 font-medium">
+                                                    Company Subdomain Name <span className="text-red-600">*</span>
+                                                </Label>
+                                                <Input
+                                                    id="subdomain"
+                                                    type="text"
+                                                    placeholder="Enter Company Subdomain Name"
+                                                    {...register("subdomain")}
+                                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    maxLength={50}
+                                                />
+                                                {errors?.subdomain?.message && (
+                                                    <p className="text-red-500 text-sm mt-1">{errors.subdomain.message}</p>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Right side: Company Logo */}
+                                        <div className="flex flex-col col-span-1">
+                                            <Label htmlFor="company_logo" className="mb-1 font-medium">
+                                                Company Logo <span className="text-red-600">*</span>
+                                            </Label>
+                                            <Controller
+                                                name="company_logo"
+                                                control={control}
+                                                rules={{ required: "Company logo is required" }}
+                                                render={({ field }) => (
+                                                    <CompanyLogoUpload
+                                                        onFileSelect={(file: File) => {
+                                                            field.onChange(file);
+                                                            setSelectedCompanyLogo(file);
+                                                        }}
+                                                        // defaultImage={null}
+                                                        defaultImage={previewCompanyLogo ?? null}
+                                                    />
+                                                )}
+                                            />
+                                            {typeof errors?.company_logo?.message === "string" && (
+                                                <p className="text-red-500 text-sm">{errors.company_logo.message}</p>
+                                            )}
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                {/* Company Phone No. */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="office_no" className="mb-1 font-medium">
+                                        Company Phone No. (max 4, comma-separated)
+                                    </Label>
+                                    <Input
+                                        id="office_no"
+                                        type="text"
+                                        placeholder="+911234567890, +911234567891..."
+                                        {...register("office_no")}
+                                        onInput={(e) => {
+                                            let val = e.currentTarget.value;
+
+                                            // Split by comma and trim spaces
+                                            let numbers = val.split(",").map((num) => num.trim());
+
+                                            // Limit to max 4 numbers
+                                            if (numbers.length > 4) numbers = numbers.slice(0, 4);
+
+                                            // Process each number
+                                            numbers = numbers.map((num) => {
+                                                if (num.startsWith("+")) {
+                                                    num = "+" + num.slice(1).replace(/\D/g, "");
+                                                } else {
+                                                    num = num.replace(/\D/g, "");
+                                                }
+
+                                                if (num.startsWith("+91")) {
+                                                    num = "+91" + num.slice(3, 13);
+                                                } else if (num.startsWith("0")) {
+                                                    num = "0" + num.slice(1, 11);
+                                                } else {
+                                                    num = num.slice(0, 10);
+                                                }
+
+                                                return num;
+                                            });
+
+                                            // Join numbers back with comma + space
+                                            e.currentTarget.value = numbers.join(", ");
+                                        }}
+                                        onPaste={(e) => {
+                                            const pasteData = e.clipboardData.getData("text");
+
+                                            // Only allow digits, commas, spaces, and optional leading +
+                                            if (!/^[\d,+\s]+$/.test(pasteData)) {
+                                                e.preventDefault();
                                             }
-                                        } else if (val.startsWith("91")) {
-                                            val = "91" + val.slice(2, 12); // Max 10 digits after 91
-                                            const numPart = val.slice(2);
-                                            if (numPart && !/^[6-9]/.test(numPart)) {
-                                                val = "91";
-                                            }
-                                        } else {
-                                            val = val.slice(0, 10);
-                                            if (val && !/^[6-9]/.test(val)) {
-                                                val = ""; // Reset if invalid start
-                                            }
-                                        }
+                                        }}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.office_no && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.office_no.message}</p>
+                                    )}
+                                </div>
 
-                                        e.currentTarget.value = val;
-                                    }}
-                                    onPaste={(e) => {
-                                        const pasteData = e.clipboardData.getData("text").trim();
-
-                                        // Allow only valid Indian numbers (+91XXXXXXXXXX, 91XXXXXXXXXX, XXXXXXXXXX)
-                                        const validPattern = /^(\+91|91)?[6-9]\d{9}$/;
-                                        if (!validPattern.test(pasteData)) {
-                                            e.preventDefault();
-                                        }
-                                    }}
-
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.mobile_no && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.mobile_no.message}</p>
-                                )}
-                            </div>
-
-                            {/* Office No. */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="office_no" className="mb-1 font-medium">
-                                    Phone No. (max 4, comma-separated)
-                                </Label>
-                                <Input
-                                    id="office_no"
-                                    type="text"
-                                    placeholder="+911234567890, +911234567891..."
-                                    {...register("office_no")}
-                                    onInput={(e) => {
-                                        let val = e.currentTarget.value;
-
-                                        // Split by comma and trim spaces
-                                        let numbers = val.split(",").map((num) => num.trim());
-
-                                        // Limit to max 4 numbers
-                                        if (numbers.length > 4) numbers = numbers.slice(0, 4);
-
-                                        // Process each number
-                                        numbers = numbers.map((num) => {
-                                            if (num.startsWith("+")) {
-                                                num = "+" + num.slice(1).replace(/\D/g, "");
+                                {/* Company Fax No. */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="fax_no" className="mb-1 font-medium">
+                                        Company Fax No.
+                                    </Label>
+                                    <Input
+                                        id="fax_no"
+                                        type="text"
+                                        placeholder="Company Fax no."
+                                        {...register("fax_no")}
+                                        onInput={(e) => {
+                                            let val = e.currentTarget.value;
+                                            if (val.startsWith("+")) {
+                                                val = "+" + val.slice(1).replace(/\D/g, "");
                                             } else {
-                                                num = num.replace(/\D/g, "");
+                                                val = val.replace(/\D/g, "");
                                             }
-
-                                            if (num.startsWith("+91")) {
-                                                num = "+91" + num.slice(3, 13);
-                                            } else if (num.startsWith("0")) {
-                                                num = "0" + num.slice(1, 11);
+                                            if (val.startsWith("+91")) {
+                                                // +91 + STD (2-4) + number (6-8) → max 13 digits
+                                                val = "+91" + val.slice(3, 13);
+                                            } else if (val.startsWith("0")) {
+                                                // 0 + STD + number → max 11 digits
+                                                val = "0" + val.slice(1, 11);
                                             } else {
-                                                num = num.slice(0, 10);
+                                                // No prefix → STD + number → max 10 digits
+                                                val = val.slice(0, 10);
                                             }
 
-                                            return num;
-                                        });
+                                            e.currentTarget.value = val;
+                                        }}
+                                        onPaste={(e) => {
+                                            const pasteData = e.clipboardData.getData("text");
 
-                                        // Join numbers back with comma + space
-                                        e.currentTarget.value = numbers.join(", ");
-                                    }}
-                                    onPaste={(e) => {
-                                        const pasteData = e.clipboardData.getData("text");
+                                            // Only allow digits and optional leading +
+                                            if (!/^\+?\d+$/.test(pasteData)) {
+                                                e.preventDefault();
+                                            }
+                                        }}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.fax_no && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.fax_no.message}</p>
+                                    )}
+                                </div>
 
-                                        // Only allow digits, commas, spaces, and optional leading +
-                                        if (!/^[\d,+\s]+$/.test(pasteData)) {
-                                            e.preventDefault();
-                                        }
-                                    }}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.office_no && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.office_no.message}</p>
-                                )}
+                                {/* Company GST No. */}
+                                <div className="flex flex-col col-span-1 md:col-span-1">
+                                    <Label htmlFor="gstin" className="mb-1 font-medium">
+                                        Company GST No. (If you have)
+                                    </Label>
+                                    <Input
+                                        id="gstin"
+                                        type="text"
+                                        placeholder="eg. 22AAAAA0000A1Z5"
+                                        {...register("gstin")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        maxLength={15}
+                                    />
+                                    {errors?.gstin?.message && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.gstin.message}</p>
+                                    )}
+                                </div>
+
                             </div>
 
-                            {/* Fax no. */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="fax_no" className="mb-1 font-medium">
-                                    Fax No.
-                                </Label>
-                                <Input
-                                    id="fax_no"
-                                    type="text"
-                                    placeholder="Fax number"
-                                    {...register("fax_no")}
-                                    onInput={(e) => {
-                                        let val = e.currentTarget.value;
-                                        if (val.startsWith("+")) {
-                                            val = "+" + val.slice(1).replace(/\D/g, "");
-                                        } else {
-                                            val = val.replace(/\D/g, "");
-                                        }
-                                        if (val.startsWith("+91")) {
-                                            // +91 + STD (2-4) + number (6-8) → max 13 digits
-                                            val = "+91" + val.slice(3, 13);
-                                        } else if (val.startsWith("0")) {
-                                            // 0 + STD + number → max 11 digits
-                                            val = "0" + val.slice(1, 11);
-                                        } else {
-                                            // No prefix → STD + number → max 10 digits
-                                            val = val.slice(0, 10);
-                                        }
+                            {/* ---------------- SOCIAL MEDIA lINKS SECTION ---------------- */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black mt-4">
+                                <div className="col-span-1 md:col-span-2">
+                                    <h2 className="text-lg font-semibold text-gray-800 mb-2">Social Media Links</h2>
+                                    <hr className="border-gray-300 mb-2" />
+                                </div>
 
-                                        e.currentTarget.value = val;
-                                    }}
-                                    onPaste={(e) => {
-                                        const pasteData = e.clipboardData.getData("text");
+                                {/* Facebook */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="fburl" className="mb-1 font-medium">
+                                        Facebook Page
+                                    </Label>
+                                    <Input
+                                        id="fburl"
+                                        placeholder="Enter Facebook URL"
+                                        {...register("fburl")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.fburl && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.fburl.message}</p>
+                                    )}
+                                </div>
 
-                                        // Only allow digits and optional leading +
-                                        if (!/^\+?\d+$/.test(pasteData)) {
-                                            e.preventDefault();
-                                        }
-                                    }}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.fax_no && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.fax_no.message}</p>
-                                )}
+                                {/* Twitter */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="xurl" className="mb-1 font-medium">
+                                        Twitter Page
+                                    </Label>
+                                    <Input
+                                        id="xurl"
+                                        placeholder="Enter Twitter URL"
+                                        {...register("xurl")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.xurl && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.xurl.message}</p>
+                                    )}
+                                </div>
+
+                                {/* Instagram */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="instaurl" className="mb-1 font-medium">
+                                        Instagram Page
+                                    </Label>
+                                    <Input
+                                        id="instaurl"
+                                        placeholder="Enter Instagram URL"
+                                        {...register("instaurl")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.instaurl && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.instaurl.message}</p>
+                                    )}
+                                </div>
+
+                                {/* LinkedIn */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="linkedinurl" className="mb-1 font-medium">
+                                        LinkedIn Page
+                                    </Label>
+                                    <Input
+                                        id="linkedinurl"
+                                        placeholder="Enter LinkedIn URL"
+                                        {...register("linkedinurl")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.linkedinurl && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.linkedinurl.message}</p>
+                                    )}
+                                </div>
+
+                                {/* Youtube */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="yturl" className="mb-1 font-medium">
+                                        Youtube Page
+                                    </Label>
+                                    <Input
+                                        id="yturl"
+                                        placeholder="Enter Youtube URL"
+                                        {...register("yturl")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.yturl && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.yturl.message}</p>
+                                    )}
+                                </div>
                             </div>
 
-                            {/* Facebook */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="fburl" className="mb-1 font-medium">
-                                    Facebook
-                                </Label>
-                                <Input
-                                    id="fburl"
-                                    placeholder="Facebook url"
-                                    {...register("fburl")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.fburl && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.fburl.message}</p>
-                                )}
-                            </div>
+                            {/* ---------------- ADDRESS INFO SECTION ---------------- */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black mt-4">
+                                <div className="col-span-1 md:col-span-2">
+                                    <h2 className="text-lg font-semibold text-gray-800 mb-2">Address Details</h2>
+                                    <hr className="border-gray-300 mb-2" />
+                                </div>
+                                {/** Address 1 */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="address1" className="mb-1 font-medium">
+                                        Current Address <span className="text-red-600">*</span>
+                                    </Label>
+                                    <Textarea
+                                        id="address1"
+                                        placeholder="Enter Current Address"
+                                        {...register("address1")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.address1 && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.address1.message}</p>
+                                    )}
+                                </div>
 
-                            {/* Twitter */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="xurl" className="mb-1 font-medium">
-                                    Twitter
-                                </Label>
-                                <Input
-                                    id="xurl"
-                                    placeholder="Twitter url"
-                                    {...register("xurl")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.xurl && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.xurl.message}</p>
-                                )}
-                            </div>
-
-                            {/* Instagram */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="instaurl" className="mb-1 font-medium">
-                                    Instagram
-                                </Label>
-                                <Input
-                                    id="instaurl"
-                                    placeholder="Instagram url"
-                                    {...register("instaurl")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.instaurl && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.instaurl.message}</p>
-                                )}
-                            </div>
-
-                            {/* LinkedIn */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="linkedinurl" className="mb-1 font-medium">
-                                    LinkedIn
-                                </Label>
-                                <Input
-                                    id="linkedinurl"
-                                    placeholder="LinkedIn url"
-                                    {...register("linkedinurl")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.linkedinurl && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.linkedinurl.message}</p>
-                                )}
-                            </div>
-
-                            {/* Youtube */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="yturl" className="mb-1 font-medium">
-                                    Youtube
-                                </Label>
-                                <Input
-                                    id="yturl"
-                                    placeholder="Youtube url"
-                                    {...register("yturl")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.yturl && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.yturl.message}</p>
-                                )}
-                            </div>
-
-                            {/* Blank */}
-                            <div></div>
-
-                            {/** Address 1 */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="address1" className="mb-1 font-medium">
-                                    Current Address <span className="text-red-600">*</span>
-                                </Label>
-                                <Textarea
-                                    id="address1"
-                                    placeholder="Enter current address"
-                                    {...register("address1")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.address1 && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.address1.message}</p>
-                                )}
-                            </div>
-
-                            {/** Address 2 */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="address2" className="mb-1 font-medium">
-                                    Parmanent Address
-                                </Label>
-                                <Textarea
-                                    id="address2"
-                                    placeholder="Enter parmanent address"
-                                    {...register("address2")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.address2 && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.address2.message}</p>
-                                )}
+                                {/** Address 2 */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="address2" className="mb-1 font-medium">
+                                        Permanent Address
+                                    </Label>
+                                    <Textarea
+                                        id="address2"
+                                        placeholder="Enter Permanent Address"
+                                        {...register("address2")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.address2 && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.address2.message}</p>
+                                    )}
+                                </div>
                             </div>
 
                         </div>

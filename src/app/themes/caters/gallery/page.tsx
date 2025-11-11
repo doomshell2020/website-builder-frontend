@@ -1,13 +1,7 @@
 "use client";
 
 import React from 'react'
-
-export default function Gallery() {
-    return (
-        <div> Gallery </div>
-    )
-}
-
+export default function Gallery() { return (<div> Gallery </div>) };
 
 // import React, { useState, useEffect } from "react";
 // import { useRouter } from "next/navigation";
@@ -37,14 +31,14 @@ export default function Gallery() {
 
 //     useEffect(() => {
 //         const fetchGalleryImages = async () => {
-//             if (!project?.company_name) {
+//             if (!project?.schema_name) {
 //                 setImagePreviews(fallbackImages);
 //                 setLoading(false);
 //                 return;
 //             }
 //             setLoading(true);
 //             try {
-//                 const res: any = await findGalleryBySlug(project.company_name, "gallery");
+//                 const res: any = await findGalleryBySlug(project.schema_name, "gallery");
 //                 const data = res?.result || res;
 //                 let imgs: string[] = [];
 //                 if (data?.images) {

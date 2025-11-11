@@ -4,7 +4,7 @@ import { useMemo, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
     Info, Trash2, ToggleRight, ToggleLeft, Edit, Plus,
-    CornerRightDown, CircleAlert, CircleCheckBig
+    CornerRightDown, CircleAlert, CircleCheckBig, ExternalLink, Link as LinkIcon
 } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -22,7 +22,6 @@ import { Input } from "@/components/ui/Input";
 import Loader from "@/components/ui/loader";
 import DomainSetup from "@/components/domains/CustomDomainSetup";
 
-
 const UsersListPage = () => {
 
     const router = useRouter();
@@ -39,8 +38,6 @@ const UsersListPage = () => {
     const [filteredData, setFilteredData] = useState<User[]>([]);
     const [openCustomDomainSetup, setOpenCustomDomainSetup] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<string | number | null>(null);
-
-
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -195,92 +192,98 @@ const UsersListPage = () => {
                 width: "5%",
             },
             {
-                name: "Name",
+                name: "Company",
                 cell: (row: User) => (
-                    <button
-                        onClick={() => router.push(`/admin/users/view/${row.id}`)}
-                        className="flex items-center space-x-2 text-blue-600 hover:underline"
-                    >
-                        <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                            {row.image &&
-                                row.image !== undefined &&
-                                row.image !== "undefined" ? (
-                                <Image
-                                    src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${row.image}`}
-                                    alt={row.name || "Profile"}
-                                    width={32}
-                                    height={32}
-                                    className="object-cover w-full h-full"
-                                />
-                            ) : (
-                                <Image
-                                    src="/assest/image/defaultUser.webp"
-                                    alt={row.name || "Profile"}
-                                    width={32}
-                                    height={32}
-                                    className="object-cover w-full h-full"
-                                />
-                            )}
+                    <div className="flex items-center gap-2">
+
+                        {/* Profile / Company Logo */}
+                        <div className="w-9 h-9 overflow-hidden flex items-center justify-center bg-gray-100 border border-gray-200">
+                            <Image
+                                src={
+                                    row.company_logo &&
+                                        row.company_logo !== undefined &&
+                                        row.company_logo !== "undefined"
+                                        ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${row.company_logo}`
+                                        : "/assest/image/defaultUser.webp"
+                                }
+                                alt={row.company_logo || "Company Logo"}
+                                width={36}
+                                height={36}
+                                className="object-cover"
+                            />
                         </div>
-                        <span>{row.name || "N/A"}</span>
-                    </button>
+
+                        {/* Company Name */}
+                        <span className="font-medium text-gray-800">{row.company_name || "N/A"}</span>
+                        <button
+                            title="User Info"
+                            onClick={() => router.push(`/admin/users/view/${row.id}`)}
+                            className="flex items-center gap-2 text-blue-600 hover:underline"
+                        >
+                            <Info name="info" className="w-4 h-4" />
+                        </button>
+
+                    </div>
                 ),
-                selector: (row: User) => row.name || "N/A",
+                selector: (row: User) => row.company_name || "N/A",
                 sortable: true,
             },
             {
-                name: "Email",
-                selector: (row: User) => row.email || "N/A",
+                name: "Customer Detail",
+                selector: (row: User) => row.name || row.email || row.mobile_no || "N/A",
                 sortable: true,
+                cell: (row: User) => (
+                    <div className="flex flex-col">
+                        <span className="font-medium text-gray-800">{row.name || "N/A"}</span>
+                        <span className="text-sm text-gray-500">{row.email || "N/A"}</span>
+                        <span className="text-sm text-gray-500">{row.mobile_no || "N/A"}</span>
+                    </div>
+                ),
             },
-            // {
-            //     name: "Mobile",
-            //     selector: (row: User) => (row.mobile_no ? String(row.mobile_no) : "N/A"),
-            //     width: "12%",
-            //     sortable: true,
-            // },
             {
                 name: "Subdomain",
-                selector: (row: User) => row?.company_name ? `https://${row.company_name}.baaraat.com` : "N/A",
+                selector: (row: User) => row?.subdomain || "N/A",
                 cell: (row: User) =>
-                    row?.company_name ? (
-                        <Link
-                            href={`https://${row.company_name}.baaraat.com`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline"
-                        >
-                            {`${row.company_name}.baaraat.com`}
-                        </Link>
+                    row?.subdomain ? (
+                        <div className="flex items-center gap-2">
+                            {/* <Link
+                                href={`https://${row.subdomain}.baaraat.com`}
+                                target="_blank"
+                                className="text-blue-600 hover:underline"
+                            >
+                            </Link> */}
+                            {`${row.subdomain}`}
+                            <Link
+                                href={`https://${row.subdomain}.baaraat.com`}
+                                target="_blank"
+                                className="text-blue-500 hover:text-blue-700"
+                            >
+                                {/* <ExternalLink className="w-4 h-4" /> */}
+                                <LinkIcon className="w-4 h-4" />
+                            </Link>
+                        </div>
                     ) : (
                         "N/A"
                     ),
-                width: "16%",
+                width: "18%",
                 sortable: true,
             },
             {
                 name: "Custom Domain",
                 cell: (row: User) => (
-                    <button
+                    <Button
                         onClick={() => {
                             setSelectedUserId(row.id);
                             setOpenCustomDomainSetup(true);
                         }}
-                        className="inline-flex items-center justify-center gap-1 rounded-md bg-gradient-to-r from-blue-600 to-blue-500 text-white text-sm font-medium px-4 py-1.5 shadow hover:from-blue-700 hover:to-blue-600 transition-all duration-200"
+                        className="inline-flex items-center justify-center gap-1 rounded-[5px] bg-gradient-to-r from-blue-600 to-blue-500 text-white text-sm font-medium px-4 shadow hover:from-blue-700 hover:to-blue-600 transition-all duration-200"
                     >
                         <span className="text-lg font-bold leading-none">+</span>
                         Custom Domain
-                    </button>
+                    </Button>
                 ),
                 width: "15%",
                 sortable: false,
-            },
-            {
-                name: "Created",
-                selector: (row: User) =>
-                    row.createdAt ? formatDate(row.createdAt, "DD-MM-YYYY hh:mm A") : "—",
-                width: "12%", // You might want to increase width
-                sortable: true,
             },
             {
                 name: "Approval",
@@ -314,7 +317,7 @@ const UsersListPage = () => {
                                         try {
                                             const response: any = await approveUser(row.id!.toString(), {
                                                 approval: "Y",
-                                                newSchema: row.company_name!.toString(),
+                                                newSchema: row.schema_name!.toString(),
                                                 role: row?.roleData?.id,
                                             });
 
@@ -370,10 +373,9 @@ const UsersListPage = () => {
 
                                 if (result.isConfirmed) {
                                     await updateUserStatus(row.id!.toString(), { status: row.status == "Y" ? "N" : "Y", });
-                                    Swal.fire("updated", `User has been successfully ${row.status === "Y" ? "deactivated" : "activated"}.
-`, "success",);
+                                    Swal.fire("updated", `User has been successfully ${row.status === "Y" ? "deactivated" : "activated"}.`, "success",);
+                                    fetchData();
                                 }
-                                fetchData();
                             }}>
                             {row.status == "Y" ? (
                                 <ToggleRight size={20} className="text-green-500" />
@@ -404,10 +406,7 @@ const UsersListPage = () => {
         [page, limit],
     );
 
-    const isDisabled =
-        search.searchTerm.trim() === "" &&
-        !search.fromDate &&
-        !search.toDate;
+    const isDisabled = search.searchTerm.trim() === "" && !search.fromDate && !search.toDate;
 
     return (
         <div className="min-h-screen">
@@ -464,16 +463,14 @@ const UsersListPage = () => {
                                             <Button
                                                 onClick={handleSearch}
                                                 disabled={isDisabled}
-                                                className={`max-w-[30] text-white rounded-[5px] 
-    ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-700"}`}  >
+                                                className={`max-w-[30] text-white rounded-[5px] ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-700"}`}  >
                                                 Search
                                             </Button>
                                             <Button
                                                 onClick={handleReset}
                                                 disabled={isDisabled}
                                                 // variant="outline"
-                                                className={`max-w-[30] text-white rounded-[5px] 
-    ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-yellow-600 hover:bg-yellow-700"}`} >
+                                                className={`max-w-[30] text-white rounded-[5px] ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-yellow-600 hover:bg-yellow-700"}`} >
                                                 Reset
                                             </Button>
                                         </div>
@@ -586,8 +583,6 @@ const UsersListPage = () => {
                     </div>
                 </div>
             )}
-
-
         </div>
     );
 };

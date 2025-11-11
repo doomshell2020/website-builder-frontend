@@ -65,17 +65,22 @@ export async function middleware(request: NextRequest) {
 
   // ------------------ Subdomains for projects ------------------
   // Example: jaipurfoodcaterers.webbuilder.local / navlok.baaraat.com
-  if (
-    (baseDomain === MAIN_DOMAIN || baseDomain === LOCAL_DEV_DOMAIN) &&
-    subdomain &&
-    subdomain !== "www"
-  ) {
-    // console.log("🌀 Rewriting for subdomain:", subdomain);
-    const url = request.nextUrl.clone();
-    url.pathname = `/site/${subdomain}${pathname}`;
-    // console.log("➡️ Rewrite to:", url.pathname);
-    return NextResponse.rewrite(url);
-  }
+if (
+  [MAIN_DOMAIN, LOCAL_DEV_DOMAIN].includes(baseDomain?.toLowerCase().replace(/\.$/, "")) &&
+  subdomain &&
+  subdomain.toLowerCase() !== "www"
+) {
+  // console.log("🌀 Rewriting for subdomain:", subdomain);
+  const url = request.nextUrl.clone();
+
+  // ✅ Ensure clean path joining (avoid double slashes)
+  const cleanPath = pathname.startsWith("/") ? pathname : `/${pathname}`;
+  url.pathname = `/site/${subdomain}${cleanPath}`;
+
+  // console.log("➡️ Rewrite to:", url.pathname);
+  return NextResponse.rewrite(url);
+}
+
 
   // ------------------ Custom external domains ------------------
   // Example: jaipurfoodcaterers.com → acts like jaipurfoodcaterers.baaraat.com

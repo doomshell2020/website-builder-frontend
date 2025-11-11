@@ -9,7 +9,6 @@ export default async function ThemeRouter({
   params: Promise<{ projectSlug: string; slug?: string[] }>;
 }) {
   const { projectSlug, slug } = await params;
-
   const pageName = (Array.isArray(slug) ? slug.join("/") : slug) || "home";
 
   // 1️⃣ Fetch project
@@ -34,7 +33,7 @@ export default async function ThemeRouter({
         `⚠️ Page '${pageName}' not found in theme '${themeName}', using fallback.`
       );
       ThemePage = () => (
-        <StaticPageFallback company={ProjectDetail.company_name} slug={pageName} />
+        <StaticPageFallback company={ProjectDetail.schema_name} slug={pageName} />
       );
     }
 

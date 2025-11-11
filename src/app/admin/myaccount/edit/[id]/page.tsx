@@ -467,11 +467,11 @@ export default function EditUser() {
                             {/* Address 2 */}
                             <div className="flex flex-col">
                                 <Label htmlFor="address2" className="mb-1 font-medium">
-                                    Parmanent Address
+                                    Permanent Address
                                 </Label>
                                 <Textarea
                                     id="address2"
-                                    placeholder="Enter Parmanent Address"
+                                    placeholder="Enter Permanent Address"
                                     {...register("address2")}
                                     className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />

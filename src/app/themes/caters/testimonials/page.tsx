@@ -22,19 +22,19 @@ const testimonialsData = [
         description: "Jaipur Food Caterers made our corporate event a huge success! The food was fresh, flavorful, and beautifully presented. Their professional service ensured a seamless experience. Highly recommended!",
     },
 ];
+
 export default function Testimonials({ project }: DefaultProps) {
     const router = useRouter();
     const [testimonialData, setTestimonialData] = useState([]);
 
     useEffect(() => {
         const fetchClientTestimonials = async () => {
-            if (!project?.company_name) {
+            if (!project?.schema_name) {
                 setTestimonialData(testimonialsData);
                 return;
-            }
-            
+            }            
             try {
-                const res: any = await fetchTestimonials(project.company_name);
+                const res: any = await fetchTestimonials(project.schema_name);
                 const data = res?.result?.data || res?.result || res;
                 console.log("res:", res);
                 console.log("data:", data);

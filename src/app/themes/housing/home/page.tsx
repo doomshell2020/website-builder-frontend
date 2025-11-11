@@ -41,14 +41,14 @@ export default function HousingHome({ project }: DefaultHomeProps) {
     useEffect(() => {
         const fetchGalleryImages = async () => {
             // If no company name, fallback
-            if (!project?.company_name) {
+            if (!project?.schema_name) {
                 setImagePreviews(fallbackImages);
                 setLoading(false);
                 return;
             }
             setLoading(true);
             try {
-                const res: any = await findGalleryBySlug(project.company_name, "gallery");
+                const res: any = await findGalleryBySlug(project.schema_name, "gallery");
                 const data = res?.result || res;
 
                 let imgs: string[] = [];
@@ -297,7 +297,7 @@ export default function HousingHome({ project }: DefaultHomeProps) {
     return (
         <div>
             {/** Hero Section */}
-            <HeroSlider company={project?.company_name} slug={"home"} />
+            <HeroSlider company={project?.schema_name} slug={"home"} />
 
             {/** About Section */}
             <section className="flex flex-col items-center relative justify-center px-6 md:px-12 lg:px-20 py-20 bg-white rounded-t-[40px] overflow-hidden">

@@ -63,6 +63,8 @@ export const userSchema = z.object({
         .min(6, "Address is too short"), // handles short input
     address2: z.string().nullable(),
     // company_name: z.string({ required_error: "Company name is required" }).nonempty("Company is required"),
+    // schema_name: z.string().nonempty("DB name is required"),
+    // subdomain: z.string().nonempty("Sub-domain is required"),
     createdAt: z.string().datetime().optional(),
     updatedAt: z.string().datetime().optional(),
     company_name: z.string().optional(),
@@ -104,7 +106,7 @@ export const addUserSchema = z.object({
             // })
             .trim()
     ),
-    mobile_no: z.string().nonempty("Mobile is required").regex(indianMobileRegex, "Invalid mobile number"),
+    mobile_no: z.string().nonempty("Mobile no. is required").regex(indianMobileRegex, "Invalid mobile number"),
     office_no: z.string().optional().nullable().or(z.literal("")).refine((val) => {
         if (!val) return true; // allow empty
 
@@ -134,51 +136,36 @@ export const addUserSchema = z.object({
         message: "Enter up to 4 valid Indian landline numbers, comma-separated",
     }),
     status: z.union([z.literal("Y"), z.literal("N")]).optional(),
-    website_type: z.string()
-        .min(1, { message: "Please select a Theme" }),
-    image: z.any().optional().refine(
-        (file) =>
-            !file || (file instanceof File && file.size > 0),
-        { message: "Please upload a valid profile image" }
-    ),
+    website_type: z.coerce
+        .number()
+        .min(1, { message: "Company theme is required. Please select a theme" }),
+    // image: z.any().optional().refine(
+    //     (file) =>
+    //         !file || (file instanceof File && file.size > 0),
+    //     { message: "Please upload a valid profile image" }
+    // ),
     company_logo: z.custom<File>((file) => file instanceof File && file.size > 0, {
-        message: "Company Logo is required",
+        message: "Company logo is required",
     }).refine((file) => file instanceof File, {
-        message: "Please upload a valid company Logo",
+        message: "Please upload a valid company logo",
     }),
-    fburl: z.string().url("Invalid Facebook URL").nullable().optional().or(z.literal("")),
-    xurl: z.string().url("Invalid Twitter URL").nullable().optional().or(z.literal("")),
-    linkedinurl: z.string().url("Invalid LinkedIn URL").nullable().optional().or(z.literal("")),
-    instaurl: z.string().url("Invalid Instagram URL").nullable().optional().or(z.literal("")),
-    yturl: z.string().url("Invalid Youtube URL").nullable().optional().or(z.literal("")),
-    address1: z.string({ required_error: "Address is required" }).nonempty("Address is required")
+    fburl: z.string().url("Invalid facebook url").nullable().optional().or(z.literal("")),
+    xurl: z.string().url("Invalid twitter url").nullable().optional().or(z.literal("")),
+    linkedinurl: z.string().url("Invalid linkedIn url").nullable().optional().or(z.literal("")),
+    instaurl: z.string().url("Invalid instagram url").nullable().optional().or(z.literal("")),
+    yturl: z.string().url("Invalid youtube url").nullable().optional().or(z.literal("")),
+    address1: z.string({ required_error: "Address is required" }).nonempty("Current address is required")
         .min(6, "Address is too short"), // handles short input
     address2: z.string().nullable(),
     gstin: z.string().trim().nullable().optional(),
-    company_name: z.string().nonempty("Company is required"),
+    company_name: z.string().nonempty("Company name is required"),
+    schema_name: z.string().nonempty("Database name is required"),
+    subdomain: z.string().nonempty("Company sub-domain is required"),
     createdAt: z.string().datetime().optional(),
     updatedAt: z.string().datetime().optional(),
 });
 
 export const updateUserSchema = addUserSchema.partial().extend({
-    image: z
-        .any()
-        .optional()
-        .refine(
-            (file) => {
-                // ✅ Skip validation if no new file uploaded
-                if (!file || file === "" || file === null) return true;
-
-                // ✅ Allow existing image URL (string from DB)
-                if (typeof file === "string") return true;
-
-                // ✅ Validate new uploaded File
-                if (file instanceof File && file.size > 0) return true;
-
-                return false;
-            },
-            { message: "Please upload a valid profile image" }
-        ),
     company_logo: z
         .any()
         .optional()
@@ -188,6 +175,8 @@ export const updateUserSchema = addUserSchema.partial().extend({
                 (file instanceof File && file.size > 0),
             { message: "Please upload a valid company logo" }
         ),
+    schema_name: z.string().optional(),
+    subdomain: z.string().optional(),
 });
 
 export type UserFormValues = z.infer<typeof userSchema>;
