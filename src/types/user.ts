@@ -19,6 +19,7 @@ export interface User {
   Theme?: any;
   company_name?: string | null;
   subdomain?: string | null;
+  custom_domain?: string | null;
   schema_name?: string | null;
   company_logo?: string | null;
   gstin?: string | null;

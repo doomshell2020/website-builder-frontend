@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter, useParams } from "next/navigation";
-import ProfileImageUpload from "@/components/ProfileImageUpload";
+import CompanyLogoUpload from "@/components/CompanyLogoUpload";
 import { logout } from "@/lib/auth";
 import { Label } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
@@ -30,7 +30,9 @@ export default function EditUser() {
         register,
         handleSubmit,
         setValue,
+        watch,
         reset,
+        control,
         formState: { errors, isSubmitting },
     } = useForm<FormData>({
         resolver: zodResolver(userSchema) as any,
@@ -38,10 +40,12 @@ export default function EditUser() {
         reValidateMode: "onChange",
         shouldFocusError: true,
     });
-    const [selectedImage, setSelectedImage] = useState<File | null>(null);
-    const [preview, setPreview] = useState<string | null>(null);
+    const [selectedCompanyLogo, setSelectedCompanyLogo] = useState<File | null>(null);
+    const [previewCompanyLogo, setPreviewCompanyLogo] = useState<string | null>(null);
 
-    const handleBack = () => { router.back() };
+    const handleBack = () => {
+        router.back();
+    };
 
     useEffect(() => {
         setLoading(true);
@@ -56,9 +60,10 @@ export default function EditUser() {
                 reset({
                     name: data.name || "",
                     email: data.email || "",
-                    mobile_no: data.mobile_no ? String(data.mobile_no) : "",
-                    office_no: data.office_no ? String(data.office_no) : "",
-                    fax_no: data.fax_no ? String(data.fax_no) : "",
+                    company_name: data.company_name || "",
+                    mobile_no: data.mobile_no || "",
+                    office_no: data.office_no || "",
+                    fax_no: data.fax_no || "",
                     fburl: data.fburl || "",
                     xurl: data.xurl || "",
                     instaurl: data.instaurl || "",
@@ -66,10 +71,11 @@ export default function EditUser() {
                     yturl: data.yturl || "",
                     address1: data.address1 || "",
                     address2: data.address2 || "",
-
+                    gstin: data.gstin || "",
                 });
-                if (data?.image != null && data.image !== "") {
-                    setPreview(`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.image}`)
+
+                if (data?.company_logo) {
+                    setPreviewCompanyLogo(`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.company_logo}`);
                 }
 
             } catch (error) {
@@ -89,21 +95,25 @@ export default function EditUser() {
             const formData = new FormData();
             formData.append("name", data.name);
             formData.append("email", data.email);
+            formData.append("company_name", data.company_name);
             formData.append("mobile_no", data.mobile_no.trim());
             formData.append("office_no", data.office_no.trim());
             formData.append("fax_no", data.fax_no.trim());
             formData.append("fburl", data.fburl.trim());
             formData.append("xurl", data.xurl.trim());
             formData.append("instaurl", data.instaurl.trim());
+            formData.append("yturl", data.yturl.trim());
+            formData.append("linkedinurl", data.linkedinurl.trim());
+            formData.append("gstin", data.gstin.trim());
             formData.append("address1", data.address1);
             formData.append("address2", data.address2);
-            if (selectedImage) {
-                formData.append("image", selectedImage); // 👈 attach uploaded file
+            if (selectedCompanyLogo instanceof File && selectedCompanyLogo.size > 0) {
+                formData.append("company_logo", selectedCompanyLogo);
             }
             const response = await updateProfile(id, formData);
             if (response?.status === true) {
                 SwalSuccess("Profile has been updated successfully.");
-                handleBack();
+                handleBack(); // If you want to go back
             } else {
                 SwalError({
                     title: "Failed!",
@@ -134,326 +144,402 @@ export default function EditUser() {
                         onSubmit={handleSubmit(onSubmit)}
                         className="space-y-6 p-6 bg-white rounded-lg shadow-md"
                     >
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black">
+                        <div className="">
 
-                            {/** Profile */}
-                            <div className="col-span-full flex items-center gap-6 mb-4">
-                                {/* Profile Image */}
-                                <div className="relative w-32 h-32">
-                                    <ProfileImageUpload
-                                        onFileSelect={(file) => setSelectedImage(file)}
-                                        defaultImage={preview ? preview : null}
+                            {/* ---------------- PERSONAL INFO SECTION ---------------- */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black mt-4">
+                                <div className="col-span-1 md:col-span-2">
+                                    <h2 className="text-lg font-semibold text-gray-800 mb-2">Personal Information</h2>
+                                    <hr className="border-gray-300 mb-2" />
+                                </div>
+
+                                {/* Name */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="name" className="mb-1 font-medium">
+                                        Customer Name <span className="text-red-600">*</span>
+                                    </Label>
+                                    <Input
+                                        id="name"
+                                        type="text"
+                                        placeholder="Enter Customer's Name"
+                                        {...register("name")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        onInput={(e: React.FormEvent<HTMLInputElement>) => {
+                                            const target = e.currentTarget;
+                                            // Replace anything that is not a letter or space
+                                            target.value = target.value.replace(/[^A-Za-z\s]/g, "");
+                                        }}
+                                        onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => {
+                                            const paste = e.clipboardData.getData("text");
+                                            if (/[^A-Za-z\s]/.test(paste)) {
+                                                e.preventDefault(); // block paste if it contains invalid chars
+                                            }
+                                        }}
                                     />
+                                    {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
                                 </div>
 
-                                {/* Upload Info / Message */}
-                                <div className="flex-1">
-                                    <p className="text-sm text-gray-600 leading-snug">
-                                        Upload only{" "}
-                                        <span className="font-medium text-gray-700">
-                                            JPG, JPEG, PNG, GIF, TIFF, or WEBP
-                                        </span>
-                                        . <br />
-                                        Max size: <span className="font-medium text-gray-700">2 MB</span>. <br />
-                                        Recommended: <span className="font-medium text-gray-700">128×128 px</span>.
-                                    </p>
+                                {/* Mobile No */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="mobile_no" className="mb-1 font-medium">
+                                        Customer Mobile No. <span className="text-red-600">*</span>
+                                    </Label>
+                                    <Input
+                                        id="mobile_no"
+                                        type="text"
+                                        placeholder="Enter Customer's Mobile No."
+                                        {...register("mobile_no")}
+                                        maxLength={13}
+                                        onInput={(e) => {
+                                            let val = e.currentTarget.value;
+                                            if (val.startsWith("+")) {
+                                                val = "+" + val.slice(1).replace(/\D/g, "");
+                                            } else {
+                                                val = val.replace(/\D/g, "");
+                                            }
+                                            if (val.startsWith("+91")) {
+                                                val = "+91" + val.slice(3, 13);
+                                            } else {
+                                                val = val.slice(0, 10);
+                                            }
+                                            e.currentTarget.value = val;
+                                        }}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.mobile_no && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.mobile_no.message}</p>
+                                    )}
+                                </div>
+
+                                {/* Email */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="email" className="mb-1 font-medium">
+                                        Email <span className="text-red-600">*</span>
+                                    </Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="Enter Email Address"
+                                        {...register("email")}
+                                        disabled
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+                                </div>
+
+                            </div>
+
+                            {/* ---------------- COMPANY DETAILS SECTION ---------------- */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black mt-4">
+                                {/* Section Header (spans full width) */}
+                                <div className="col-span-1 md:col-span-2">
+                                    <h2 className="text-lg font-semibold text-gray-800 mb-2">Company Details</h2>
+                                    <hr className="border-gray-300 mb-2" />
+                                </div>
+
+                                {/* Company Name & GST No -- Company Logo */}
+                                <div className="flex flex-col col-span-1 md:col-span-2">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black">
+
+                                        {/* Left side: Company Name  & GST No.*/}
+                                        <div className="grid grid-cols-1 md:grid-cols-1 gap-4 col-span-1">
+
+                                            {/* Company Name */}
+                                            <div className="flex flex-col">
+                                                <Label htmlFor="company_name" className="mb-1 font-medium">
+                                                    Company Name <span className="text-red-600">*</span>
+                                                </Label>
+                                                <Input
+                                                    id="company_name"
+                                                    type="text"
+                                                    placeholder="Enter Company Name"
+                                                    {...register("company_name")}
+                                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    maxLength={50}
+                                                />
+                                                {errors?.company_name?.message && (
+                                                    <p className="text-red-500 text-sm mt-1">{errors.company_name.message}</p>
+                                                )}
+                                            </div>
+
+                                            {/* Company GST No. */}
+                                            <div className="flex flex-col col-span-1 md:col-span-1">
+                                                <Label htmlFor="gstin" className="mb-1 font-medium">
+                                                    Company GST No. (If you have)
+                                                </Label>
+                                                <Input
+                                                    id="gstin"
+                                                    type="text"
+                                                    placeholder="eg. 22AAAAA0000A1Z5"
+                                                    {...register("gstin")}
+                                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    maxLength={15}
+                                                />
+                                                {errors?.gstin?.message && (
+                                                    <p className="text-red-500 text-sm mt-1">{errors.gstin.message}</p>
+                                                )}
+                                            </div>
+
+                                        </div>
+
+                                        {/* Right side: Company Logo */}
+                                        <div className="flex flex-col col-span-1">
+                                            <Label htmlFor="company_logo" className="mb-1 font-medium">
+                                                Company Logo <span className="text-red-600">*</span>
+                                            </Label>
+                                            <Controller
+                                                name="company_logo"
+                                                control={control}
+                                                rules={{ required: "Company logo is required" }}
+                                                render={({ field }) => (
+                                                    <CompanyLogoUpload
+                                                        onFileSelect={(file: File) => {
+                                                            field.onChange(file);
+                                                            setSelectedCompanyLogo(file);
+                                                        }}
+                                                        // defaultImage={null}
+                                                        defaultImage={previewCompanyLogo ?? null}
+                                                    />
+                                                )}
+                                            />
+                                            {typeof errors?.company_logo?.message === "string" && (
+                                                <p className="text-red-500 text-sm">{errors.company_logo.message}</p>
+                                            )}
+
+                                        </div>
+
+                                        {/* Company Phone No. */}
+                                        <div className="flex flex-col">
+                                            <Label htmlFor="office_no" className="mb-1 font-medium">
+                                                Company Phone No. (max 4, comma-separated)
+                                            </Label>
+                                            <Input
+                                                id="office_no"
+                                                type="text"
+                                                placeholder="+911234567890, +911234567891..."
+                                                {...register("office_no")}
+                                                onInput={(e) => {
+                                                    let val = e.currentTarget.value;
+
+                                                    // Split by comma and trim spaces
+                                                    let numbers = val.split(",").map((num) => num.trim());
+
+                                                    // Limit to max 4 numbers
+                                                    if (numbers.length > 4) numbers = numbers.slice(0, 4);
+
+                                                    // Process each number
+                                                    numbers = numbers.map((num) => {
+                                                        if (num.startsWith("+")) {
+                                                            num = "+" + num.slice(1).replace(/\D/g, "");
+                                                        } else {
+                                                            num = num.replace(/\D/g, "");
+                                                        }
+
+                                                        if (num.startsWith("+91")) {
+                                                            num = "+91" + num.slice(3, 13);
+                                                        } else if (num.startsWith("0")) {
+                                                            num = "0" + num.slice(1, 11);
+                                                        } else {
+                                                            num = num.slice(0, 10);
+                                                        }
+
+                                                        return num;
+                                                    });
+
+                                                    // Join numbers back with comma + space
+                                                    e.currentTarget.value = numbers.join(", ");
+                                                }}
+                                                onPaste={(e) => {
+                                                    const pasteData = e.clipboardData.getData("text");
+
+                                                    // Only allow digits, commas, spaces, and optional leading +
+                                                    if (!/^[\d,+\s]+$/.test(pasteData)) {
+                                                        e.preventDefault();
+                                                    }
+                                                }}
+                                                className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                            {errors.office_no && (
+                                                <p className="text-red-500 text-sm mt-1">{errors.office_no.message}</p>
+                                            )}
+                                        </div>
+
+                                        {/* Company Fax No. */}
+                                        <div className="flex flex-col">
+                                            <Label htmlFor="fax_no" className="mb-1 font-medium">
+                                                Company Fax No.
+                                            </Label>
+                                            <Input
+                                                id="fax_no"
+                                                type="text"
+                                                placeholder="Company Fax no."
+                                                {...register("fax_no")}
+                                                onInput={(e) => {
+                                                    let val = e.currentTarget.value;
+                                                    if (val.startsWith("+")) {
+                                                        val = "+" + val.slice(1).replace(/\D/g, "");
+                                                    } else {
+                                                        val = val.replace(/\D/g, "");
+                                                    }
+                                                    if (val.startsWith("+91")) {
+                                                        // +91 + STD (2-4) + number (6-8) → max 13 digits
+                                                        val = "+91" + val.slice(3, 13);
+                                                    } else if (val.startsWith("0")) {
+                                                        // 0 + STD + number → max 11 digits
+                                                        val = "0" + val.slice(1, 11);
+                                                    } else {
+                                                        // No prefix → STD + number → max 10 digits
+                                                        val = val.slice(0, 10);
+                                                    }
+
+                                                    e.currentTarget.value = val;
+                                                }}
+                                                onPaste={(e) => {
+                                                    const pasteData = e.clipboardData.getData("text");
+
+                                                    // Only allow digits and optional leading +
+                                                    if (!/^\+?\d+$/.test(pasteData)) {
+                                                        e.preventDefault();
+                                                    }
+                                                }}
+                                                className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                            {errors.fax_no && (
+                                                <p className="text-red-500 text-sm mt-1">{errors.fax_no.message}</p>
+                                            )}
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            {/* ---------------- SOCIAL MEDIA lINKS SECTION ---------------- */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black mt-4">
+                                <div className="col-span-1 md:col-span-2">
+                                    <h2 className="text-lg font-semibold text-gray-800 mb-2">Social Media Links</h2>
+                                    <hr className="border-gray-300 mb-2" />
+                                </div>
+
+                                {/* Facebook */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="fburl" className="mb-1 font-medium">
+                                        Facebook Page
+                                    </Label>
+                                    <Input
+                                        id="fburl"
+                                        placeholder="Enter Facebook URL"
+                                        {...register("fburl")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.fburl && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.fburl.message}</p>
+                                    )}
+                                </div>
+
+                                {/* Twitter */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="xurl" className="mb-1 font-medium">
+                                        Twitter Page
+                                    </Label>
+                                    <Input
+                                        id="xurl"
+                                        placeholder="Enter Twitter URL"
+                                        {...register("xurl")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.xurl && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.xurl.message}</p>
+                                    )}
+                                </div>
+
+                                {/* Instagram */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="instaurl" className="mb-1 font-medium">
+                                        Instagram Page
+                                    </Label>
+                                    <Input
+                                        id="instaurl"
+                                        placeholder="Enter Instagram URL"
+                                        {...register("instaurl")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.instaurl && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.instaurl.message}</p>
+                                    )}
+                                </div>
+
+                                {/* LinkedIn */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="linkedinurl" className="mb-1 font-medium">
+                                        LinkedIn Page
+                                    </Label>
+                                    <Input
+                                        id="linkedinurl"
+                                        placeholder="Enter LinkedIn URL"
+                                        {...register("linkedinurl")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.linkedinurl && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.linkedinurl.message}</p>
+                                    )}
+                                </div>
+
+                                {/* Youtube */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="yturl" className="mb-1 font-medium">
+                                        Youtube Page
+                                    </Label>
+                                    <Input
+                                        id="yturl"
+                                        placeholder="Enter Youtube URL"
+                                        {...register("yturl")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.yturl && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.yturl.message}</p>
+                                    )}
                                 </div>
                             </div>
 
-                            {/* Name */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="name" className="mb-1 font-medium">
-                                    Name <span className="text-red-600">*</span>
-                                </Label>
-                                <Input
-                                    id="name"
-                                    type="text"
-                                    placeholder="Name"
-                                    {...register("name")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.name && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-                                )}
-                            </div>
+                            {/* ---------------- ADDRESS INFO SECTION ---------------- */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black mt-4">
+                                <div className="col-span-1 md:col-span-2">
+                                    <h2 className="text-lg font-semibold text-gray-800 mb-2">Address Details</h2>
+                                    <hr className="border-gray-300 mb-2" />
+                                </div>
+                                {/** Address 1 */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="address1" className="mb-1 font-medium">
+                                        Current Address <span className="text-red-600">*</span>
+                                    </Label>
+                                    <Textarea
+                                        id="address1"
+                                        placeholder="Enter Current Address"
+                                        {...register("address1")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.address1 && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.address1.message}</p>
+                                    )}
+                                </div>
 
-                            {/* Email */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="email" className="mb-1 font-medium">
-                                    Email <span className="text-red-600">*</span>
-                                </Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="Email"
-                                    disabled
-                                    {...register("email")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.email && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-                                )}
-                            </div>
-
-                            {/* Mobile */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="mobile_no" className="mb-1 font-medium">
-                                    Mobile No. <span className="text-red-600">*</span>
-                                </Label>
-                                <Input
-                                    id="mobile_no"
-                                    type="text"
-                                    placeholder="Mobile number"
-                                    maxLength={13} // ensure max 10 digits
-                                    {...register("mobile_no")}
-                                    onInput={(e) => {
-                                        let val = e.currentTarget.value;
-
-                                        // Remove all non-digit characters except optional + at start
-                                        if (val.startsWith("+")) {
-                                            val = "+" + val.slice(1).replace(/\D/g, "");
-                                        } else {
-                                            val = val.replace(/\D/g, "");
-                                        }
-
-                                        // Optional: limit to +91XXXXXXXXXX format
-                                        if (val.startsWith("+91")) {
-                                            val = "+91" + val.slice(3, 13); // max 10 digits after +91
-                                        } else if (val.startsWith("91")) {
-                                            val = "91" + val.slice(2, 12); // max 10 digits after 91
-                                        } else {
-                                            val = val.slice(0, 10); // max 10 digits
-                                        }
-
-                                        e.currentTarget.value = val;
-                                    }}
-                                    onPaste={(e) => {
-                                        const pasteData = e.clipboardData.getData("text");
-
-                                        // Only allow digits and optional leading +
-                                        if (!/^\+?\d+$/.test(pasteData)) {
-                                            e.preventDefault();
-                                        }
-                                    }}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.mobile_no && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.mobile_no.message}</p>
-                                )}
-                            </div>
-
-                            {/* Office No */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="office_no" className="mb-1 font-medium">
-                                    Phone No. (max 4, comma-separated)
-                                </Label>
-                                <Input
-                                    id="office_no"
-                                    type="text"
-                                    placeholder="+911234567890, +911234567891..."
-                                    {...register("office_no")}
-                                    onInput={(e) => {
-                                        let val = e.currentTarget.value;
-
-                                        // Split by comma and trim spaces
-                                        let numbers = val.split(",").map((num) => num.trim());
-
-                                        // Limit to max 4 numbers
-                                        if (numbers.length > 4) numbers = numbers.slice(0, 4);
-
-                                        // Process each number
-                                        numbers = numbers.map((num) => {
-                                            if (num.startsWith("+")) {
-                                                num = "+" + num.slice(1).replace(/\D/g, "");
-                                            } else {
-                                                num = num.replace(/\D/g, "");
-                                            }
-
-                                            if (num.startsWith("+91")) {
-                                                num = "+91" + num.slice(3, 13);
-                                            } else if (num.startsWith("0")) {
-                                                num = "0" + num.slice(1, 11);
-                                            } else {
-                                                num = num.slice(0, 10);
-                                            }
-
-                                            return num;
-                                        });
-
-                                        // Join numbers back with comma + space
-                                        e.currentTarget.value = numbers.join(", ");
-                                    }}
-                                    onPaste={(e) => {
-                                        const pasteData = e.clipboardData.getData("text");
-
-                                        // Only allow digits, commas, spaces, and optional leading +
-                                        if (!/^[\d,+\s]+$/.test(pasteData)) {
-                                            e.preventDefault();
-                                        }
-                                    }}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.office_no && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.office_no.message}</p>
-                                )}
-                            </div>
-
-                            {/* Fax no. */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="Fax" className="mb-1 font-medium">
-                                    Fax No.
-                                </Label>
-                                <Input
-                                    id="fax_no"
-                                    type="text"
-                                    placeholder="Fax number"
-                                    {...register("fax_no")}
-                                    onInput={(e) => {
-                                        let val = e.currentTarget.value;
-                                        if (val.startsWith("+")) {
-                                            val = "+" + val.slice(1).replace(/\D/g, "");
-                                        } else {
-                                            val = val.replace(/\D/g, "");
-                                        }
-                                        if (val.startsWith("+91")) {
-                                            // +91 + STD (2-4) + number (6-8) → max 13 digits
-                                            val = "+91" + val.slice(3, 13);
-                                        } else if (val.startsWith("0")) {
-                                            // 0 + STD + number → max 11 digits
-                                            val = "0" + val.slice(1, 11);
-                                        } else {
-                                            // No prefix → STD + number → max 10 digits
-                                            val = val.slice(0, 10);
-                                        }
-
-                                        e.currentTarget.value = val;
-                                    }}
-                                    onPaste={(e) => {
-                                        const pasteData = e.clipboardData.getData("text");
-
-                                        // Only allow digits and optional leading +
-                                        if (!/^\+?\d+$/.test(pasteData)) {
-                                            e.preventDefault();
-                                        }
-                                    }}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.fax_no && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.fax_no.message}</p>
-                                )}
-                            </div>
-
-                            {/* Facebook */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="fburl" className="mb-1 font-medium">
-                                    Facebook
-                                </Label>
-                                <Input
-                                    id="fburl"
-                                    type="url"
-                                    placeholder="Facebook url"
-                                    {...register("fburl")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.fburl && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.fburl.message}</p>
-                                )}
-                            </div>
-
-                            {/* Twitter */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="xurl" className="mb-1 font-medium">
-                                    Twitter
-                                </Label>
-                                <Input
-                                    id="xurl"
-                                    placeholder="Twitter url"
-                                    {...register("xurl")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.xurl && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.xurl.message}</p>
-                                )}
-                            </div>
-
-                            {/* Instagram */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="instaurl" className="mb-1 font-medium">
-                                    Instagram
-                                </Label>
-                                <Input
-                                    id="instaurl"
-                                    placeholder="Instagram url"
-                                    {...register("instaurl")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.instaurl && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.instaurl.message}</p>
-                                )}
-                            </div>
-
-                            {/* LinkedIn */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="linkedinurl" className="mb-1 font-medium">
-                                    LinkedIn
-                                </Label>
-                                <Input
-                                    id="linkedinurl"
-                                    placeholder="LinkedIn url"
-                                    {...register("linkedinurl")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.linkedinurl && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.linkedinurl.message}</p>
-                                )}
-                            </div>
-
-                            {/* Youtube */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="yturl" className="mb-1 font-medium">
-                                    Youtube
-                                </Label>
-                                <Input
-                                    id="yturl"
-                                    placeholder="Youtube url"
-                                    {...register("yturl")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.yturl && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.yturl.message}</p>
-                                )}
-                            </div>
-
-                            {/* Address 1 */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="address1" className="mb-1 font-medium">
-                                    Current Address <span className="text-red-600">*</span>
-                                </Label>
-                                <Textarea
-                                    id="address1"
-                                    placeholder="Enter current address"
-                                    {...register("address1")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.address1 && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.address1.message}</p>
-                                )}
-                            </div>
-
-                            {/* Address 2 */}
-                            <div className="flex flex-col">
-                                <Label htmlFor="address2" className="mb-1 font-medium">
-                                    Permanent Address
-                                </Label>
-                                <Textarea
-                                    id="address2"
-                                    placeholder="Enter Permanent Address"
-                                    {...register("address2")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                                {errors.address2 && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.address2.message}</p>
-                                )}
+                                {/** Address 2 */}
+                                <div className="flex flex-col">
+                                    <Label htmlFor="address2" className="mb-1 font-medium">
+                                        Permanent Address
+                                    </Label>
+                                    <Textarea
+                                        id="address2"
+                                        placeholder="Enter Permanent Address"
+                                        {...register("address2")}
+                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    {errors.address2 && (
+                                        <p className="text-red-500 text-sm mt-1">{errors.address2.message}</p>
+                                    )}
+                                </div>
                             </div>
 
                         </div>
@@ -478,7 +564,6 @@ export default function EditUser() {
                                 )}
                             </Button>
                         </div>
-
                     </form>
                 )}
             </main>

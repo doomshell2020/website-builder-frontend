@@ -1,10 +1,11 @@
 "use client";
 
-import React , { useMemo, useCallback, useEffect, useRef, useState } from "react";
+import React, { useMemo, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-    Info, Trash2, ToggleRight, ToggleLeft, Edit, Plus,
-    CornerRightDown, CircleAlert, CircleCheckBig, ExternalLink, Link as LinkIcon
+    Trash2, ToggleRight, ToggleLeft, Edit, Plus,
+    CornerRightDown, CircleAlert, CircleCheckBig, ExternalLink, Link as LinkIcon,
+    EyeIcon
 } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -194,45 +195,42 @@ const UsersListPage = () => {
             {
                 name: "Company Detail",
                 cell: (row: User) => {
-                    // ✅ Determine valid image source
                     const validLogo =
                         row?.company_logo &&
                             row?.company_logo !== "undefined" &&
                             row?.company_logo.trim() !== ""
-                            ? (row.company_logo.startsWith("http")
+                            ? row.company_logo.startsWith("http")
                                 ? row.company_logo
-                                : `${process.env.NEXT_PUBLIC_IMAGE_URL}${row.company_logo}`)
+                                : `${process.env.NEXT_PUBLIC_IMAGE_URL}${row.company_logo}`
                             : "/assest/image/defaultUser.webp";
 
-                    // ✅ Use state fallback for missing/broken images
                     const [imgSrc, setImgSrc] = React.useState(validLogo);
 
                     return (
                         <button
-                            title="Company Details"
+                            title="View Company Details"
                             onClick={() => router.push(`/admin/users/view/${row.id}`)}
-                            className="flex items-center gap-2 text-blue-600 hover:underline"
+                            className="flex items-center gap-2 text-blue-600 hover:underline max-w-full truncate"
                         >
-                            {/* Profile / Company Logo */}
-                            <div className="w-9 h-9 overflow-hidden flex items-center justify-center bg-gray-100 border border-gray-200 rounded-full">
+                            {/* Logo */}
+                            <div className="flex-shrink-0 w-8 h-8 md:w-9 md:h-9 overflow-hidden flex items-center justify-center bg-gray-100 border border-gray-200 rounded-full">
                                 <Image
                                     src={imgSrc}
                                     alt={`${row.company_name || "Company"} Logo`}
                                     width={36}
                                     height={36}
                                     className="object-cover"
-                                    onError={() => setImgSrc("/assest/image/defaultUser.webp")} // ✅ fallback if not found
+                                    onError={() => setImgSrc("/assest/image/defaultUser.webp")}
                                 />
                             </div>
 
                             {/* Company Name */}
-                            <span className="font-medium text-gray-800 truncate max-w-[160px]">
+                            <span className="font-medium text-gray-800 truncate max-w-[100px] sm:max-w-[160px] md:max-w-[200px]">
                                 {row.company_name || "N/A"}
                             </span>
                         </button>
                     );
                 },
-                selector: (row: User) => row.company_name || "N/A",
                 sortable: true,
             },
             {
@@ -246,6 +244,7 @@ const UsersListPage = () => {
                         <span className="text-sm text-gray-500">{row.mobile_no || "N/A"}</span>
                     </div>
                 ),
+                width: "20%",
             },
             {
                 name: "Subdomain",
@@ -278,18 +277,45 @@ const UsersListPage = () => {
             {
                 name: "Custom Domain",
                 cell: (row: User) => (
-                    <Button
-                        onClick={() => {
-                            setSelectedUserId(row.id);
-                            setOpenCustomDomainSetup(true);
-                        }}
-                        className="inline-flex items-center justify-center gap-1 rounded-[5px] bg-gradient-to-r from-blue-600 to-blue-500 text-white text-sm font-medium px-4 shadow hover:from-blue-700 hover:to-blue-600 transition-all duration-200"
-                    >
-                        <span className="text-lg font-bold leading-none">+</span>
-                        Custom Domain
-                    </Button>
+                    <div className="flex items-center justify-start">
+                        {row?.custom_domain ? (
+                            <div className="flex items-center justify-between flex-row gap-2">
+                                <div className="flex items-center text-gray-800 font-medium">
+                                    <Link
+                                        href={`https://${row.custom_domain}`}
+                                        target="_blank"
+                                        // title="Visit Domain"
+                                        className="text-black font-medium hover:text-blue-700">
+                                        {row.custom_domain}
+                                    </Link>
+                                </div>
+
+                                <div className="flex items-center gap-3 text-gray-500">
+                                    <button
+                                        onClick={() => {
+                                            setSelectedUserId(row.id);
+                                            setOpenCustomDomainSetup(true);
+                                        }}
+                                        // title="Change / Remove Custom Domain"
+                                        className="text-blue-500 hover:text-blue-700">
+                                        <EyeIcon className="w-5 h-5" />
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <Button
+                                onClick={() => {
+                                    setSelectedUserId(row.id);
+                                    setOpenCustomDomainSetup(true);
+                                }}
+                                className="inline-flex items-center justify-center gap-1 rounded-md bg-gradient-to-r from-blue-600 to-blue-500 text-white text-xs md:text-sm font-medium px-2 md:px-2 shadow hover:from-blue-700 hover:to-blue-600 transition-all duration-200 w-full sm:w-auto truncate rounded-[5px]"
+                            >
+                                <span className="text-base font-bold leading-none">+</span>
+                                <span className="hidden sm:inline">Custom Domain</span>
+                            </Button>
+                        )}
+                    </div>
                 ),
-                width: "15%",
                 sortable: false,
             },
             {
@@ -560,30 +586,25 @@ const UsersListPage = () => {
             </main>
             {openCustomDomainSetup && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-                    {/* Scroll container */}
                     <div className="relative w-full max-w-2xl max-h-[80vh] overflow-y-auto bg-white rounded-2xl shadow-xl p-6 animate-fadeIn">
-                        {/* Close button */}
                         <button
-                            onClick={() => setOpenCustomDomainSetup(false)}
+                            onClick={() => {
+                                setOpenCustomDomainSetup(false);
+                                fetchData();
+                            }}
                             className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 transition"
                         >
                             ✕
                         </button>
 
-                        {/* Header */}
                         <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
                             🌐 Custom Domain Setup
                         </h2>
 
-                        {/* Scrollable Content */}
                         <div className="space-y-4">
                             {selectedUserId && (
                                 <DomainSetup
-                                    userId={
-                                        Array.isArray(selectedUserId)
-                                            ? selectedUserId[0]
-                                            : selectedUserId
-                                    }
+                                    userId={Array.isArray(selectedUserId) ? selectedUserId[0] : selectedUserId}
                                 />
                             )}
                         </div>

@@ -5,6 +5,7 @@ import { projectsAddProjectDomain } from "@vercel/sdk/funcs/projectsAddProjectDo
 import { projectsGetProjectDomain } from "@vercel/sdk/funcs/projectsGetProjectDomain.js";
 import { projectsRemoveProjectDomain } from "@vercel/sdk/funcs/projectsRemoveProjectDomain.js";
 import { CheckCircle, AlertTriangle } from "lucide-react";
+import { saveDomain, removeDomain } from '@/services/userService'
 
 interface CustomDomainSetupProps { userId: string; }
 
@@ -82,6 +83,14 @@ export default function CustomDomainSetup({ userId }: CustomDomainSetupProps) {
         setVerified(!!infoRes.value.verified);
       }
 
+      // Step 4: Prepare FormData for your backend
+      const formData = new FormData();
+      formData.append("www_domain", wwwDomain);
+
+      // Step 5: Save domain in your backend users table
+      const dbRes = await saveDomain(Number(userId), formData);
+      console.log("Domain saved to DB: ", dbRes);
+
       setStatus({
         type: "success",
         message: `✅ Both "${apexDomain}" and "www.${apexDomain}" have been added or already exist.`,
@@ -118,6 +127,10 @@ export default function CustomDomainSetup({ userId }: CustomDomainSetupProps) {
       });
 
       if (apexRes.ok || wwwRes.ok) {
+
+        const dbRes = await removeDomain(Number(userId));
+        console.log("Domain removed to DB: ", dbRes);
+
         setStatus({
           type: "success",
           message: `✅ "${apexDomain}" and "www.${apexDomain}" removed successfully.`,

@@ -52,13 +52,22 @@ export const userSchema = z.object({
     }, {
         message: "Enter up to 4 valid Indian landline numbers, comma-separated",
     }),
+    company_logo: z
+        .any()
+        .optional()
+        .refine(
+            (file) =>
+                !file ||
+                (file instanceof File && file.size > 0),
+            { message: "Please upload a valid company logo" }
+        ),
     status: z.union([z.literal("Y"), z.literal("N")]).optional(),
-    image: z.string().nullable().optional(),
     fburl: z.string().url("Invalid Facebook URL").nullable().optional().or(z.literal("")),
     xurl: z.string().url("Invalid Twitter URL").nullable().optional().or(z.literal("")),
     linkedinurl: z.string().url("Invalid LinkedIn URL").nullable().optional().or(z.literal("")),
     instaurl: z.string().url("Invalid Instagram URL").nullable().optional().or(z.literal("")),
     yturl: z.string().url("Invalid Youtube URL").nullable().optional().or(z.literal("")),
+    gstin: z.string().trim().nullable().optional(),
     address1: z.string({ required_error: "Address is required" }).nonempty("Address is required")
         .min(6, "Address is too short"), // handles short input
     address2: z.string().nullable(),

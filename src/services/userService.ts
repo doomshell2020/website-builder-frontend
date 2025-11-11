@@ -63,6 +63,7 @@ export const updateUser = async (id: string, data: any): Promise<{ status: boole
   });
   return response.data;
 };
+
 // separate for users profile update
 export const updateProfile = async (id: string, data: any): Promise<{ status: boolean; message?: string }> => {
   const response = await API.put(`/update-profile/self/${id}`, data, {
@@ -92,5 +93,16 @@ export const getAllSchemas = async (page = 1, limit = 10): Promise<any> => {
   const response = await API.get('/schema/view-all', {
     params: { page, limit },
   });
+  return response.data;
+};
+
+// ==== FOR DOMAIN SERVICES ==== //
+export const saveDomain = async (id: number, data: FormData): Promise<any> => {
+  const response = await API.put(`/users/save/custom-domain/${id}`, data);
+  return response.data;
+};
+
+export const removeDomain = async (id: number): Promise<void> => {
+  const response = await API.put(`/users/remove/custom-domain/${id}`);
   return response.data;
 };
