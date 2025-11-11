@@ -83,13 +83,15 @@ export default function CustomDomainSetup({ userId }: CustomDomainSetupProps) {
         setVerified(!!infoRes.value.verified);
       }
 
-      // Step 4: Prepare FormData for your backend
-      const formData = new FormData();
-      formData.append("www_domain", wwwDomain);
+      if (wwwRes.ok) {
+        // Step 4: Prepare FormData for your backend
+        const formData = new FormData();
+        formData.append("www_domain", wwwDomain);
 
-      // Step 5: Save domain in your backend users table
-      const dbRes = await saveDomain(Number(userId), formData);
-      console.log("Domain saved to DB: ", dbRes);
+        // Step 5: Save domain in your backend users table
+        const dbRes = await saveDomain(Number(userId), formData);
+        console.log("Domain saved to DB: ", dbRes);
+      }
 
       setStatus({
         type: "success",
@@ -127,10 +129,8 @@ export default function CustomDomainSetup({ userId }: CustomDomainSetupProps) {
       });
 
       if (apexRes.ok || wwwRes.ok) {
-
         const dbRes = await removeDomain(Number(userId));
         console.log("Domain removed to DB: ", dbRes);
-
         setStatus({
           type: "success",
           message: `✅ "${apexDomain}" and "www.${apexDomain}" removed successfully.`,
