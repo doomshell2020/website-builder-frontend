@@ -148,7 +148,7 @@ export default function Contact({ project }: DefaultProps) {
                 .replaceAll('{SUBJECT}', data?.subject)
                 .replaceAll('{COMPANY_PHONE}', project?.mobile_no)
                 .replaceAll('{COMPANY_NAME}', project?.company_name)
-                .replaceAll('{SITE_URL}', `http://${project?.company_name}.webbuilder.local:3000`)
+                .replaceAll('{SITE_URL}', `https://${project?.subdomain}.baaraat.com`)
                 .replaceAll('{DATE}', `${new Date().getFullYear()}`)
                 .replaceAll('{LOGO_URL}', `https://navlokcolonizers.com/wp-content/uploads/2025/08/logo-300x141.png`);
 
@@ -161,7 +161,7 @@ export default function Contact({ project }: DefaultProps) {
                 company_name: project?.company_name,
                 company_email: project?.email,
             };
-            const response: any = await createEnquiry(project?.company_name, payload);
+            const response: any = await createEnquiry(project?.schema_name, payload);
             if (response?.status === true) {
                 SwalSuccess("enquiry submitted successfully.");
                 reset({

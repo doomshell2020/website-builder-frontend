@@ -146,7 +146,7 @@ export default function Contact({ project }: DefaultProps) {
                 .replaceAll('{SUBJECT}', data?.subject)
                 .replaceAll('{COMPANY_PHONE}', project?.mobile_no)
                 .replaceAll('{COMPANY_NAME}', project?.company_name)
-                .replaceAll('{SITE_URL}', `http://${project?.company_name}.webbuilder.local:3000`)
+                .replaceAll('{SITE_URL}', `https://${project?.subdomain}.baaraat.com`)
                 .replaceAll('{DATE}', `${new Date().getFullYear()}`)
                 .replaceAll("{HEADER_BG_IMAGE}", "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=1200&q=80")
                 .replaceAll('{LOGO_URL}', `https://jaipurfoodcaterers.com/wp-content/themes/twentytwenty-child/assets/images/logo.png`);
@@ -160,7 +160,7 @@ export default function Contact({ project }: DefaultProps) {
                 company_name: project?.company_name,
                 company_email: project?.email,
             };
-            const response: any = await createEnquiry(project?.company_name, payload);
+            const response: any = await createEnquiry(project?.schema_name, payload);
             if (response?.status === true) {
                 SwalSuccess("enquiry submitted successfully.");
                 reset({
