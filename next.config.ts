@@ -2,7 +2,7 @@
 import type { NextConfig } from "next";
 
 const imageDomains =
-  process.env.BUILD_TARGET == 'development'
+  process.env.NODE_ENV == 'development'
     ? ['localhost', '127.0.0.1', '192.168.0.77']
     : ['api.doomshell.com'];
 
