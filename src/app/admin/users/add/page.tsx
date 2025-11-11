@@ -323,17 +323,21 @@ export default function AddUser() {
                                                         <HelpCircle className="text-red-600 cursor-pointer w-5 h-5" />
                                                     </PopoverTrigger>
 
-                                                    <PopoverContent className="w-80 text-sm text-black bg-white rounded-lg shadow-md border p-4">
+                                                    <PopoverContent className="w-80 text-sm text-gray-800 bg-white rounded-lg shadow-md border p-4 leading-relaxed">
                                                         <p className="font-semibold mb-2">Subdomain Naming Instructions:</p>
-                                                        <ul className="list-disc pl-4 space-y-1">
-                                                            <li>Use only lowercase letters (<code>a–z</code>), numbers (<code>0–9</code>), underscores (<code>_</code>), and hyphens (<code>-</code>).</li>
-                                                            <li>Do <strong>not</strong> start with an underscore (<code>_</code>) or hyphen (<code>-</code>).</li>
-                                                            <li>Spaces and special characters (like <code>@, #, !, $, %</code>) are not allowed.</li>
-                                                            <li>Keep the subdomain short and descriptive (under 50 characters).</li>
-                                                            <li>Each company should have a unique subdomain name.</li>
-                                                        </ul>
+                                                        <p className="mb-2">
+                                                            The subdomain you enter will be automatically created using a wildcard DNS configuration.
+                                                        </p>
+                                                        <p className="mb-2">
+                                                            Example: if you enter <code>mycompany</code>, your site will be available at{" "}
+                                                            <strong>mycompany.baaraat.com</strong>.
+                                                        </p>
+                                                        <p>
+                                                            You can link a custom domain (like <strong>mycompany.com</strong>) anytime later.
+                                                        </p>
                                                     </PopoverContent>
                                                 </Popover>
+
 
                                             </div>
                                             <Input
@@ -347,10 +351,7 @@ export default function AddUser() {
                                                     const target = e.currentTarget;
                                                     let value = target.value.toLowerCase();
 
-                                                    // ✅ Allow only lowercase letters, numbers, underscores, and hyphens
                                                     value = value.replace(/[^a-z0-9_-]/g, "");
-
-                                                    // 🚫 Remove invalid starting characters (_ or -)
                                                     value = value.replace(/^[-_]+/, "");
 
                                                     target.value = value;
@@ -358,7 +359,6 @@ export default function AddUser() {
                                                 onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => {
                                                     let paste = e.clipboardData.getData("text").toLowerCase();
 
-                                                    // 🚫 Block paste if invalid chars or starts with _ or -
                                                     if (/[^a-z0-9_-]/.test(paste) || /^[-_]/.test(paste)) {
                                                         e.preventDefault();
                                                     }
