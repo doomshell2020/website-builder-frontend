@@ -64,12 +64,18 @@ export default function AddUser() {
 
     const onSubmit = async (data: any) => {
         try {
+            const schemaFriendlyName = data.company_name
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, "_")
+                .replace(/[^a-z0-9_]/g, "");
+
             const formData = new FormData();
             formData.append("name", data.name);
             formData.append("email", data.email);
             formData.append("password", data.password);
             formData.append("company_name", data.company_name);
-            formData.append("schema_name", data.schema_name);
+            formData.append("schema_name", schemaFriendlyName);
             formData.append("subdomain", data.subdomain);
             formData.append("website_type", data.website_type);
             formData.append("mobile_no", data.mobile_no.trim());
@@ -160,20 +166,38 @@ export default function AddUser() {
                                     maxLength={13}
                                     onInput={(e) => {
                                         let val = e.currentTarget.value;
+
+                                        // ✅ Allow only digits (keep '+' only at start)
                                         if (val.startsWith("+")) {
                                             val = "+" + val.slice(1).replace(/\D/g, "");
                                         } else {
                                             val = val.replace(/\D/g, "");
                                         }
+
+                                        // ✅ Handle Indian format (+91 or 10 digits)
                                         if (val.startsWith("+91")) {
-                                            val = "+91" + val.slice(3, 13);
+                                            val = "+91" + val.slice(3, 13); // +91 + 10 digits max
+
+                                            // 🚫 Block numbers starting with 0–5 after +91
+                                            const firstDigit = val.charAt(3);
+                                            if (/[0-5]/.test(firstDigit)) {
+                                                val = "+91"; // reset if invalid start
+                                            }
                                         } else {
+                                            // ✅ Handle 10-digit local numbers only
                                             val = val.slice(0, 10);
+
+                                            // 🚫 Block numbers starting with 0–5
+                                            if (/^[0-5]/.test(val)) {
+                                                val = ""; // clear invalid start
+                                            }
                                         }
+
                                         e.currentTarget.value = val;
                                     }}
                                     className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
+
                                 {errors.mobile_no && (
                                     <p className="text-red-500 text-sm mt-1">{errors.mobile_no.message}</p>
                                 )}
@@ -282,58 +306,36 @@ export default function AddUser() {
                                 )}
                             </div>
 
-                            {/* Database & Subdomain Name -- Company Logo */}
+                            {/* Subdomain Name -- Company Logo */}
                             <div className="flex flex-col col-span-1 md:col-span-2">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black">
 
-                                    {/* Left side: Database + Subdomain */}
+                                    {/* Left side: Subdomain + GST */}
                                     <div className="grid grid-cols-1 md:grid-cols-1 gap-4 col-span-1">
-                                        {/* Database Name */}
+                                        {/* Subdomain */}
                                         <div className="flex flex-col">
                                             <div className="flex items-center gap-2 mb-1">
-                                                <Label htmlFor="schema_name" className="font-medium">
-                                                    Company DB/Schema Name <span className="text-red-600">*</span>
+                                                <Label htmlFor="subdomain" className="mb-1 font-medium">
+                                                    Company Subdomain Name <span className="text-red-600">*</span>
                                                 </Label>
-
                                                 <Popover>
                                                     <PopoverTrigger asChild>
                                                         <HelpCircle className="text-red-600 cursor-pointer w-5 h-5" />
                                                     </PopoverTrigger>
 
                                                     <PopoverContent className="w-80 text-sm text-black bg-white rounded-lg shadow-md border p-4">
-                                                        <p className="font-semibold mb-2">Schema Naming Instructions:</p>
+                                                        <p className="font-semibold mb-2">Subdomain Naming Instructions:</p>
                                                         <ul className="list-disc pl-4 space-y-1">
-                                                            <li>Use only lowercase letters, numbers, and underscores (_)</li>
-                                                            <li>Do not use spaces or special characters (like @, #, -, !)</li>
-                                                            <li>Keep the name short (under 63 characters)</li>
-                                                            <li>Make it unique for each company or tenant</li>
-                                                            <li>
-                                                                Recommended format: <code>{`{company_name}_{id}`}</code>
-                                                            </li>
+                                                            <li>Use only lowercase letters (<code>a–z</code>), numbers (<code>0–9</code>), underscores (<code>_</code>), and hyphens (<code>-</code>).</li>
+                                                            <li>Do <strong>not</strong> start with an underscore (<code>_</code>) or hyphen (<code>-</code>).</li>
+                                                            <li>Spaces and special characters (like <code>@, #, !, $, %</code>) are not allowed.</li>
+                                                            <li>Keep the subdomain short and descriptive (under 50 characters).</li>
+                                                            <li>Each company should have a unique subdomain name.</li>
                                                         </ul>
                                                     </PopoverContent>
                                                 </Popover>
+
                                             </div>
-
-                                            <Input
-                                                id="schema_name"
-                                                type="text"
-                                                placeholder="Enter Assigned Database (Schema) Name"
-                                                {...register("schema_name")}
-                                                className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                maxLength={50}
-                                            />
-
-                                            {errors?.schema_name?.message && (
-                                                <p className="text-red-500 text-sm mt-1">{errors.schema_name.message}</p>
-                                            )}
-                                        </div>
-
-                                        {/* Subdomain Name */}
-                                        <div className="flex flex-col">
-                                            <Label htmlFor="subdomain" className="mb-1 font-medium">
-                                                Company Subdomain Name <span className="text-red-600">*</span>
-                                            </Label>
                                             <Input
                                                 id="subdomain"
                                                 type="text"
@@ -341,11 +343,50 @@ export default function AddUser() {
                                                 {...register("subdomain")}
                                                 className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 maxLength={50}
+                                                onInput={(e: React.FormEvent<HTMLInputElement>) => {
+                                                    const target = e.currentTarget;
+                                                    let value = target.value.toLowerCase();
+
+                                                    // ✅ Allow only lowercase letters, numbers, underscores, and hyphens
+                                                    value = value.replace(/[^a-z0-9_-]/g, "");
+
+                                                    // 🚫 Remove invalid starting characters (_ or -)
+                                                    value = value.replace(/^[-_]+/, "");
+
+                                                    target.value = value;
+                                                }}
+                                                onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => {
+                                                    let paste = e.clipboardData.getData("text").toLowerCase();
+
+                                                    // 🚫 Block paste if invalid chars or starts with _ or -
+                                                    if (/[^a-z0-9_-]/.test(paste) || /^[-_]/.test(paste)) {
+                                                        e.preventDefault();
+                                                    }
+                                                }}
                                             />
                                             {errors?.subdomain?.message && (
                                                 <p className="text-red-500 text-sm mt-1">{errors.subdomain.message}</p>
                                             )}
                                         </div>
+
+                                        {/* Company GST No. */}
+                                        <div className="flex flex-col col-span-1 md:col-span-1">
+                                            <Label htmlFor="gstin" className="mb-1 font-medium">
+                                                Company GST No. (If you have)
+                                            </Label>
+                                            <Input
+                                                id="gstin"
+                                                type="text"
+                                                placeholder="eg. 22AAAAA0000A1Z5"
+                                                {...register("gstin")}
+                                                className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                maxLength={15}
+                                            />
+                                            {errors?.gstin?.message && (
+                                                <p className="text-red-500 text-sm mt-1">{errors.gstin.message}</p>
+                                            )}
+                                        </div>
+
                                     </div>
 
                                     {/* Right side: Company Logo */}
@@ -473,24 +514,6 @@ export default function AddUser() {
                                 />
                                 {errors.fax_no && (
                                     <p className="text-red-500 text-sm mt-1">{errors.fax_no.message}</p>
-                                )}
-                            </div>
-
-                            {/* Company GST No. */}
-                            <div className="flex flex-col col-span-1 md:col-span-1">
-                                <Label htmlFor="gstin" className="mb-1 font-medium">
-                                    Company GST No. (If you have)
-                                </Label>
-                                <Input
-                                    id="gstin"
-                                    type="text"
-                                    placeholder="eg. 22AAAAA0000A1Z5"
-                                    {...register("gstin")}
-                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    maxLength={15}
-                                />
-                                {errors?.gstin?.message && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.gstin.message}</p>
                                 )}
                             </div>
 

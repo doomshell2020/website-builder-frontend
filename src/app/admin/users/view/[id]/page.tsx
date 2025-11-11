@@ -37,11 +37,6 @@ const UsersViewPage = () => {
 
     if (loading) return <Loader />;
     if (!data) return <p className="text-center text-gray-500 mt-10">No customer data found.</p>;
-
-    const profileImg = data.image
-        ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${data.image}`
-        : "/assest/image/defaultUser.webp";
-
     const companyLogo = data.company_logo
         ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${data.company_logo}`
         : "/assest/image/defaultCompanyLogo.png";

@@ -159,7 +159,6 @@ export const addUserSchema = z.object({
     address2: z.string().nullable(),
     gstin: z.string().trim().nullable().optional(),
     company_name: z.string().nonempty("Company name is required"),
-    schema_name: z.string().nonempty("Database name is required"),
     subdomain: z.string().nonempty("Company sub-domain is required"),
     createdAt: z.string().datetime().optional(),
     updatedAt: z.string().datetime().optional(),
@@ -175,7 +174,6 @@ export const updateUserSchema = addUserSchema.partial().extend({
                 (file instanceof File && file.size > 0),
             { message: "Please upload a valid company logo" }
         ),
-    schema_name: z.string().optional(),
     subdomain: z.string().optional(),
 });
 

@@ -75,8 +75,6 @@ export default function UpdateUser() {
                         name: data.name || "",
                         email: data.email || "",
                         company_name: data.company_name || "",
-                        schema_name: data.schema_name || "",
-                        subdomain: data.subdomain || "",
                         mobile_no: data.mobile_no || "",
                         office_no: data.office_no || "",
                         fax_no: data.fax_no || "",
@@ -130,8 +128,6 @@ export default function UpdateUser() {
             appendIfValid("name", data.name);
             appendIfValid("email", data.email);
             appendIfValid("company_name", data.company_name);
-            // appendIfValid("schema_name", data.schema_name);
-            appendIfValid("subdomain", data.subdomain);
             appendIfValid("mobile_no", data.mobile_no);
             appendIfValid("office_no", data.office_no);
             appendIfValid("fax_no", data.fax_no);
@@ -326,71 +322,114 @@ export default function UpdateUser() {
                                     )}
                                 </div>
 
-                                {/* Database & Subdomain Name -- Company Logo */}
+                                {/* Company Phone No. & Fax No. -- Company Logo */}
                                 <div className="flex flex-col col-span-1 md:col-span-2">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black">
 
-                                        {/* Left side: Database + Subdomain */}
+                                        {/* Left side: Company Phone No. & Fax No.*/}
                                         <div className="grid grid-cols-1 md:grid-cols-1 gap-4 col-span-1">
-                                            {/* Database Name */}
+
+                                            {/* Company Phone No. */}
                                             <div className="flex flex-col">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <Label htmlFor="schema_name" className="font-medium">
-                                                        Company DB/Schema Name <span className="text-red-600">*</span>
-                                                    </Label>
-
-                                                    <Popover>
-                                                        <PopoverTrigger asChild>
-                                                            <HelpCircle className="text-red-600 cursor-pointer w-5 h-5" />
-                                                        </PopoverTrigger>
-
-                                                        <PopoverContent className="w-80 text-sm text-black bg-white rounded-lg shadow-md border p-4">
-                                                            <p className="font-semibold mb-2">Schema Naming Instructions:</p>
-                                                            <ul className="list-disc pl-4 space-y-1">
-                                                                <li>Use only lowercase letters, numbers, and underscores (_)</li>
-                                                                <li>Do not use spaces or special characters (like @, #, -, !)</li>
-                                                                <li>Keep the name short (under 63 characters)</li>
-                                                                <li>Make it unique for each company or tenant</li>
-                                                                <li>
-                                                                    Recommended format: <code>{`{company_name}_{id}`}</code>
-                                                                </li>
-                                                            </ul>
-                                                        </PopoverContent>
-                                                    </Popover>
-                                                </div>
-
-                                                <Input
-                                                    id="schema_name"
-                                                    type="text"
-                                                    disabled
-                                                    placeholder="Enter Assigned Database (Schema) Name"
-                                                    {...register("schema_name")}
-                                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                    maxLength={50}
-                                                />
-
-                                                {errors?.schema_name?.message && (
-                                                    <p className="text-red-500 text-sm mt-1">{errors.schema_name.message}</p>
-                                                )}
-                                            </div>
-
-                                            {/* Subdomain Name */}
-                                            <div className="flex flex-col">
-                                                <Label htmlFor="subdomain" className="mb-1 font-medium">
-                                                    Company Subdomain Name <span className="text-red-600">*</span>
+                                                <Label htmlFor="office_no" className="mb-1 font-medium">
+                                                    Company Phone No. (max 4, comma-separated)
                                                 </Label>
                                                 <Input
-                                                    id="subdomain"
+                                                    id="office_no"
                                                     type="text"
-                                                    placeholder="Enter Company Subdomain Name"
-                                                    {...register("subdomain")}
+                                                    placeholder="+911234567890, +911234567891..."
+                                                    {...register("office_no")}
+                                                    onInput={(e) => {
+                                                        let val = e.currentTarget.value;
+
+                                                        // Split by comma and trim spaces
+                                                        let numbers = val.split(",").map((num) => num.trim());
+
+                                                        // Limit to max 4 numbers
+                                                        if (numbers.length > 4) numbers = numbers.slice(0, 4);
+
+                                                        // Process each number
+                                                        numbers = numbers.map((num) => {
+                                                            if (num.startsWith("+")) {
+                                                                num = "+" + num.slice(1).replace(/\D/g, "");
+                                                            } else {
+                                                                num = num.replace(/\D/g, "");
+                                                            }
+
+                                                            if (num.startsWith("+91")) {
+                                                                num = "+91" + num.slice(3, 13);
+                                                            } else if (num.startsWith("0")) {
+                                                                num = "0" + num.slice(1, 11);
+                                                            } else {
+                                                                num = num.slice(0, 10);
+                                                            }
+
+                                                            return num;
+                                                        });
+
+                                                        // Join numbers back with comma + space
+                                                        e.currentTarget.value = numbers.join(", ");
+                                                    }}
+                                                    onPaste={(e) => {
+                                                        const pasteData = e.clipboardData.getData("text");
+
+                                                        // Only allow digits, commas, spaces, and optional leading +
+                                                        if (!/^[\d,+\s]+$/.test(pasteData)) {
+                                                            e.preventDefault();
+                                                        }
+                                                    }}
                                                     className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                    maxLength={50}
                                                 />
-                                                {errors?.subdomain?.message && (
-                                                    <p className="text-red-500 text-sm mt-1">{errors.subdomain.message}</p>
+                                                {errors.office_no && (
+                                                    <p className="text-red-500 text-sm mt-1">{errors.office_no.message}</p>
                                                 )}
                                             </div>
+
+                                            {/* Company Fax No. */}
+                                            <div className="flex flex-col">
+                                                <Label htmlFor="fax_no" className="mb-1 font-medium">
+                                                    Company Fax No.
+                                                </Label>
+                                                <Input
+                                                    id="fax_no"
+                                                    type="text"
+                                                    placeholder="Company Fax no."
+                                                    {...register("fax_no")}
+                                                    onInput={(e) => {
+                                                        let val = e.currentTarget.value;
+                                                        if (val.startsWith("+")) {
+                                                            val = "+" + val.slice(1).replace(/\D/g, "");
+                                                        } else {
+                                                            val = val.replace(/\D/g, "");
+                                                        }
+                                                        if (val.startsWith("+91")) {
+                                                            // +91 + STD (2-4) + number (6-8) → max 13 digits
+                                                            val = "+91" + val.slice(3, 13);
+                                                        } else if (val.startsWith("0")) {
+                                                            // 0 + STD + number → max 11 digits
+                                                            val = "0" + val.slice(1, 11);
+                                                        } else {
+                                                            // No prefix → STD + number → max 10 digits
+                                                            val = val.slice(0, 10);
+                                                        }
+
+                                                        e.currentTarget.value = val;
+                                                    }}
+                                                    onPaste={(e) => {
+                                                        const pasteData = e.clipboardData.getData("text");
+
+                                                        // Only allow digits and optional leading +
+                                                        if (!/^\+?\d+$/.test(pasteData)) {
+                                                            e.preventDefault();
+                                                        }
+                                                    }}
+                                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                                {errors.fax_no && (
+                                                    <p className="text-red-500 text-sm mt-1">{errors.fax_no.message}</p>
+                                                )}
+                                            </div>
+
                                         </div>
 
                                         {/* Right side: Company Logo */}
@@ -421,108 +460,7 @@ export default function UpdateUser() {
 
                                     </div>
                                 </div>
-
-                                {/* Company Phone No. */}
-                                <div className="flex flex-col">
-                                    <Label htmlFor="office_no" className="mb-1 font-medium">
-                                        Company Phone No. (max 4, comma-separated)
-                                    </Label>
-                                    <Input
-                                        id="office_no"
-                                        type="text"
-                                        placeholder="+911234567890, +911234567891..."
-                                        {...register("office_no")}
-                                        onInput={(e) => {
-                                            let val = e.currentTarget.value;
-
-                                            // Split by comma and trim spaces
-                                            let numbers = val.split(",").map((num) => num.trim());
-
-                                            // Limit to max 4 numbers
-                                            if (numbers.length > 4) numbers = numbers.slice(0, 4);
-
-                                            // Process each number
-                                            numbers = numbers.map((num) => {
-                                                if (num.startsWith("+")) {
-                                                    num = "+" + num.slice(1).replace(/\D/g, "");
-                                                } else {
-                                                    num = num.replace(/\D/g, "");
-                                                }
-
-                                                if (num.startsWith("+91")) {
-                                                    num = "+91" + num.slice(3, 13);
-                                                } else if (num.startsWith("0")) {
-                                                    num = "0" + num.slice(1, 11);
-                                                } else {
-                                                    num = num.slice(0, 10);
-                                                }
-
-                                                return num;
-                                            });
-
-                                            // Join numbers back with comma + space
-                                            e.currentTarget.value = numbers.join(", ");
-                                        }}
-                                        onPaste={(e) => {
-                                            const pasteData = e.clipboardData.getData("text");
-
-                                            // Only allow digits, commas, spaces, and optional leading +
-                                            if (!/^[\d,+\s]+$/.test(pasteData)) {
-                                                e.preventDefault();
-                                            }
-                                        }}
-                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    />
-                                    {errors.office_no && (
-                                        <p className="text-red-500 text-sm mt-1">{errors.office_no.message}</p>
-                                    )}
-                                </div>
-
-                                {/* Company Fax No. */}
-                                <div className="flex flex-col">
-                                    <Label htmlFor="fax_no" className="mb-1 font-medium">
-                                        Company Fax No.
-                                    </Label>
-                                    <Input
-                                        id="fax_no"
-                                        type="text"
-                                        placeholder="Company Fax no."
-                                        {...register("fax_no")}
-                                        onInput={(e) => {
-                                            let val = e.currentTarget.value;
-                                            if (val.startsWith("+")) {
-                                                val = "+" + val.slice(1).replace(/\D/g, "");
-                                            } else {
-                                                val = val.replace(/\D/g, "");
-                                            }
-                                            if (val.startsWith("+91")) {
-                                                // +91 + STD (2-4) + number (6-8) → max 13 digits
-                                                val = "+91" + val.slice(3, 13);
-                                            } else if (val.startsWith("0")) {
-                                                // 0 + STD + number → max 11 digits
-                                                val = "0" + val.slice(1, 11);
-                                            } else {
-                                                // No prefix → STD + number → max 10 digits
-                                                val = val.slice(0, 10);
-                                            }
-
-                                            e.currentTarget.value = val;
-                                        }}
-                                        onPaste={(e) => {
-                                            const pasteData = e.clipboardData.getData("text");
-
-                                            // Only allow digits and optional leading +
-                                            if (!/^\+?\d+$/.test(pasteData)) {
-                                                e.preventDefault();
-                                            }
-                                        }}
-                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    />
-                                    {errors.fax_no && (
-                                        <p className="text-red-500 text-sm mt-1">{errors.fax_no.message}</p>
-                                    )}
-                                </div>
-
+                                
                                 {/* Company GST No. */}
                                 <div className="flex flex-col col-span-1 md:col-span-1">
                                     <Label htmlFor="gstin" className="mb-1 font-medium">

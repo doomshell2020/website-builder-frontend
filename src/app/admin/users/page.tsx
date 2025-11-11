@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useCallback, useEffect, useRef, useState } from "react";
+import React , { useMemo, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
     Info, Trash2, ToggleRight, ToggleLeft, Edit, Plus,
@@ -192,39 +192,46 @@ const UsersListPage = () => {
                 width: "5%",
             },
             {
-                name: "Company",
-                cell: (row: User) => (
-                    <div className="flex items-center gap-2">
+                name: "Company Detail",
+                cell: (row: User) => {
+                    // ✅ Determine valid image source
+                    const validLogo =
+                        row?.company_logo &&
+                            row?.company_logo !== "undefined" &&
+                            row?.company_logo.trim() !== ""
+                            ? (row.company_logo.startsWith("http")
+                                ? row.company_logo
+                                : `${process.env.NEXT_PUBLIC_IMAGE_URL}${row.company_logo}`)
+                            : "/assest/image/defaultUser.webp";
 
-                        {/* Profile / Company Logo */}
-                        <div className="w-9 h-9 overflow-hidden flex items-center justify-center bg-gray-100 border border-gray-200">
-                            <Image
-                                src={
-                                    row.company_logo &&
-                                        row.company_logo !== undefined &&
-                                        row.company_logo !== "undefined"
-                                        ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${row.company_logo}`
-                                        : "/assest/image/defaultUser.webp"
-                                }
-                                alt={row.company_logo || "Company Logo"}
-                                width={36}
-                                height={36}
-                                className="object-cover"
-                            />
-                        </div>
+                    // ✅ Use state fallback for missing/broken images
+                    const [imgSrc, setImgSrc] = React.useState(validLogo);
 
-                        {/* Company Name */}
-                        <span className="font-medium text-gray-800">{row.company_name || "N/A"}</span>
+                    return (
                         <button
-                            title="User Info"
+                            title="Company Details"
                             onClick={() => router.push(`/admin/users/view/${row.id}`)}
                             className="flex items-center gap-2 text-blue-600 hover:underline"
                         >
-                            <Info name="info" className="w-4 h-4" />
-                        </button>
+                            {/* Profile / Company Logo */}
+                            <div className="w-9 h-9 overflow-hidden flex items-center justify-center bg-gray-100 border border-gray-200 rounded-full">
+                                <Image
+                                    src={imgSrc}
+                                    alt={`${row.company_name || "Company"} Logo`}
+                                    width={36}
+                                    height={36}
+                                    className="object-cover"
+                                    onError={() => setImgSrc("/assest/image/defaultUser.webp")} // ✅ fallback if not found
+                                />
+                            </div>
 
-                    </div>
-                ),
+                            {/* Company Name */}
+                            <span className="font-medium text-gray-800 truncate max-w-[160px]">
+                                {row.company_name || "N/A"}
+                            </span>
+                        </button>
+                    );
+                },
                 selector: (row: User) => row.company_name || "N/A",
                 sortable: true,
             },
