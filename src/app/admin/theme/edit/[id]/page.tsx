@@ -13,11 +13,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/Button";
 import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
 import { editThemeSchema } from "@/schemas/theme.schema";
-import { getWebsiteTypeById, updateWebsiteType } from "@/services/theme.service";
-import { WebsiteTypeAttribute } from '@/types/theme';
+import { getThemeById, updateTheme } from "@/services/theme.service";
+import { ThemeAttribute } from '@/types/theme';
 type FormData = z.infer<typeof editThemeSchema>;
 
-export default function WebsiteTypeEditForm() {
+export default function ThemeEditForm() {
 
   const router = useRouter();
   const params = useParams();
@@ -44,7 +44,7 @@ export default function WebsiteTypeEditForm() {
       if (!id) return;
       setLoading(true);
       try {
-        const res: any = await getWebsiteTypeById(id);
+        const res: any = await getThemeById(id);
         const data = res?.result;
         reset({
           name: data.name || "",
@@ -75,12 +75,12 @@ export default function WebsiteTypeEditForm() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const payload: WebsiteTypeAttribute = {
+      const payload: ThemeAttribute = {
         name: data.name,
         slug: data.slug,
         description: data.description,
       };
-      const response: any = await updateWebsiteType(id, payload);
+      const response: any = await updateTheme(id, payload);
       if (response?.status === true) { SwalSuccess("Theme updated successfully."); handleBack(); }
       else { SwalError({ title: "Failed!", message: response?.message ?? "Failed to connect.", }); }
     } catch (error: any) {

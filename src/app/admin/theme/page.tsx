@@ -4,17 +4,17 @@ import { useMemo, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, ToggleRight, ToggleLeft, Edit, Plus } from "lucide-react";
 import Swal from "sweetalert2";
-import { getAllWebsiteTypes, deleteWebsiteType, updateWebsiteTypeStatus } from "@/services/theme.service";
+import { getAllThemes, deleteTheme, updateThemeStatus } from "@/services/theme.service";
 import { formatDate } from "@/lib/date";
 import PaginatedDataTable from "@/components/PaginatedDataTablet";
-import { WebsiteTypeAttribute } from "@/types/theme";
+import { ThemeAttribute } from "@/types/theme";
 import { Button } from "@/components/ui/Button";
 import Loader from '@/components/ui/loader'
 
-export default function websiteTypeListPage() {
+export default function ThemeListPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [filteredData, setFilteredData] = useState<WebsiteTypeAttribute[]>([]);
+  const [filteredData, setFilteredData] = useState<ThemeAttribute[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -23,8 +23,8 @@ export default function websiteTypeListPage() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const res: any = await getAllWebsiteTypes(page, limit);
-      const data: WebsiteTypeAttribute[] = res?.result?.data || [];
+      const res: any = await getAllThemes(page, limit);
+      const data: ThemeAttribute[] = res?.result?.data || [];
       setFilteredData(data);
       setTotalRows(res?.result?.total || 0);
     } catch (error) {
@@ -51,7 +51,7 @@ export default function websiteTypeListPage() {
 
     if (result.isConfirmed) {
       try {
-        await deleteWebsiteType(id);
+        await deleteTheme(id);
         Swal.fire("Deleted!", "Theme has been deleted.", "success");
         fetchData();
       } catch {
@@ -72,7 +72,7 @@ export default function websiteTypeListPage() {
 
     if (result.isConfirmed) {
       try {
-        await updateWebsiteTypeStatus(id, { status: newStatus });
+        await updateThemeStatus(id, { status: newStatus });
         Swal.fire("Updated!", "Theme status has been changed.", "success");
         fetchData();
       } catch {
@@ -85,20 +85,20 @@ export default function websiteTypeListPage() {
     () => [
       {
         name: "S.No",
-        selector: (_: WebsiteTypeAttribute, index: number) => (page - 1) * limit + index + 1,
+        selector: (_: ThemeAttribute, index: number) => (page - 1) * limit + index + 1,
         width: "5%",
       },
       {
         name: "Name",
-        selector: (row: WebsiteTypeAttribute) => row.name || "N/A",
-        cell: (row: WebsiteTypeAttribute) => (
+        selector: (row: ThemeAttribute) => row.name || "N/A",
+        cell: (row: ThemeAttribute) => (
           <div className="max-w-xs truncate" title={row.name}>{row.name}</div>
         ),
       },
       {
         name: "Slug",
-        selector: (row: WebsiteTypeAttribute) => row.slug || "N/A",
-        cell: (row: WebsiteTypeAttribute) => (
+        selector: (row: ThemeAttribute) => row.slug || "N/A",
+        cell: (row: ThemeAttribute) => (
           <div className="max-w-xs truncate" title={row.slug}>
             {row.slug}
           </div>
@@ -106,8 +106,8 @@ export default function websiteTypeListPage() {
       },
       {
         name: "Status",
-        selector: (row: WebsiteTypeAttribute) => (row.status === "Y" ? "Active" : "Inactive"),
-        cell: (row: WebsiteTypeAttribute) => (
+        selector: (row: ThemeAttribute) => (row.status === "Y" ? "Active" : "Inactive"),
+        cell: (row: ThemeAttribute) => (
           <span
             className={`px-2 py-1 rounded text-xs ${row.status === "Y"
               ? "bg-green-100 text-green-800"
@@ -121,12 +121,12 @@ export default function websiteTypeListPage() {
       },
       {
         name: "Created",
-        selector: (row: WebsiteTypeAttribute) => row.createdAt ? formatDate(row.createdAt, "DD-MM-YYYY hh:mm A") : "—",
+        selector: (row: ThemeAttribute) => row.createdAt ? formatDate(row.createdAt, "DD-MM-YYYY hh:mm A") : "—",
         width: "15%",
       },
       {
         name: "Actions",
-        cell: (row: WebsiteTypeAttribute) => (
+        cell: (row: ThemeAttribute) => (
           <div className="flex space-x-3 items-center">
             <div
               className="cursor-pointer"

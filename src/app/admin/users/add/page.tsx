@@ -13,8 +13,8 @@ import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/Button";
 import { createUser } from "@/services/userService";
-import { viewAllWebsiteType } from "@/services/theme.service";
-import { WebsiteTypeAttribute } from '@/types/theme';
+import { viewAllThemes } from "@/services/theme.service";
+import { ThemeAttribute } from '@/types/theme';
 import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
 import { addUserSchema } from "@/schemas/userSchema";
 type FormData = z.infer<typeof addUserSchema>;
@@ -39,15 +39,15 @@ export default function AddUser() {
     });
     const [showPassword, setShowPassword] = useState(false);
     const [selectedCompanyLogo, setSelectedCompanyLogo] = useState<File | null>(null);
-    const [websiteTypes, setWebsiteTypes] = useState<WebsiteTypeAttribute[]>([]);
+    const [websiteTypes, setWebsiteTypes] = useState<ThemeAttribute[]>([]);
 
     const handleBack = () => { router.back(); };
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res: any = await viewAllWebsiteType();
-                const data: WebsiteTypeAttribute[] = Array.isArray(res?.result?.data)
+                const res: any = await viewAllThemes();
+                const data: ThemeAttribute[] = Array.isArray(res?.result?.data)
                     ? res.result.data : [];
                 setWebsiteTypes(data); // ✅ just set state
             } catch (error) {

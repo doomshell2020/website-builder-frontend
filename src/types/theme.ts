@@ -1,4 +1,4 @@
-export interface WebsiteTypeAttribute {
+export interface ThemeAttribute {
     id?: number;
     name: string;
     slug?: string;

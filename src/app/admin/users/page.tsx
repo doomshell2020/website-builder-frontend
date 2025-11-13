@@ -140,7 +140,7 @@ const UsersListPage = () => {
 
         if (result.isConfirmed) {
             try {
-                await deleteUser(id); // Uncomment when implemented
+                await deleteUser(id);
                 Swal.fire("Deleted!", "User has been deleted.", "success");
                 fetchData();
             } catch {

@@ -17,8 +17,8 @@ import { getUserById } from "@/services/userService";
 import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
 import { updateUserSchema } from "@/schemas/userSchema";
 import { User } from "@/types/user";
-import { viewAllWebsiteType } from "@/services/theme.service";
-import { WebsiteTypeAttribute } from '@/types/theme';
+import { viewAllThemes } from "@/services/theme.service";
+import { ThemeAttribute } from '@/types/theme';
 import Loader from '@/components/ui/loader'
 type FormData = z.infer<typeof updateUserSchema>;
 
@@ -46,7 +46,7 @@ export default function UpdateUser() {
 
     const [selectedCompanyLogo, setSelectedCompanyLogo] = useState<File | null>(null);
     const [previewCompanyLogo, setPreviewCompanyLogo] = useState<string | null>(null);
-    const [websiteTypes, setWebsiteTypes] = useState<WebsiteTypeAttribute[]>([]);
+    const [websiteTypes, setWebsiteTypes] = useState<ThemeAttribute[]>([]);
 
     const handleBack = () => { router.back(); };
 
@@ -59,11 +59,11 @@ export default function UpdateUser() {
                 // ✅ Fetch both user and themes in parallel
                 const [userRes, themeRes] = await Promise.all([
                     getUserById(id),
-                    viewAllWebsiteType(),
+                    viewAllThemes(),
                 ]);
 
                 // ✅ Prepare theme list
-                const themeData: WebsiteTypeAttribute[] = Array.isArray(themeRes?.result?.data)
+                const themeData: ThemeAttribute[] = Array.isArray(themeRes?.result?.data)
                     ? themeRes.result.data
                     : [];
                 if (isMounted) setWebsiteTypes(themeData);

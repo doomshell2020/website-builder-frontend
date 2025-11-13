@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import slugify from "slugify";
 import { zodResolver } from "@hookform/resolvers/zod";
+import slugify from "slugify";
 import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
@@ -12,11 +12,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/Button";
 import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
 import { themeSchema } from "@/schemas/theme.schema";
-import { createWebsiteType } from "@/services/theme.service";
-import { WebsiteTypeAttribute } from '@/types/theme'
+import { createTheme } from "@/services/theme.service";
+import { ThemeAttribute } from '@/types/theme'
 type FormData = z.infer<typeof themeSchema>;
 
-export default function WebsiteTypeAddForm() {
+export default function ThemeAddForm() {
   const router = useRouter();
   const [slug, setSlug] = useState("");
   const {
@@ -47,12 +47,12 @@ export default function WebsiteTypeAddForm() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const payload: WebsiteTypeAttribute = {
+      const payload: ThemeAttribute = {
         name: data.name,
         slug: data.slug,
         description: data.description,
       };
-      const response: any = await createWebsiteType(payload);
+      const response: any = await createTheme(payload);
       if (response?.status === true) { SwalSuccess("Theme added successfully."); handleBack(); }
       else { SwalError({ title: "Failed!", message: response?.message ?? "Failed to connect.", }); }
     } catch (error: any) {
