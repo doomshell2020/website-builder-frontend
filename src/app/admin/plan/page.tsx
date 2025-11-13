@@ -273,7 +273,7 @@ export default function PlanPage() {
             {/* Price */}
             <div className="flex flex-col">
               <Label htmlFor="name" className="mb-1 font-medium">
-                Price<span className="text-red-600">*</span>
+                Price <span className="text-red-600">*</span>
               </Label>
               <Input
                 id="price"
