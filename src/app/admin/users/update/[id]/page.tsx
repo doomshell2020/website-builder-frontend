@@ -27,6 +27,7 @@ export default function UpdateUser() {
     const params = useParams();
     const id = String(params.id);
     const [loading, setLoading] = useState(false);
+    const [imageFolder, setImageFolder] = useState<string | null>(null);
 
     const {
         register,
@@ -86,10 +87,11 @@ export default function UpdateUser() {
                         address1: data.address1 || "",
                         address2: data.address2 || "",
                         gstin: data.gstin || "",
-                        // ✅ Convert to string — select options are string values
                         website_type: data?.Theme?.id ? data.Theme.id.toString() : "",
                     });
 
+                    setImageFolder(data?.imageFolder);
+                    
                     if (data?.company_logo) {
                         setPreviewCompanyLogo(`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.company_logo}`);
                     }
@@ -107,9 +109,6 @@ export default function UpdateUser() {
         fetchAll();
         return () => { isMounted = false; };
     }, [id, reset]);
-
-
-    const selectedTheme = watch("website_type");
 
     const onSubmit = async (data: any) => {
         try {
@@ -139,6 +138,7 @@ export default function UpdateUser() {
             appendIfValid("address1", data.address1);
             appendIfValid("address2", data.address2);
             appendIfValid("gstin", data.gstin);
+            appendIfValid("imageFolder", imageFolder);
             appendIfValid("website_type", data.website_type);
             if (selectedCompanyLogo instanceof File && selectedCompanyLogo.size > 0) {
                 formData.append("company_logo", selectedCompanyLogo);
@@ -460,7 +460,7 @@ export default function UpdateUser() {
 
                                     </div>
                                 </div>
-                                
+
                                 {/* Company GST No. */}
                                 <div className="flex flex-col col-span-1 md:col-span-1">
                                     <Label htmlFor="gstin" className="mb-1 font-medium">

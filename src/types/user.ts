@@ -18,6 +18,7 @@ export interface User {
   websiteType?: any;
   Theme?: any;
   company_name?: string | null;
+  imageFolder?: string | null;
   subdomain?: string | null;
   custom_domain?: string | null;
   schema_name?: string | null;

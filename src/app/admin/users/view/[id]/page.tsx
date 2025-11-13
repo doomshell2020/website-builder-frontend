@@ -49,7 +49,7 @@ const UsersViewPage = () => {
                     <div className="flex items-center h-14">
                         <Button
                             onClick={handleBack}
-                            className="flex items-center justify-center w-9 h-9 text-white bg-blue-500 hover:bg-blue-600 rounded-md"
+                            className="flex items-center justify-center w-9 h-9 text-white bg-blue-500 hover:bg-blue-600 rounded-[5px]"
                         >
                             <MoveLeft className="w-5 h-5" />
                         </Button>

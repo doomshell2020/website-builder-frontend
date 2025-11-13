@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AdminLogin } from '@/services/admin.service';
-import { setToken, setLogo, setSchema, getToken, setRole } from '@/lib/auth';
+import { setToken, setLogo, setSchema, getToken,setFolder, setRole } from '@/lib/auth';
 import { SwalError } from "@/components/ui/SwalAlert";
 import ReCAPTCHA from "react-google-recaptcha";
 type LoginFormData = z.infer<typeof schema>;
@@ -104,6 +104,7 @@ const LoginScreen = () => {
       if (response.status === true) {
         setSchema(response?.user?.schema);
         setLogo(response?.user?.company_logo);
+        setFolder(response?.user?.image_folder);
         setRole(role);
         setToken(response.token);
 

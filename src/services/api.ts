@@ -1,4 +1,4 @@
-import { getToken, getSlug } from "@/lib/auth";
+import { getToken, getSchema, getFolder } from "@/lib/auth";
 import axios, { InternalAxiosRequestConfig } from "axios";
 
 const API = axios.create({
@@ -10,11 +10,15 @@ const API = axios.create({
 
 // Request interceptor: Add token and schema
 API.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const slug = getSlug?.();
+  const slug = getSchema?.();
+  const folder = getFolder?.();
   const token = typeof window !== 'undefined' ? getToken?.() : null;
 
   if (slug && config.headers) {
     config.headers['x-schema'] = slug;
+  }
+  if (folder && config.headers) {
+    config.headers['x-folder'] = folder;
   }
   if (token && config.headers) {
     config.headers['Authorization'] = `Bearer ${token}`;

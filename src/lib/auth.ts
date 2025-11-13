@@ -35,7 +35,13 @@ export const getToken = (): string | undefined => getCookie("admin_token");
 export const setSchema = (schema: string) => setCookie("schema", schema);
 
 /** Get schema slug */
-export const getSlug = (): string | undefined => getCookie("schema");
+export const getSchema = (): string | undefined => getCookie("schema");
+
+/** Save schema slug */
+export const setFolder = (folder: string) => setCookie("image_folder", folder);
+
+/** Get schema slug */
+export const getFolder = (): string | undefined => getCookie("image_folder");
 
 /** Save company logo */
 export const setLogo = (logo: string) => setCookie("company_logo", logo);
@@ -55,6 +61,7 @@ export const removeAuthToken = () => {
   removeCookie("schema");
   removeCookie("company_logo");
   removeCookie("role");
+  removeCookie("image_folder");
 };
 
 /**

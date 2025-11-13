@@ -25,6 +25,7 @@ export default function EditUser() {
     const params = useParams();
     const id = String(params.id);
     const [loading, setLoading] = useState(false);
+    const [imageFolder, setImageFolder] = useState<string | null>(null);
 
     const {
         register,
@@ -73,6 +74,7 @@ export default function EditUser() {
                     address2: data.address2 || "",
                     gstin: data.gstin || "",
                 });
+                setImageFolder(data?.imageFolder);
 
                 if (data?.company_logo) {
                     setPreviewCompanyLogo(`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.company_logo}`);
@@ -107,6 +109,8 @@ export default function EditUser() {
             formData.append("gstin", data.gstin.trim());
             formData.append("address1", data.address1);
             formData.append("address2", data.address2);
+            formData.append("imageFolder", imageFolder);
+
             if (selectedCompanyLogo instanceof File && selectedCompanyLogo.size > 0) {
                 formData.append("company_logo", selectedCompanyLogo);
             }
