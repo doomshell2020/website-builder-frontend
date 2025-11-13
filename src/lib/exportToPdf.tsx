@@ -1,60 +1,76 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-export const exportToPdf = (data: unknown[], filename: string, heading: string) => {
+interface PdfColumn {
+  key: string;              // field name in data
+  label?: string;           // optional custom column name
+  format?: (value: any) => string; // custom formatter
+}
+
+interface ExportPdfOptions {
+  data: any[];
+  filename: string;
+  heading: string;
+  columns: PdfColumn[];
+  showSerialNo?: boolean;  // S.No column
+}
+
+export const exportToPdf = ({
+  data,
+  filename,
+  heading,
+  columns,
+  showSerialNo = true,
+}: ExportPdfOptions) => {
   if (!Array.isArray(data) || data.length === 0) return;
 
-  // ✅ Only include these keys
-  const includedFields = ["name", "email", "mobile_no", "status", "address"];
+  const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-  const headers = ["S.No.", ...includedFields.map((key) => key.toUpperCase())];
-  const monthNames = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
+  // Status formatter
+  const formatStatus = (val: any) => {
+    if (val == null) return "Inactive";
+    const s = String(val).trim().toUpperCase();
+    return ["Y", "YES", "1", "TRUE"].includes(s) ? "Active" : "Inactive";
+  };
 
+  // Prepare headers
+  const headers = [];
+  if (showSerialNo) headers.push("S.No.");
+  headers.push(
+    ...columns.map(col => col.label || col.key.toUpperCase())
+  );
+
+  // Prepare rows
   const rows = data.map((item, index) => {
-    return [
-      index + 1,
-      ...includedFields.map((key) => {
-        const value = item[key];
+    const row = [];
 
-        // Format status
-        function formatStatus(val) {
-          if (val == null) return "Inactive"; // null or undefined
-          const s = String(val).trim().toUpperCase();
-          return ["Y", "YES", "1", "TRUE"].includes(s) ? "Active" : "Inactive";
-        }
+    if (showSerialNo) row.push(index + 1); // S.No.
 
-        // usage
-        if (key === "status") {
-          return formatStatus(value);
-        }
-        if (key === "dob" && value) {
-          const date = new Date(value);
-          const day = String(date.getDate()).padStart(2, "0");
-          const month = monthNames[date.getMonth()];
-          const year = String(date.getFullYear()).slice(-2);
-          return `${day}-${month}-${year}`; // 👉 dd-MMM-yy
-        }
-        // Format empty values
-        if (value === null || value === undefined || value === "") {
-          return "N/A";
-        }
+    columns.forEach(col => {
+      let value = item[col.key];
 
-        return value;
-      }),
-    ];
+      // Global formatters
+      if (col.key === "status") value = formatStatus(value);
+
+      if (col.key === "approval") value = formatStatus(value);
+
+      if (col.key === "createdAt" && value) {
+        const date = new Date(value);
+        value = `${String(date.getDate()).padStart(2, "0")}-${
+          monthNames[date.getMonth()]
+        }-${String(date.getFullYear()).slice(-2)}`;
+      }
+
+      // Custom user-defined format
+      if (col.format) value = col.format(value);
+
+      // Default empty value
+      if (value === null || value === undefined || value === "") value = "N/A";
+
+      row.push(value);
+    });
+
+    return row;
   });
 
   const doc = new jsPDF();
@@ -64,11 +80,9 @@ export const exportToPdf = (data: unknown[], filename: string, heading: string) 
     startY: 20,
     head: [headers],
     body: rows,
-    styles: {
-      fontSize: 9,
-    },
+    styles: { fontSize: 9 },
     headStyles: {
-      fillColor: [0, 102, 204], // Blue header
+      fillColor: [0, 102, 204],
       textColor: 255,
       fontStyle: "bold",
     },
@@ -77,6 +91,7 @@ export const exportToPdf = (data: unknown[], filename: string, heading: string) 
 
   doc.save(`${filename}.pdf`);
 };
+
 
 // export const exportToPdfOne = (
 //     data: any,

@@ -160,17 +160,20 @@ const UsersListPage = () => {
             return;
         }
         const exportData = filteredData.map((row) => ({
-            "User Name": row.name || "N/A",
             "Company Name": row.company_name || "N/A",
+            "User Name": row.name || "N/A",
             "Email": row.email || "N/A",
             "Mobile No": row.mobile_no || "N/A",
-            "Status": row.status || "N/A",
+            "Subdomain": row.subdomain || "N/A",
+            "Custom Domain": row.custom_domain || "N/A",
+            "Approval": row.approval || "N/A",
             "Facebook": row.fburl || "N/A",
             "Twitter": row.xurl || "N/A",
             "Instagram": row.instaurl || "N/A",
             "LinkedIn": row.linkedinurl || "N/A",
             "Youtube": row.yturl || "N/A",
             "Address": row.address1 || "N/A",
+            // "Status": row.status || "N/A",
             "Created": row.createdAt || "N/A",
         }));
         exportToExcel(exportData, "user_report");
@@ -181,7 +184,23 @@ const UsersListPage = () => {
             Swal.fire("Error!", "No user data available to Generate PDF.", "error",);
             return;
         }
-        exportToPdf(filteredData, "user_report", 'User Report');
+        exportToPdf({
+            data: filteredData,
+            filename: "user_report",
+            heading: "User Report",
+            showSerialNo: true,
+            columns: [
+                { key: "company_name", label: "Company Name" },
+                // { key: "name", label: "User Name" },
+                { key: "email", label: "Email" },
+                // { key: "mobile_no", label: "Mobile No" },
+                { key: "subdomain", label: "Subdomain" },
+                { key: "custom_domain", label: "Custom Domain" },
+                { key: "approval", label: "Approval Status" },
+                { key: "createdAt", label: "Created" },
+            ],
+        });
+
     };
 
     const columns = useMemo(
@@ -258,20 +277,20 @@ const UsersListPage = () => {
                                 className="text-blue-600 hover:underline"
                             >
                             </Link> */}
-                            {`${row.subdomain}`}
+                            {/* {`${row.subdomain}`} */}
                             <Link
                                 href={`https://${row.subdomain}.baaraat.com`}
                                 target="_blank"
-                                className="text-blue-500 hover:text-blue-700"
-                            >
+                                className="text-black font-medium hover:text-blue-700" >
                                 {/* <ExternalLink className="w-4 h-4" /> */}
-                                <LinkIcon className="w-4 h-4" />
+                                {/* <LinkIcon className="w-4 h-4" /> */}
+                                {`${row.subdomain}`}
                             </Link>
                         </div>
                     ) : (
                         "N/A"
                     ),
-                width: "18%",
+                width: "15%",
                 sortable: true,
             },
             {
@@ -317,6 +336,42 @@ const UsersListPage = () => {
                     </div>
                 ),
                 sortable: false,
+            },
+            // {
+            //     name: "Subscription",
+            //     width: "15%",
+            //     cell: (row: User) => {
+            //         const start = row.subscription_start_at
+            //             ? formatDate(row.subscription_start_at, "DD-MM-YYYY hh:mm A") 
+            //             : "—";
+
+            //         const end = row.subscription_end_at
+            //             ? formatDate(row.subscription_end_at, "DD-MM-YYYY hh:mm A") 
+            //             : "—";
+
+            //         const status = row.subscription_status
+            //             ? row.subscription_status
+            //             : "N/A";
+
+            //         return (
+            //             <div className="flex flex-col text-xs leading-tight">
+            //                 <span><strong>Start:</strong> {start}</span>
+            //                 <span><strong>End:</strong> {end}</span>
+            //                 <span><strong>Status:</strong> {status}</span>
+            //             </div>
+            //         );
+            //     },
+            // },
+            {
+                name: "Subscription Detail",
+                cell: (row: User) => (
+                    <div className="flex flex-col text-xs leading-tight">
+                        <span><strong>Start:</strong> {"13-11-2025"}</span>
+                        <span><strong>End:</strong> {"13-12-2025"}</span>
+                        <span><strong>Status:</strong> {"Active"}</span>
+                    </div>
+                ),
+                width: "12%",
             },
             {
                 name: "Approval",
@@ -439,8 +494,6 @@ const UsersListPage = () => {
         [page, limit],
     );
 
-    const isDisabled = search.searchTerm.trim() === "" && !search.fromDate && !search.toDate;
-
     return (
         <div className="min-h-screen">
             <main className="max-w-10xl py-2">
@@ -457,8 +510,8 @@ const UsersListPage = () => {
                                     <div className="flex md:col-span-3">
                                         <Input
                                             type="text"
-                                            placeholder="Search by name / email"
-                                            className="h-10 text-black text-sm border max-w-[220px] border-gray-200 rounded-[5px] px-3"
+                                            placeholder="Search by company name / email"
+                                            className="h-10 text-black text-sm border max-w-[240px] border-gray-200 rounded-[5px] px-3"
                                             value={search.searchTerm}
                                             onChange={(e) =>
                                                 setsearch((prev) => ({
@@ -495,15 +548,13 @@ const UsersListPage = () => {
                                         <div className="w-full flex gap-2 ml-4">
                                             <Button
                                                 onClick={handleSearch}
-                                                disabled={isDisabled}
-                                                className={`max-w-[30] text-white rounded-[5px] ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-700"}`}  >
+                                                className={`max-w-[30] text-white rounded-[5px] bg-blue-500 hover:bg-blue-700`}  >
                                                 Search
                                             </Button>
                                             <Button
                                                 onClick={handleReset}
-                                                disabled={isDisabled}
                                                 // variant="outline"
-                                                className={`max-w-[30] text-white rounded-[5px] ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-yellow-600 hover:bg-yellow-700"}`} >
+                                                className={`max-w-[30] text-white rounded-[5px] bg-yellow-600 hover:bg-yellow-700`} >
                                                 Reset
                                             </Button>
                                         </div>

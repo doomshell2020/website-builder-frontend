@@ -50,6 +50,12 @@ export const exportToExcel = async (data: any[], filename: string) => {
     return `${year}-${month}-${day} ${formattedTime}`;
   };
 
+  const formatStatus = (val: any) => {
+    if (val == null) return "Inactive";
+    const s = String(val).trim().toUpperCase();
+    return ["Y", "YES", "1", "TRUE"].includes(s) ? "Active" : "Inactive";
+  };
+
   // 3️⃣ Add data rows
   data.forEach((item, index) => {
     const row = [
@@ -58,6 +64,12 @@ export const exportToExcel = async (data: any[], filename: string) => {
         // If the key is "createdAt", format it to readable AM/PM format
         if (key.toLowerCase() === "created") {
           return formatDateTime(item[key]);
+        }
+        if (key.toLowerCase() === "approval") {
+          return formatStatus(item[key]);
+        }
+        if (key.toLowerCase() === "status") {
+          return formatStatus(item[key]);
         }
         return item[key];
       }),
