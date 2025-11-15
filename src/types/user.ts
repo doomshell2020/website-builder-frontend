@@ -25,6 +25,7 @@ export interface User {
   company_logo?: string | null;
   gstin?: string | null;
   image?: string | null;
+  subscriptionData?: any;
   status?: 'Y' | 'N';
   approval?: 'Y' | 'N';
   createdAt?: Date;

@@ -337,41 +337,34 @@ const UsersListPage = () => {
                 ),
                 sortable: false,
             },
-            // {
-            //     name: "Subscription",
-            //     width: "15%",
-            //     cell: (row: User) => {
-            //         const start = row.subscription_start_at
-            //             ? formatDate(row.subscription_start_at, "DD-MM-YYYY hh:mm A") 
-            //             : "—";
-
-            //         const end = row.subscription_end_at
-            //             ? formatDate(row.subscription_end_at, "DD-MM-YYYY hh:mm A") 
-            //             : "—";
-
-            //         const status = row.subscription_status
-            //             ? row.subscription_status
-            //             : "N/A";
-
-            //         return (
-            //             <div className="flex flex-col text-xs leading-tight">
-            //                 <span><strong>Start:</strong> {start}</span>
-            //                 <span><strong>End:</strong> {end}</span>
-            //                 <span><strong>Status:</strong> {status}</span>
-            //             </div>
-            //         );
-            //     },
-            // },
             {
-                name: "Subscription Detail",
-                cell: (row: User) => (
-                    <div className="flex flex-col text-xs leading-tight">
-                        <span><strong>Start:</strong> {"13-11-2025"}</span>
-                        <span><strong>End:</strong> {"13-12-2025"}</span>
-                        <span><strong>Status:</strong> {"Active"}</span>
-                    </div>
-                ),
-                width: "12%",
+                name: "Subscription",
+                width: "15%",
+                cell: (row: User) => {
+                    const sub = row?.subscriptionData[0]; // shorter & safer
+
+                    const start = sub?.created
+                        ? formatDate(sub.created, "DD-MM-YYYY")
+                        : "—";
+
+                    const end = sub?.expiry_date
+                        ? formatDate(sub.expiry_date, "DD-MM-YYYY")
+                        : "—";
+
+                    const status = sub?.status === "Y"
+                        ? "Active"
+                        : sub?.status === "N"
+                            ? "Inactive"
+                            : "N/A";
+
+                    return (
+                        <div className="flex flex-col text-xs leading-tight">
+                            <span><strong>Start:</strong> {start}</span>
+                            <span><strong>End:</strong> {end}</span>
+                            <span><strong>Status:</strong> {status}</span>
+                        </div>
+                    );
+                },
             },
             {
                 name: "Approval",

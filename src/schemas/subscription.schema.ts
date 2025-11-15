@@ -1,0 +1,27 @@
+import { z } from "zod";
+
+export const subscriptionSchema = z.object({
+    plan_id: z.coerce.number().int().min(1, "Plan ID is required"),
+    c_id: z.coerce.number().int().min(1, "Customer ID is required"),
+    created: z.coerce.string().min(1, "Created date is required"),
+    expiry_date: z.coerce.string().min(1, "Expiry date is required"),
+    status: z.enum(["Y", "N", "D"]).default("Y"),
+    payment_id: z.string().optional().nullable(),
+    order_id: z.string().optional().nullable(),
+    signature_razorpay: z.string().optional().nullable(),
+    totaluser: z.coerce.number().min(1, "Total users must be at least 1").max(100000, "Too many users"),
+    plantotalprice: z.string().optional().nullable(),
+    taxprice: z.string().optional().nullable(),
+    discount: z.string().optional().nullable(),
+    payment_detail: z.string().default("0"),
+    dropreason: z.string().optional().nullable(),
+    isdrop: z.enum(["Y", "N"]).default("N"),
+    dropdate: z.string().optional().nullable(),
+    payment_date: z.string().optional().nullable(),
+    razorpay_order_id: z.string().optional().nullable(),
+    cgst: z.string().default("0"),
+    sgst: z.string().default("0"),
+    igst: z.string().default("0"),
+    per_user_rate: z.number().int().default(0),
+    email: z.string().optional(),
+});

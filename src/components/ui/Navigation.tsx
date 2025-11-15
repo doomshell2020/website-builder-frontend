@@ -4,8 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
-  MessagesSquare, Database, SlidersHorizontal, User, Cog, Palette, BadgeIndianRupee,
-  Search, Slack, GalleryHorizontalEnd, Quote, MessageCircleQuestion, ChevronDown,
+  MessagesSquare, Database, SlidersHorizontal, User, Cog, Palette, ClipboardPenLine,
+  Search, Slack, GalleryHorizontalEnd, Quote, MessageCircleQuestion, ChevronDown, ScrollText,
 } from "lucide-react";
 import { getRole } from "@/lib/auth";
 
@@ -38,6 +38,7 @@ const Navigation = () => {
         if (path.includes("/schemas")) return "schemas";
         if (path.includes("/theme")) return "theme";
         if (path.includes("/plan")) return "plan";
+        if (path.includes("/billings")) return "billings";
         return null;
       case "2": // User
         if (path.includes("/enquiry")) return "enquiry";
@@ -171,7 +172,14 @@ const Navigation = () => {
       key: "plan",
       label: "Plans",
       href: "/admin/plan",
-      icon: <BadgeIndianRupee size={16} strokeWidth={2.5} />,
+      icon: <ClipboardPenLine size={16} strokeWidth={2.5} />,
+      visibleFor: ["1"],
+    },
+    {
+      key: "billings",
+      label: "Billings",
+      href: "/admin/billings",
+      icon: <ScrollText size={16} strokeWidth={2.5} />,
       visibleFor: ["1"],
     },
   ];

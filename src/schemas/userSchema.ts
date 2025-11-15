@@ -79,7 +79,9 @@ export const userSchema = z.object({
     company_name: z.string().optional(),
 });
 
-const allowedDomains = ["com", "net", "org", "in", "edu", "co"]; // add more if needed
+const allowedDomains = ["com", "net", "org", "info", "biz", "xyz", "in", "co.in", "ac.in", "gov.in",
+    "edu", "io", "ai", "tech", "app", "dev", "online", "store", "website", "me", "club", "pro"
+];
 
 export const addUserSchema = z.object({
     id: z.number().optional(),

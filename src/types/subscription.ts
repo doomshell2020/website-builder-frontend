@@ -1,0 +1,34 @@
+export interface SubscriptionAttribute {
+    id?: number;
+    plan_id?: number;
+    c_id?: number | string;
+    created?: Date | string;
+    expiry_date?: Date | string;
+    status?: "Y" | "N" | "D";
+    payment_id?: string | null;
+    order_id?: string | null;
+    signature_razorpay?: string | null;
+    totaluser?: number;
+    plantotalprice?: string | number;
+    taxprice?: string | number;
+    discount?: string | number;
+    discountType?: string | number;
+    payment_detail?: string;
+    dropreason?: string | null;
+    isdrop?: "Y" | "N";
+    dropdate?: Date | null;
+    createdAt?: Date;
+    updatedAt?: Date;
+    payment_date?: Date | null;
+    razorpay_order_id?: string | null;
+    cgst?: string | number;
+    sgst?: string | number;
+    igst?: string | number;
+    per_user_rate?: number;
+    Users?: any;
+    email?: string;
+    Customer?: any;
+    Plan?: any;
+    res?: any;
+    result?: any;
+}
