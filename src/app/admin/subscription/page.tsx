@@ -173,7 +173,7 @@ export default function SubscriptionListPage() {
 
             {/* Plan Description */}
             <span className="text-gray-500 text-sm">
-              {`${row?.totaluser || 0} Users Plan @ Rs.${row?.Plan?.price || 0}`}
+              {`Plan @ Rs.${row?.Plan?.price || 0}`}
             </span>
           </div>
         ),

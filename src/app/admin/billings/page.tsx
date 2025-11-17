@@ -7,7 +7,7 @@ import Swal from "sweetalert2";
 import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { getAllSubscriptions, updateSubscriptionStatus, searchSubscription } from "@/services/subscription.service";
+import { getAllSubscriptions, updateSubscriptionStatus, searchSubscription, sendEmail, InactivateExpiredSubs } from "@/services/subscription.service";
 import { getAllUsers } from "@/services/userService";
 import { formatDate } from "@/lib/date";
 import PaginatedDataTable from "@/components/PaginatedDataTablet";
@@ -77,6 +77,8 @@ export default function BillingListPage() {
     const fetchData = useCallback(
         async (searchParams = activeSearch, currentPage = page, currentLimit = limit) => {
             try {
+                // 1️⃣ Call your Inactivate API silently (no UI, no toast)
+                // await InactivateExpiredSubs();
                 setLoading(true);
                 const isSearchActive =
                     searchParams &&
@@ -112,14 +114,16 @@ export default function BillingListPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
+                // 1️⃣ Call your Inactivate API silently (no UI, no toast)
+                await InactivateExpiredSubs();
                 const res: any = await getAllUsers();
-                const data: any = Array.isArray(res?.result?.data)
-                    ? res.result.data : [];
-                setCompanies(data); // ✅ just set state
+                const data: any = Array.isArray(res?.result?.data) ? res.result.data : [];
+                setCompanies(data);
             } catch (error) {
                 SwalError({ title: "Failed!", message: error?.message ?? "Failed to load Companies.", });
             }
         };
+
         fetchData();
     }, []);
 
@@ -233,6 +237,30 @@ export default function BillingListPage() {
         });
     };
 
+    const handleSendEmail = async (id: number) => {
+        const result = await Swal.fire({
+            title: "Are you sure",
+            text: `You want to send email?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Send",
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const emailData = await sendEmail(id);
+                if (emailData?.result == 'true') {
+                    Swal.fire("Updated!", "Email have been send successfully.", "success");
+                    fetchData();
+                } else {
+                    Swal.fire("Error", "Failed to send email.", "error");
+                }
+            } catch (error: any) {
+                Swal.fire("Error", error?.message ?? "Failed to send email.", "error");
+            }
+        }
+    };
+
     const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null);
     const [openCustomerDetail, setOpenCustomerDetail] = useState(false);
 
@@ -330,7 +358,8 @@ export default function BillingListPage() {
             },
             {
                 name: "Amount",
-                selector: (row) => Math.round(Number(row.plantotalprice)) ?? "N/A",
+                selector: (row) => row.plantotalprice ?? "N/A",
+                // Math.round(Number(row.plantotalprice))
                 sortable: true,
                 sortFunction: (rowA, rowB) => {
                     return Number(rowA.plantotalprice) - Number(rowB.plantotalprice);
@@ -340,8 +369,9 @@ export default function BillingListPage() {
                 name: "Actions",
                 cell: (row) => (
                     <div className="flex gap-2">
-
-                        <button onClick={() => handleStatusChange(row.id, row.status)}>
+                        <button
+                            title="status"
+                            onClick={() => handleStatusChange(row.id, row.status)}>
                             {row.status === "Y"
                                 ? <ToggleRight size={20} className="text-green-500" />
                                 : <ToggleLeft size={20} className="text-red-500" />}
@@ -356,7 +386,16 @@ export default function BillingListPage() {
                             onClick={() => handleExportPDF(row.id)}>
                             <FileText size={18} className="text-red-600 hover:text-red-800" />
                         </button>
-                        <Mail size={18} className="text-purple-600" />
+                        <button
+                            title="email"
+                            onClick={() => handleSendEmail(row?.Customer?.id)}
+                            disabled={row?.status === 'N'}
+                        >
+                            <Mail size={18} className={`${row?.status === 'N'
+                                ? "text-gray-400 cursor-not-allowed"
+                                : "text-purple-600 hover:text-purple-800"}`}
+                            />
+                        </button>
                     </div>
                 ),
                 width: "10%",

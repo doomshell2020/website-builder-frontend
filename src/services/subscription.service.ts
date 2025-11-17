@@ -42,3 +42,13 @@ export const searchSubscription = async (
     const response = await API.get("/subscription/search", { params: { ...params, page, limit, }, });
     return response.data;
 };
+
+export const sendEmail = async (id: string | number): Promise<SubscriptionAttribute> => {
+    const response = await API.get(`/subscription/send/email/${id}`);
+    return response.data;
+};
+
+export const InactivateExpiredSubs = async (): Promise<SubscriptionAttribute> => {
+    const response = await API.get(`/subscription/check-expired-subs`);
+    return response.data;
+};

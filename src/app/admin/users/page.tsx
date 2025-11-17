@@ -341,7 +341,7 @@ const UsersListPage = () => {
                 name: "Subscription",
                 width: "15%",
                 cell: (row: User) => {
-                    const sub = row?.subscriptionData[0]; // shorter & safer
+                    const sub = row?.subscriptionData?.[0]; // shorter & safer
 
                     const start = sub?.created
                         ? formatDate(sub.created, "DD-MM-YYYY")
@@ -648,7 +648,7 @@ const UsersListPage = () => {
                         <div className="space-y-4">
                             {selectedUserId && (
                                 <DomainSetup
-                                    userId={Array.isArray(selectedUserId) ? selectedUserId[0] : selectedUserId}
+                                    userId={Array.isArray(selectedUserId) ? selectedUserId?.[0] : selectedUserId}
                                 />
                             )}
                         </div>
