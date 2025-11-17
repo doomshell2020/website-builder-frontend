@@ -1,17 +1,9 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-
 export default function InvoiceBreakdown({
-    companyName,
-    users,
-    pricePerUser,
-    billingStart,
-    billingEnd,
-    planName,
-    discount = 0,
-    gstType = "INTRA",
-    onTotalsChange,   // ⭐ callback to parent
+    companyName, users, pricePerUser, billingStart, billingEnd, planName,
+    discount = 0, gstType = "INTRA", onTotalsChange,
 }) {
     const [discountType, setDiscountType] = useState("amount");
     const [discountAmount, setDiscountAmount] = useState(0);
@@ -84,7 +76,8 @@ export default function InvoiceBreakdown({
                 {/* Users */}
                 <div className="grid grid-cols-2 p-3">
                     <div className="text-gray-700">
-                        - {users} Users Plan @ ₹{pricePerUser} / {planName}
+                        {/* - {users} Users */}
+                        Plan @ ₹{pricePerUser} / {planName}
                     </div>
                     <div className="text-right text-gray-800">
                         {calculations.basePrice.toFixed(2)}

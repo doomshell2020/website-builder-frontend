@@ -27,6 +27,9 @@ export default function AddSubscriptionForm() {
         formState: { errors, isSubmitting },
     } = useForm<FormData>({
         resolver: zodResolver(subscriptionSchema),
+        mode: "onSubmit",
+        reValidateMode: "onChange",
+        shouldFocusError: true,
         defaultValues: {
             totaluser: 1,
         }
@@ -228,8 +231,10 @@ export default function AddSubscriptionForm() {
                                 <select
                                     id="company"
                                     className="w-full py-2 pl-3 pr-8 text-sm text-gray-800 bg-white border border-gray-300 appearance-none dark:bg-dark-900 h-9 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 cursor-pointer"
-                                    {...register("c_id")}
-                                    onChange={(e) => handleCompanySelect(e.target.value)}
+                                    {...register("c_id", {
+                                        required: "Customer is Required",
+                                        onChange: (e) => handleCompanySelect(e.target.value), // <-- use register's onChange
+                                    })}
                                 >
                                     <option value="">
                                         -- Select Company --
@@ -240,12 +245,14 @@ export default function AddSubscriptionForm() {
                                         </option>
                                     ))}
                                 </select>
-
                                 <ChevronDown
                                     size={16}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
                                 />
                             </div>
+                            {typeof errors?.c_id?.message == "string" && (
+                                <p className="text-red-500 text-sm">{errors.c_id.message}</p>
+                            )}
                         </div>
 
                         {/* Email */}
@@ -297,8 +304,10 @@ export default function AddSubscriptionForm() {
                             <div className="relative">
                                 <select
                                     id="plans"
-                                    {...register("plan_id")}
-                                    onChange={handlePlanChange}
+                                    {...register("plan_id", {
+                                        required: "Plan is required",
+                                        onChange: (e) => handlePlanChange(e), // here e is event
+                                    })}
                                     className="w-full py-2 pl-3 pr-8 text-sm text-gray-800 bg-white border border-gray-300 appearance-none dark:bg-dark-900 h-9 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 cursor-pointer"
                                 >
                                     <option value="">
@@ -316,6 +325,9 @@ export default function AddSubscriptionForm() {
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
                                 />
                             </div>
+                            {typeof errors?.plan_id?.message == "string" && (
+                                <p className="text-red-500 text-sm">{errors.plan_id.message}</p>
+                            )}
                         </div>
 
                         {/* Total Users */}
@@ -326,6 +338,7 @@ export default function AddSubscriptionForm() {
                                 type="number"
                                 step="any"
                                 min="0"
+                                disabled
                                 {...register("totaluser", {
                                     onChange: (e) => {
                                         const value = Number(e.target.value) || 0;
@@ -343,7 +356,7 @@ export default function AddSubscriptionForm() {
                         </div>
                     </div>
 
-                    {/** Invoice / Bill */}
+                    {/* Invoice / Bill */}
                     {selectedCompany && billingEnd && (
                         <InvoiceBreakdown
                             companyName="Doomshell"

@@ -1,7 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-
 interface GenerateInvoiceOptions {
     customer: any;        // Customer object from backend
     subscription: any;    // Subscription object from backend
@@ -28,7 +27,6 @@ export const generateInvoicePdf = async ({
     subscription,
     filename,
 }: GenerateInvoiceOptions) => {
-
     // --------------------------
     // Resolve all fields properly
     // --------------------------
@@ -242,36 +240,38 @@ export const generateInvoicePdf = async ({
         });
     });
 
-
     const boxX = 140;
     const boxWidth = 56;
     const boxY = finalY + 45;
     const boxHeights = 10;
 
+    const roundedTotal = Math.round(total); // or Number(total.toFixed(2))
+
     // Red Total Box
     doc.setFillColor(224, 76, 76);
     doc.rect(boxX, boxY, boxWidth, boxHeights, "F");
 
-    // White centered text
+    // Center text (white)
     doc.setTextColor(255);
     doc.setFontSize(11);
 
     const centerX = boxX + boxWidth / 2;
 
-    doc.text(`Total Order Value:  ${total.toFixed(2)}`, centerX, boxY + 7, {
+    doc.text(`Total Order Value:  ${roundedTotal}`, centerX, boxY + 7, {
         align: "center",
     });
 
-
-    // LEFT LABEL (red)
+    // Amount in Words label (red)
     doc.setFontSize(12);
-    doc.setTextColor(224, 76, 76);  // red
+    doc.setTextColor(224, 76, 76);
     doc.text("Amount in Words", 14, finalY + 65);
 
-    // RIGHT TEXT (black)
+    // Amount in Words (black)
     doc.setFontSize(11);
     doc.setTextColor(0);
-    doc.text(numberToWords(total) + " Only", 200, finalY + 65, { align: "right" });
+    doc.text(numberToWords(roundedTotal) + " Only", 200, finalY + 65, {
+        align: "right",
+    });
 
     // Save
     // doc.save(`${filename}.pdf`);

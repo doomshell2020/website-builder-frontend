@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const subscriptionSchema = z.object({
-    plan_id: z.coerce.number().int().min(1, "Plan ID is required"),
-    c_id: z.coerce.number().int().min(1, "Customer ID is required"),
+    plan_id: z.coerce.number().min(1, "Plan is required."),
+    c_id: z.coerce.number().min(1, "Customer is Required."),
     created: z.coerce.string().min(1, "Created date is required"),
     expiry_date: z.coerce.string().min(1, "Expiry date is required"),
     status: z.enum(["Y", "N", "D"]).default("Y"),
