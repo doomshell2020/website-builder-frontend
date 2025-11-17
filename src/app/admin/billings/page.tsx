@@ -330,7 +330,7 @@ export default function BillingListPage() {
             },
             {
                 name: "Amount",
-                selector: (row) => row.plantotalprice ?? "N/A",
+                selector: (row) => Math.round(Number(row.plantotalprice)) ?? "N/A",
                 sortable: true,
                 sortFunction: (rowA, rowB) => {
                     return Number(rowA.plantotalprice) - Number(rowB.plantotalprice);
@@ -546,22 +546,8 @@ export default function BillingListPage() {
 
                     return result.trim() + " Rupees Only";
                 }
-
-                const subTotal = Number(selectedInvoice.plantotalprice) || 0;
-                let discountValue = 0;
-                if (typeof selectedInvoice.discount === "string" && selectedInvoice.discount.includes("%")) {
-                    const percent = Number(selectedInvoice.discount.replace("%", ""));
-                    discountValue = (subTotal * percent) / 100;
-                } else {
-                    discountValue = Number(selectedInvoice.discount) || 0;
-                }
+                const roundedPrice = Number(selectedInvoice?.plantotalprice || 0).toFixed(2);
                 const hasIGST = Number(selectedInvoice.igst) > 0;
-                const igst = hasIGST ? Number(selectedInvoice.igst) : 0;
-                const cgst = hasIGST ? 0 : Number(selectedInvoice.cgst || 0);
-                const sgst = hasIGST ? 0 : Number(selectedInvoice.sgst || 0);
-                const totalTax = hasIGST ? igst : cgst + sgst;
-                const finalTotal = subTotal - discountValue + totalTax;
-                const finalTotalInWords = numberToWords(Math.round(finalTotal));
 
                 return (<div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-2 sm:p-4 overflow-y-auto">
                     <div className="bg-white w-full max-w-[900px] rounded shadow-xl relative overflow-hidden">
@@ -630,7 +616,7 @@ export default function BillingListPage() {
                                                 </div>
 
                                                 <p className="mt-1">
-                                                    +{selectedInvoice.totaluser} Users Plan @ Rs. {selectedInvoice?.per_user_rate}
+                                                    Plan @ Rs. {selectedInvoice?.per_user_rate}
                                                 </p>
 
                                                 <p className="text-gray-600">
@@ -655,37 +641,31 @@ export default function BillingListPage() {
                                     {/* Subtotal */}
                                     <p className="flex justify-between border-b py-1">
                                         <span>Sub Total</span>
-                                        <span>₹{subTotal.toFixed(2)}</span>
+                                        <span>₹{selectedInvoice?.per_user_rate}</span>
                                     </p>
 
                                     {/* Discount */}
                                     <p className="flex justify-between border-b py-1">
-                                        <span>
-                                            Discount
-                                            {typeof selectedInvoice.discount === "string" &&
-                                                selectedInvoice.discount.includes("%")
-                                                ? ` (${selectedInvoice.discount})`
-                                                : ""}
-                                        </span>
-                                        <span>- ₹{discountValue.toFixed(2)}</span>
+                                        <span>Discount</span>
+                                        <span>- ₹{selectedInvoice?.discount}</span>
                                     </p>
 
                                     {/* GST — IGST OR CGST+SGST */}
                                     {hasIGST ? (
                                         <p className="flex justify-between border-b py-1">
                                             <span>IGST (18%)</span>
-                                            <span>₹{igst.toFixed(2)}</span>
+                                            <span>₹{selectedInvoice?.igst}</span>
                                         </p>
                                     ) : (
                                         <>
                                             <p className="flex justify-between border-b py-1">
                                                 <span>CGST (9%)</span>
-                                                <span>₹{cgst.toFixed(2)}</span>
+                                                <span>₹{selectedInvoice?.cgst}</span>
                                             </p>
 
                                             <p className="flex justify-between border-b py-1">
                                                 <span>SGST (9%)</span>
-                                                <span>₹{sgst.toFixed(2)}</span>
+                                                <span>₹{selectedInvoice?.sgst}</span>
                                             </p>
                                         </>
                                     )}
@@ -693,7 +673,7 @@ export default function BillingListPage() {
                                     {/* Total Tax */}
                                     <p className="flex justify-between text-sm font-bold py-2 text-gray-800">
                                         <span>Total Tax (18%)</span>
-                                        <span>₹{totalTax.toFixed(2)}</span>
+                                        <span>₹{selectedInvoice?.taxprice}</span>
                                     </p>
                                 </div>
                             </div>
@@ -702,16 +682,18 @@ export default function BillingListPage() {
                             <div className="flex justify-end mt-2">
                                 <div className="w-full sm:w-1/3 bg-[#006c80] text-white px-2 py-2 text-xs sm:text-sm font-semibold text-right rounded flex justify-between">
                                     <p>Total Order Value — </p>
-                                    <p>₹{finalTotal.toFixed(2)}</p>
+                                    <p>₹{(Math.round(Number(roundedPrice)))}</p>
                                 </div>
                             </div>
-
 
                             {/* AMOUNT IN WORDS */}
                             <p className="mt-6 text-xs sm:text-sm font-semibold flex justify-between">
                                 Amount in Words:{" "}
-                                <span className="font-bold">{finalTotalInWords}</span>
+                                <span className="font-bold">
+                                    {numberToWords(Math.round(Number(roundedPrice)))}
+                                </span>
                             </p>
+
                         </div>
                     </div>
                 </div>)
