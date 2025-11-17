@@ -10,6 +10,7 @@ export interface SubscriptionAttribute {
     signature_razorpay?: string | null;
     totaluser?: number;
     plantotalprice?: string | number;
+    subTotal?: string | number;
     taxprice?: string | number;
     discount?: string | number;
     discountType?: string | number;

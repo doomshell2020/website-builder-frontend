@@ -34,8 +34,6 @@ export default function AddSubscriptionForm() {
             totaluser: 1,
         }
     });
-    console.log("Schema Requirements :", errors);
-
     const handleBack = () => { router.back(); };
     const [companies, setCompanies] = useState([]);
     const [plans, setPlans] = useState([]);
@@ -122,6 +120,7 @@ export default function AddSubscriptionForm() {
 
     // invoice calculated values come from the InvoiceComponent
     const [invoiceTotals, setInvoiceTotals] = useState({
+        discount: 0,
         basePrice: 0,
         discountInputValue: 0,
         discountType: "",
@@ -180,10 +179,9 @@ export default function AddSubscriptionForm() {
                 c_id: data?.c_id ?? selectedCompany,
                 totaluser: selectedPlanUsers,
                 per_user_rate: selectedPlanPrice,
-                plantotalprice: invoiceTotals.basePrice,
-                discount: invoiceTotals.discountType === "percent"
-                    ? `${invoiceTotals?.discountInputValue}%`
-                    : invoiceTotals.discountInputValue,
+                plantotalprice: invoiceTotals.subTotal,
+                // subTotal: invoiceTotals.subTotal,
+                discount: invoiceTotals.discount,
                 taxprice: invoiceTotals.totalTax,
                 cgst: invoiceTotals.cgst,
                 sgst: invoiceTotals.sgst,

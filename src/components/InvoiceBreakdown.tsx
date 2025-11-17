@@ -20,12 +20,13 @@ export default function InvoiceBreakdown({
         }
 
         const taxableAmount = basePrice - finalDiscount;
+        const round2 = (num: number) => Number(num.toFixed(2));
 
-        const cgst = gstType === "INTRA" ? taxableAmount * 0.09 : 0;
-        const sgst = gstType === "INTRA" ? taxableAmount * 0.09 : 0;
-        const igst = gstType === "INTER" ? taxableAmount * 0.18 : 0;
+        const cgst = gstType === "INTRA" ? round2(taxableAmount * 0.09) : 0;
+        const sgst = gstType === "INTRA" ? round2(taxableAmount * 0.09) : 0;
+        const igst = gstType === "INTER" ? round2(taxableAmount * 0.18) : 0;
 
-        const totalTax = cgst + sgst + igst;
+        const totalTax = round2(cgst + sgst + igst);
         const subTotal = taxableAmount + totalTax;
 
         return {

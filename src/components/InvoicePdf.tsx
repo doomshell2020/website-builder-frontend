@@ -53,7 +53,7 @@ export const generateInvoicePdf = async ({
     const sgst = Number(subscription.sgst) || 0;
     const igst = Number(subscription.igst) || 0;
 
-    const total = Number(subscription.total) || subtotal - discount + tax;
+    const total = Number(subscription.total) || rate - discount + tax;
 
     // --------------------------
     // START PDF
@@ -196,7 +196,7 @@ export const generateInvoicePdf = async ({
                     styles: { halign: "left", fontSize: 10 },
                 },
                 {
-                    content: subtotal.toFixed(2),
+                    content: rate.toFixed(2),
                     styles: { halign: "right", fontSize: 10 },
                 },
             ],
@@ -225,7 +225,7 @@ export const generateInvoicePdf = async ({
     doc.setFontSize(10);
 
     const items = [
-        ["Sub Total", subtotal],
+        ["Sub Total", rate],
         ["Discount", discount],
         ["CGST", cgst],
         ["SGST", sgst],
