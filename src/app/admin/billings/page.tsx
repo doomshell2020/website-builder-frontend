@@ -545,7 +545,6 @@ export default function BillingListPage() {
                 </div>
             </main >
             {openCustomerDetail && selectedInvoice && (() => {
-
                 // ----------------- SAFE CALCULATIONS -----------------
                 function numberToWords(num) {
                     if (num === 0) return "Zero Rupees Only";
@@ -588,155 +587,155 @@ export default function BillingListPage() {
                 const roundedPrice = Number(selectedInvoice?.plantotalprice || 0).toFixed(2);
                 const hasIGST = Number(selectedInvoice.igst) > 0;
 
-                return (<div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-2 sm:p-4 overflow-y-auto">
-                    <div className="bg-white w-full max-w-[900px] rounded shadow-xl relative overflow-hidden">
-
-                        {/* HEADER */}
-                        <div className="bg-[#006c80] text-white px-4 sm:px-6 py-3 flex justify-between items-center">
-                            <h2 className="text-base sm:text-lg font-semibold">Invoice Detail</h2>
-                            <button
-                                onClick={() => setOpenCustomerDetail(false)}
-                                className="text-white text-xl hover:text-gray-200"
-                            >
-                                ✕
-                            </button>
-                        </div>
-
-                        {/* BODY */}
-                        <div className="p-4 sm:p-6">
-
-                            {/* TOP SECTION */}
-                            <div className="flex flex-col sm:flex-row justify-between border-b pb-4 gap-3">
-                                <div>
-                                    <h3 className="font-bold text-lg">Doomshell</h3>
-                                    <p className="text-xs sm:text-sm text-gray-700">A-3 Mall Road, Vidhyadhar Nagar, jaipur 302039 India</p>
+                return (
+                    <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-2 sm:p-4">
+                        <div className="bg-white w-full max-w-[900px] max-h-[95vh] rounded shadow-xl overflow-hidden">
+                            <div className="overflow-y-auto max-h-[95vh] p-4">
+                                {/* HEADER */}
+                                <div className="bg-[#3b414f] text-white px-4 sm:px-6 py-3 flex justify-between items-center">
+                                    <h2 className="text-base sm:text-lg font-semibold">Invoice Detail</h2>
+                                    <button
+                                        onClick={() => setOpenCustomerDetail(false)}
+                                        className="text-white text-xl hover:text-gray-200"
+                                    >
+                                        ✕
+                                    </button>
                                 </div>
 
-                                <div className="text-right text-xs sm:text-sm">
-                                    <p className="font-semibold">Invoice</p>
-                                    <p className="mt-1">
-                                        <span className="font-semibold">Invoice No:</span> {selectedInvoice.id}
-                                    </p>
-                                </div>
-                            </div>
+                                {/* BODY */}
+                                <div className="p-4 sm:p-6">
 
-                            {/* BILLING TO */}
-                            <div className="mt-4 border-b pb-4">
-                                <p className="text-xs sm:text-sm font-semibold text-gray-700 mb-2">Billing To:</p>
+                                    {/* TOP SECTION */}
+                                    <div className="flex flex-col sm:flex-row justify-between border-b pb-4 gap-3">
+                                        <div>
+                                            <h3 className="font-bold text-lg">Doomshell</h3>
+                                            <p className="text-xs sm:text-sm text-gray-700">A-3 Mall Road, Vidhyadhar Nagar, jaipur 302039 India</p>
+                                        </div>
 
-                                <div className="flex justify-between items-center">
-                                    <p className="font-bold text-sm sm:text-base">{selectedInvoice.Customer?.company_name}</p>
-                                    <p className="text-gray-600 text-sm whitespace-nowrap font-bold">
-                                        Invoice Date: <span>{formatDate(selectedInvoice.created)}</span>
-                                    </p>
-                                </div>
+                                        <div className="text-right text-xs sm:text-sm">
+                                            <p className="font-semibold">Invoice</p>
+                                            <p className="mt-1">
+                                                <span className="font-semibold">Invoice No:</span> {selectedInvoice.id}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* BILLING TO */}
+                                    <div className="mt-4 border-b pb-4">
+                                        <p className="text-xs sm:text-sm font-semibold text-gray-700 mb-2">Billing To:</p>
+
+                                        <div className="flex justify-between items-center">
+                                            <p className="font-bold text-sm sm:text-base">{selectedInvoice.Customer?.company_name}</p>
+                                            <p className="text-gray-600 text-sm whitespace-nowrap font-bold">
+                                                Invoice Date: <span>{formatDate(selectedInvoice.created)}</span>
+                                            </p>
+                                        </div>
 
 
-                                <p className="text-xs sm:text-sm text-gray-700">{selectedInvoice.Customer?.mobile_no}</p>
-                                <p className="text-xs sm:text-sm text-gray-700">{selectedInvoice.Customer?.address1}</p>
-                                <p className="text-xs sm:text-sm text-gray-700">GST: {selectedInvoice.Customer?.gstin}</p>
-                            </div>
+                                        <p className="text-xs sm:text-sm text-gray-700">{selectedInvoice.Customer?.mobile_no}</p>
+                                        <p className="text-xs sm:text-sm text-gray-700">{selectedInvoice.Customer?.address1}</p>
+                                        <p className="text-xs sm:text-sm text-gray-700">GST: {selectedInvoice.Customer?.gstin}</p>
+                                    </div>
 
-                            {/* DESCRIPTION TABLE */}
-                            <div className="mt-4 overflow-x-auto">
-                                <table className="w-full border border-gray-300 text-xs sm:text-sm">
-                                    <thead>
-                                        <tr className="bg-[#006c80] text-white">
-                                            <th className="text-left p-2">Description</th>
-                                            <th className="text-right p-2">Amount (In Rs.)</th>
-                                        </tr>
-                                    </thead>
+                                    {/* DESCRIPTION TABLE */}
+                                    <div className="mt-4 overflow-x-auto">
+                                        <table className="w-full border border-gray-300 text-xs sm:text-sm">
+                                            <thead>
+                                                <tr className="bg-[#3b414f] text-white">
+                                                    <th className="text-left p-2">Description</th>
+                                                    <th className="text-right p-2">Amount (In Rs.)</th>
+                                                </tr>
+                                            </thead>
 
-                                    <tbody>
-                                        <tr className="border-b">
-                                            <td className="p-3">
-                                                <div>
-                                                    <p className="font-semibold">{selectedInvoice.Plan?.name}</p>
-                                                </div>
+                                            <tbody>
+                                                <tr className="border-b">
+                                                    <td className="p-3">
+                                                        <div>
+                                                            <p className="font-semibold">{selectedInvoice.Plan?.name}</p>
+                                                        </div>
 
-                                                <p className="mt-1">
-                                                    Plan @ Rs. {selectedInvoice?.per_user_rate}
-                                                </p>
+                                                        <p className="mt-1">
+                                                            Plan @ Rs. {selectedInvoice?.per_user_rate}
+                                                        </p>
 
-                                                <p className="text-gray-600">
-                                                    •Billing Period : {formatDate(selectedInvoice.created, "DD-MM-YYYY")} to {formatDate(selectedInvoice.expiry_date)}
-                                                </p>
+                                                        <p className="text-gray-600">
+                                                            •Billing Period : {formatDate(selectedInvoice.created, "DD-MM-YYYY")} to {formatDate(selectedInvoice.expiry_date)}
+                                                        </p>
 
-                                                <p className="mt-2">Thank you for your Business!</p>
-                                            </td>
+                                                        <p className="mt-2">Thank you for your Business!</p>
+                                                    </td>
 
-                                            <td className="text-right p-3 font-semibold">
-                                                ₹{selectedInvoice.plantotalprice}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                                                    <td className="text-right p-3 font-semibold">
+                                                        ₹{selectedInvoice.plantotalprice}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
 
-                            {/* TOTALS SECTION */}
-                            <div className="flex justify-end mt-4">
-                                <div className="w-full sm:w-1/3 text-xs sm:text-sm mr-1">
+                                    {/* TOTALS SECTION */}
+                                    <div className="flex justify-end mt-4">
+                                        <div className="w-full sm:w-1/3 text-xs sm:text-sm mr-1">
 
-                                    {/* Subtotal */}
-                                    <p className="flex justify-between border-b py-1">
-                                        <span>Sub Total</span>
-                                        <span>₹{selectedInvoice?.per_user_rate}</span>
-                                    </p>
-
-                                    {/* Discount */}
-                                    <p className="flex justify-between border-b py-1">
-                                        <span>Discount</span>
-                                        <span>- ₹{selectedInvoice?.discount}</span>
-                                    </p>
-
-                                    {/* GST — IGST OR CGST+SGST */}
-                                    {hasIGST ? (
-                                        <p className="flex justify-between border-b py-1">
-                                            <span>IGST (18%)</span>
-                                            <span>₹{selectedInvoice?.igst}</span>
-                                        </p>
-                                    ) : (
-                                        <>
+                                            {/* Subtotal */}
                                             <p className="flex justify-between border-b py-1">
-                                                <span>CGST (9%)</span>
-                                                <span>₹{selectedInvoice?.cgst}</span>
+                                                <span>Sub Total</span>
+                                                <span>₹{selectedInvoice?.per_user_rate}</span>
                                             </p>
 
+                                            {/* Discount */}
                                             <p className="flex justify-between border-b py-1">
-                                                <span>SGST (9%)</span>
-                                                <span>₹{selectedInvoice?.sgst}</span>
+                                                <span>Discount</span>
+                                                <span>- ₹{selectedInvoice?.discount}</span>
                                             </p>
-                                        </>
-                                    )}
 
-                                    {/* Total Tax */}
-                                    <p className="flex justify-between text-sm font-bold py-2 text-gray-800">
-                                        <span>Total Tax (18%)</span>
-                                        <span>₹{selectedInvoice?.taxprice}</span>
+                                            {/* GST — IGST OR CGST+SGST */}
+                                            {hasIGST ? (
+                                                <p className="flex justify-between border-b py-1">
+                                                    <span>IGST (18%)</span>
+                                                    <span>₹{selectedInvoice?.igst}</span>
+                                                </p>
+                                            ) : (
+                                                <>
+                                                    <p className="flex justify-between border-b py-1">
+                                                        <span>CGST (9%)</span>
+                                                        <span>₹{selectedInvoice?.cgst}</span>
+                                                    </p>
+
+                                                    <p className="flex justify-between border-b py-1">
+                                                        <span>SGST (9%)</span>
+                                                        <span>₹{selectedInvoice?.sgst}</span>
+                                                    </p>
+                                                </>
+                                            )}
+
+                                            {/* Total Tax */}
+                                            <p className="flex justify-between text-sm font-bold py-2 text-gray-800">
+                                                <span>Total Tax (18%)</span>
+                                                <span>₹{selectedInvoice?.taxprice}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* TOTAL ORDER VALUE */}
+                                    <div className="flex justify-end mt-2">
+                                        <div className="w-full sm:w-1/3 bg-[#3b414f] text-white px-2 py-2 text-xs sm:text-sm font-semibold text-right rounded flex justify-between">
+                                            <p>Total Order Value — </p>
+                                            <p>₹{(Math.round(Number(roundedPrice)))}</p>
+                                        </div>
+                                    </div>
+
+                                    {/* AMOUNT IN WORDS */}
+                                    <p className="mt-6 text-xs sm:text-sm font-semibold flex justify-between">
+                                        Amount in Words:{" "}
+                                        <span className="font-bold">
+                                            {numberToWords(Math.round(Number(roundedPrice)))}
+                                        </span>
                                     </p>
                                 </div>
                             </div>
-
-                            {/* TOTAL ORDER VALUE */}
-                            <div className="flex justify-end mt-2">
-                                <div className="w-full sm:w-1/3 bg-[#006c80] text-white px-2 py-2 text-xs sm:text-sm font-semibold text-right rounded flex justify-between">
-                                    <p>Total Order Value — </p>
-                                    <p>₹{(Math.round(Number(roundedPrice)))}</p>
-                                </div>
-                            </div>
-
-                            {/* AMOUNT IN WORDS */}
-                            <p className="mt-6 text-xs sm:text-sm font-semibold flex justify-between">
-                                Amount in Words:{" "}
-                                <span className="font-bold">
-                                    {numberToWords(Math.round(Number(roundedPrice)))}
-                                </span>
-                            </p>
-
                         </div>
-                    </div>
-                </div>)
-
+                    </div>)
             })()}
         </div >
     );
