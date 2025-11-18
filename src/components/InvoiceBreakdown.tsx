@@ -59,6 +59,10 @@ export default function InvoiceBreakdown({
         }
     }, [calculations]);
 
+    useEffect(() => {
+        setDiscountAmount(0);
+    }, [planName, pricePerUser]);
+
     return (
         <div className="w-full border border-gray-300 rounded-md overflow-hidden mt-4">
             {/* Header */}
@@ -126,6 +130,7 @@ export default function InvoiceBreakdown({
                             onChange={(e) => {
                                 let value = Number(e.target.value || 0);
 
+                                if (value < 0) value = 0;
                                 if (discountType === "percent") {
                                     if (value > 100) value = 100;
                                 } else {
@@ -133,7 +138,6 @@ export default function InvoiceBreakdown({
                                         value = calculations.basePrice;
                                     }
                                 }
-
                                 setDiscountAmount(value);
                             }}
                         />
