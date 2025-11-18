@@ -13,15 +13,23 @@ import Swal from "sweetalert2";
 const Header = () => {
   const router = useRouter();
   const { name, id } = useContext(AdminContext);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const profileRef = useRef<HTMLDivElement>(null);
 
+  // 🚀 New: load instantly without useEffect delay
+  const [initialName] = useState(() =>
+    typeof window !== "undefined" ? localStorage.getItem("name") : name
+  );
+
+  const [initialRole] = useState(() =>
+    typeof window !== "undefined" ? localStorage.getItem("role") : getRole?.()
+  );
+
+  const profileRef = useRef<HTMLDivElement>(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  // Close on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        profileRef.current &&
-        !profileRef.current.contains(event.target as Node)
-      ) {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false);
       }
     };
@@ -31,20 +39,23 @@ const Header = () => {
 
   const handleAccountClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const role = getRole?.(); // get role instantly on click
+
+    const role = initialRole;
     if (!role) return;
+
     router.push(
       role === "1"
         ? `/admin/myaccount/edit/${id}`
         : `/user/myaccount/edit/${id}`
     );
+
     setIsProfileOpen(false);
   };
 
   const handleLogout = async () => {
     const result = await Swal.fire({
-      title: "Are you sure",
-      text: "You want to logout ?",
+      title: "Are you sure?",
+      text: "You want to logout?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#506ae5",
@@ -65,19 +76,18 @@ const Header = () => {
     <>
       <header className="bg-[#293042] text-xs p-4 border-b">
         <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            <Logo className="justify-center" />
-          </div>
+          <Logo className="justify-center" />
+
           <div className="relative" ref={profileRef}>
             <button
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="flex items-center space-x-2 text-blue-600"
+              className="flex items-center space-x-2"
             >
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                 <User size={16} className="text-white" />
               </div>
-              <span className="text-white outline-none hover:underline hover:decoration-white">
-                {name}
+              <span className="text-white text-sm hover:underline">
+                {initialName || name || "User"}
               </span>
               <ChevronDown size={16} className="text-white" />
             </button>
@@ -105,7 +115,8 @@ const Header = () => {
             )}
           </div>
         </div>
-      </header >
+      </header>
+
       <Navigation />
     </>
   );

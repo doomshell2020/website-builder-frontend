@@ -27,7 +27,7 @@ export default function InvoiceBreakdown({
         const igst = gstType === "INTER" ? round2(taxableAmount * 0.18) : 0;
 
         const totalTax = round2(cgst + sgst + igst);
-        const subTotal = taxableAmount + totalTax;
+        const subTotal = round2(taxableAmount + totalTax);
 
         return {
             basePrice,
