@@ -113,7 +113,7 @@ export default function AddSubscriptionForm() {
     const [selectedCompany, setSelectedCompany] = useState(null);
     const [selectedPlanId, setSelectedPlanId] = useState(null);
     const [selectedPlanName, setSelectedPlanName] = useState("");
-    const [selectedPlanUsers, setSelectedPlanUsers] = useState(0);
+    const [selectedPlanUsers, setSelectedPlanUsers] = useState(1);
     const [selectedPlanPrice, setSelectedPlanPrice] = useState(0);
     const [billingStart, setBillingStart] = useState(null);
     const [billingEnd, setBillingEnd] = useState(null);
@@ -328,7 +328,7 @@ export default function AddSubscriptionForm() {
                             )}
                         </div>
 
-                        {/* Total Users */}
+                        {/* Total Users
                         <div className="flex flex-col">
                             <Label htmlFor="totaluser" className="mb-1 font-medium">Total Users <span className="text-red-600">*</span></Label>
                             <Input
@@ -351,7 +351,7 @@ export default function AddSubscriptionForm() {
                                 }}
                             />
                             {errors.totaluser && <p className="text-red-600">{errors.totaluser.message}</p>}
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Invoice / Bill */}
