@@ -3,6 +3,7 @@ import autoTable from "jspdf-autotable";
 
 interface GenerateInvoiceOptions {
     customer: any;        // Customer object from backend
+    plan: any;        // Plan object from backend
     subscription: any;    // Subscription object from backend
     filename: string;     // e.g. "invoice_8"
 }
@@ -24,6 +25,7 @@ function numberToWords(num: number) {
 
 export const generateInvoicePdf = async ({
     customer,
+    plan,
     subscription,
     filename,
 }: GenerateInvoiceOptions) => {
@@ -192,7 +194,7 @@ export const generateInvoicePdf = async ({
         body: [
             [
                 {
-                    content: `Doomshell Software\n- Plan @ Rs. ${rate}\n- Billing Period: ${periodStart} to ${periodEnd}`,
+                    content: `Doomshell Software\n- ${plan?.name} Plan @ Rs. ${rate}\n- Billing Period: ${periodStart} to ${periodEnd}`,
                     styles: { halign: "left", fontSize: 10 },
                 },
                 {

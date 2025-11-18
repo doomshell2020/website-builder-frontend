@@ -229,9 +229,14 @@ export default function BillingListPage() {
             address1: invoice.Customer?.address1 || "",
             gstin: invoice.Customer?.gstin || "",
         };
+        const plan = {
+            name: invoice.Plan?.name || "",
+            price: invoice.Plan?.price || ""
+        };
         const subscription = invoice;
         generateInvoicePdf({
             customer,
+            plan,
             subscription,
             filename: "invoice" + (invoice.order_id || invoice.id),
         });
@@ -497,13 +502,9 @@ export default function BillingListPage() {
                                     onClick={handleClick}
                                     className="min-w-[80px] p-2 rounded-[5px] bg-blue-600 text-white hover:bg-blue-700"
                                 >
-                                    {isLoading ? (
-                                        <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                                    ) : (
-                                        <>
-                                            <Plus className="h-5 w-5 text-white" /> Add Subscription
-                                        </>
-                                    )}
+                                    {isLoading
+                                        ? (<span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>)
+                                        : (<> <Plus className="h-5 w-5 text-white" /> Add Subscription </>)}
                                 </Button>
                             </div>
                         </div>
@@ -546,7 +547,6 @@ export default function BillingListPage() {
             {openCustomerDetail && selectedInvoice && (() => {
 
                 // ----------------- SAFE CALCULATIONS -----------------
-
                 function numberToWords(num) {
                     if (num === 0) return "Zero Rupees Only";
 

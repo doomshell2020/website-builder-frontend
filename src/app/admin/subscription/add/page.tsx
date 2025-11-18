@@ -330,7 +330,7 @@ export default function AddSubscriptionForm() {
 
                         {/* Total Users */}
                         <div className="flex flex-col">
-                            <Label htmlFor="totaluser" className="mb-1 font-medium">Total Employees <span className="text-red-600">*</span></Label>
+                            <Label htmlFor="totaluser" className="mb-1 font-medium">Total Users <span className="text-red-600">*</span></Label>
                             <Input
                                 id="totaluser"
                                 type="number"
