@@ -39,18 +39,16 @@ const Header = () => {
 
   const handleAccountClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-
-    const role = initialRole;
+    const role = getRole?.(); // get role instantly on click
     if (!role) return;
-
     router.push(
       role === "1"
         ? `/admin/myaccount/edit/${id}`
         : `/user/myaccount/edit/${id}`
     );
-
     setIsProfileOpen(false);
   };
+
 
   const handleLogout = async () => {
     const result = await Swal.fire({

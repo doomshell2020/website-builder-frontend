@@ -355,7 +355,7 @@ export default function AddSubscriptionForm() {
                     </div>
 
                     {/* Invoice / Bill */}
-                    {selectedCompany && billingEnd && (
+                    {selectedCompany && selectedPlanId && (
                         <InvoiceBreakdown
                             companyName="Doomshell"
                             users={selectedPlanUsers}
