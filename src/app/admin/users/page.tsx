@@ -128,7 +128,17 @@ const UsersListPage = () => {
         fetchData(activeSearch, page, limit);
     }, [fetchData, activeSearch, page, limit]);
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: number, status: string) => {
+
+        // 🔒 Block delete if user has active plan
+        if (status === "Y") {
+            Swal.fire({
+                icon: "error",
+                title: "Action Blocked",
+                text: "You cannot delete this user because they have an active subscription.",
+            });
+            return;
+        }
         const result = await Swal.fire({
             title: "Are you sure",
             text: "You want to delete this user ?",
@@ -365,36 +375,19 @@ const UsersListPage = () => {
                 cell: (row: User) => {
                     const sub = row?.subscriptionData?.[0];
 
-                    const start = sub?.created
-                        ? formatDate(sub.created, "DD-MM-YYYY")
-                        : "—";
-
+                    const start = sub?.created ? formatDate(sub.created, "DD-MM-YYYY") : "—";
                     const expiryDate = sub?.expiry_date ? new Date(sub.expiry_date) : null;
                     const today = new Date();
-
-                    // Check expiry
                     const isExpired = expiryDate ? expiryDate < today : false;
-
-                    const end = sub?.expiry_date
-                        ? formatDate(sub.expiry_date, "DD-MM-YYYY")
-                        : "—";
-
-                    // Status color
-                    const status = sub?.status === "Y"
-                        ? "Active"
-                        : sub?.status === "N"
-                            ? "Inactive"
-                            : "N/A";
+                    const end = sub?.expiry_date ? formatDate(sub.expiry_date, "DD-MM-YYYY") : "—";
+                    const status = sub?.status === "Y" ? "Active" : sub?.status === "N" ? "Inactive" : "N/A";
 
                     const statusClasses =
-                        sub?.status === "Y"
-                            ? "bg-green-100 text-green-700"
+                        sub?.status === "Y" ? "bg-green-100 text-green-700"
                             : sub?.status === "N"
                                 ? "bg-red-100 text-red-700"
                                 : "bg-gray-200 text-gray-600 opacity-60 cursor-not-allowed";
 
-
-                    // Expiry date color
                     const expiryColor = isExpired ? "text-red-600" : "text-gray-700";
 
                     return (
@@ -429,113 +422,111 @@ const UsersListPage = () => {
             },
             {
                 name: "Actions",
-                cell: (row: User) => (
-                    <div className="flex space-x-2 items-center">
-
-                        <div className="flex space-x-3 items-center w-full justify-center">
-                            {row?.roleData?.id === 2 && ( // ✅ Show only if role ID is 2
-                                <div
-                                    className={`${row.approval === "Y" ? "cursor-not-allowed opacity-60" : "cursor-pointer"
-                                        }`}
-                                    title={
-                                        row.approval === "Y"
-                                            ? "Already approved"
-                                            : "Click to approve this user"
-                                    }
-                                    onClick={async () => {
-                                        if (row.approval === "Y") return;
-
-                                        try {
-                                            const result = await Swal.fire({
-                                                title: "Are you sure?",
-                                                text: "You want to approve this user?",
-                                                icon: "warning",
-                                                showCancelButton: true,
-                                                confirmButtonColor: "#506ae5",
-                                                cancelButtonColor: "#d33",
-                                                confirmButtonText: "Yes, approve!",
-                                            });
-
-                                            if (!result.isConfirmed) return;
-
+                cell: (row: User) => {
+                    const sub = row?.subscriptionData?.[0]?.status;
+                    return (
+                        <div className="flex space-x-2 items-center">
+                            <div className="flex space-x-3 items-center w-full justify-center">
+                                {row?.roleData?.id === 2 && ( // ✅ Show only if role ID is 2
+                                    <div
+                                        className={`${row.approval === "Y" ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+                                            }`}
+                                        title={
+                                            row.approval === "Y" ? "Already approved" : "Click to approve this user"
+                                        }
+                                        onClick={async () => {
+                                            if (row.approval === "Y") return;
                                             try {
-                                                const response: any = await approveUser(row.id!.toString(), {
-                                                    approval: "Y",
-                                                    newSchema: row.schema_name!.toString(),
-                                                    role: row?.roleData?.id,
+                                                const result = await Swal.fire({
+                                                    title: "Are you sure?",
+                                                    text: "You want to approve this user?",
+                                                    icon: "warning",
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: "#506ae5",
+                                                    cancelButtonColor: "#d33",
+                                                    confirmButtonText: "Yes, approve!",
                                                 });
 
-                                                if (response?.status === 400) {
-                                                    Swal.fire("Error", response?.message || "Failed to approve user", "error");
-                                                    return;
+                                                if (!result.isConfirmed) return;
+                                                try {
+                                                    const response: any = await approveUser(row.id!.toString(), {
+                                                        approval: "Y",
+                                                        newSchema: row.schema_name!.toString(),
+                                                        role: row?.roleData?.id,
+                                                    });
+
+                                                    if (response?.status === 400) {
+                                                        Swal.fire("Error", response?.message || "Failed to approve user", "error");
+                                                        return;
+                                                    }
+
+                                                    Swal.fire("Approved", "User has been approved successfully", "success");
+                                                    await fetchData();
+                                                } catch (apiError: any) {
+                                                    Swal.fire(
+                                                        "Error",
+                                                        apiError?.response?.data?.message || apiError?.message || "Something went wrong while approving",
+                                                        "error"
+                                                    );
                                                 }
-
-                                                Swal.fire("Approved", "User has been approved successfully", "success");
-                                                await fetchData();
-                                            } catch (apiError: any) {
-                                                Swal.fire(
-                                                    "Error",
-                                                    apiError?.response?.data?.message || apiError?.message || "Something went wrong while approving",
-                                                    "error"
-                                                );
+                                            } catch (outerError: any) {
+                                                Swal.fire("Error", "Unexpected error occurred. Please try again later.", "error");
                                             }
-                                        } catch (outerError: any) {
-                                            Swal.fire("Error", "Unexpected error occurred. Please try again later.", "error");
-                                        }
-                                    }}
-                                >
-                                    {row.approval === "Y" ? (
-                                        <CircleCheckBig size={20} className="text-green-500" />
-                                    ) : (
-                                        <CircleAlert size={20} className="text-red-500" />
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                        <div
-                            className="cursor-pointer"
-                            title={`Click to mark as ${row.status == "Y" ? "Inactive" : "Active"}`}
-                            onClick={async () => {
-                                // TODO: Implement updateUserStatus
-                                const result = await Swal.fire({
-                                    title: "Are you sure",
-                                    text: "You want to update this user's status?",
-                                    icon: "warning",
-                                    showCancelButton: true,
-                                    confirmButtonColor: "#506ae5",
-                                    cancelButtonColor: "#d33",
-                                    confirmButtonText: "Yes, update it!",
-                                });
+                                        }}
+                                    >
+                                        {row.approval === "Y" ? (
+                                            <CircleCheckBig size={18} className="text-green-500" />
+                                        ) : (
+                                            <CircleAlert size={18} className="text-red-500" />
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                            <div
+                                className="cursor-pointer"
+                                title={`Click to mark as ${row.status == "Y" ? "Inactive" : "Active"}`}
+                                onClick={async () => {
+                                    // TODO: Implement updateUserStatus
+                                    const result = await Swal.fire({
+                                        title: "Are you sure",
+                                        text: "You want to update this user's status?",
+                                        icon: "warning",
+                                        showCancelButton: true,
+                                        confirmButtonColor: "#506ae5",
+                                        cancelButtonColor: "#d33",
+                                        confirmButtonText: "Yes, update it!",
+                                    });
 
-                                if (result.isConfirmed) {
-                                    await updateUserStatus(row.id!.toString(), { status: row.status == "Y" ? "N" : "Y", });
-                                    Swal.fire("updated", `User has been successfully ${row.status === "Y" ? "deactivated" : "activated"}.`, "success",);
-                                    fetchData();
-                                }
-                            }}>
-                            {row.status == "Y" ? (
-                                <ToggleRight size={20} className="text-green-500" />
-                            ) : (
-                                <ToggleLeft size={20} className="text-red-500" />
-                            )}
-                        </div>
-                        {/* <button
+                                    if (result.isConfirmed) {
+                                        await updateUserStatus(row.id!.toString(), { status: row.status == "Y" ? "N" : "Y", });
+                                        Swal.fire("updated", `User has been successfully ${row.status === "Y" ? "deactivated" : "activated"}.`, "success",);
+                                        fetchData();
+                                    }
+                                }}>
+                                {row.status == "Y" ? (
+                                    <ToggleRight size={20} className="text-green-500" />
+                                ) : (
+                                    <ToggleLeft size={20} className="text-red-500" />
+                                )}
+                            </div>
+                            {/* <button
                             title="View"
                             onClick={() => router.push(`/users/view/${row.id}`)}
                         >
                             <Info size={18} color="blue" />
                         </button> */}
-                        <button
-                            title="Edit"
-                            onClick={() => router.push(`/admin/users/update/${row.id}`)}
-                        >
-                            <Edit size={18} color="green" />
-                        </button>
-                        <button title="Delete" onClick={() => handleDelete(row.id!)}>
-                            <Trash2 size={16} color="red" />
-                        </button>
-                    </div>
-                ),
+                            <button
+                                title="Edit"
+                                onClick={() => router.push(`/admin/users/update/${row.id}`)}
+                            >
+                                <Edit size={18} color="green" />
+                            </button>
+                            <button title="Delete" onClick={() => handleDelete(row.id!, row?.subscriptionData?.[0]?.status)}>
+                                <Trash2 size={16} color="red" />
+                            </button>
+                        </div>
+                    )
+                },
                 width: "10%",
             },
         ],
