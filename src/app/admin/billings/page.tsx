@@ -2,14 +2,15 @@
 
 import { useMemo, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ToggleRight, ToggleLeft, Plus, ChevronDown, Eye, Mail, FileText } from "lucide-react";
+import { ToggleRight, ToggleLeft, Plus, ChevronDown, Eye, Wallet, Mail, FileText } from "lucide-react";
 import Swal from "sweetalert2";
 import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { getAllSubscriptions, updateSubscriptionStatus, searchSubscription, sendEmail, InactivateExpiredSubs } from "@/services/subscription.service";
+import { getAllSubscriptions, updateSubscriptionStatus, updatePaymentStatus, searchSubscription, sendEmail, InactivateExpiredSubs } from "@/services/subscription.service";
 import { getAllUsers } from "@/services/userService";
 import { formatDate } from "@/lib/date";
+import { formatPrice } from "@/lib/price";
 import PaginatedDataTable from "@/components/PaginatedDataTablet";
 import { SubscriptionAttribute } from "@/types/subscription";
 import { Button } from "@/components/ui/Button";
@@ -208,6 +209,27 @@ export default function BillingListPage() {
         }
     };
 
+    const handlePaymentStatus = async (id: number, currentStatus: string) => {
+        const newStatus = currentStatus === "Y" ? "N" : "Y";
+        const result = await Swal.fire({
+            title: "Are you sure",
+            text: `You want to mark payment as ${newStatus === "Y" ? "paid" : "pending"}?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, change it!",
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await updatePaymentStatus(id, { isdrop: newStatus });
+                Swal.fire("Updated!", "Payment status has been changed.", "success");
+                fetchData();
+            } catch {
+                Swal.fire("Error", "Failed to update payment status.", "error");
+            }
+        }
+    };
+
     const handleView = (id: number) => {
         const invoice = data.find(item => Number(item.id) === Number(id));
         if (!invoice) {
@@ -282,7 +304,6 @@ export default function BillingListPage() {
                 name: "Company Detail",
                 selector: (row) => row?.Customer?.company_name || "",
                 sortable: true,
-                width: "15%",
                 cell: (row) => (
                     <div className="flex flex-col leading-5">
                         {/* Company Name */}
@@ -303,67 +324,143 @@ export default function BillingListPage() {
                         {/* Plan Description */}
                         <span className="text-gray-500 text-sm">
                             {/* ${row?.totaluser || 0} Users */}
-                            {`Plan @ Rs.${row?.Plan?.price || 0}`}
+                            {`Plan @ Rs.${formatPrice(row?.Plan?.price) || 0}`}
                         </span>
                     </div>
                 ),
             },
             {
-                name: "Invoice Id",
+                name: "Invoice Detail",
                 selector: (row) => row.id,
                 sortable: true,
-                width: "8%",
-            },
-            {
-                name: "Start Date",
-                selector: (row) =>
-                    row.created
-                        ? formatDate(row.created, "DD-MM-YYYY")
-                        : "—",
-                sortable: true,
-            },
-            {
-                name: "Expiry Date",
-                selector: (row) =>
-                    row.expiry_date
-                        ? formatDate(row.expiry_date, "DD-MM-YYYY")
-                        : "—",
-                sortable: true,
-            },
-            {
-                name: "Invoice Date",
-                selector: (row) =>
-                    row.createdAt
-                        ? formatDate(row.createdAt, "DD-MM-YYYY")
-                        : "—",
-                sortable: true,
-            },
-            {
-                name: "Payment Date",
-                selector: (row) =>
-                    row.payment_date
-                        ? formatDate(row.payment_date, "DD-MM-YYYY")
-                        : "—",
-                sortable: true,
-            },
-            {
-                name: "Payment Status",
-                selector: (row) => row.isdrop,
-                sortable: true,
-                width: "12%",
                 cell: (row) => (
-                    <span
-                        className={`px-2 py-1 text-xs font-semibold rounded-md ${row.isdrop === "Y"
-                            ? "text-green-700" : "text-red-700 "
-                            }`}
-                    >
-                        {row.isdrop === "Y" ? "Paid" : "Pending"}
-                    </span>
+                    <div className="flex flex-col text-xs leading-tight">
+
+                        {/* Invoice ID */}
+                        <div className="flex flex-row">
+                            <span className="font-medium text-black">Invoice ID: </span>
+                            <button
+                                title="Invoice"
+                                onClick={() => handleExportPDF(row.id)}
+                                className="w-fit text-blue-600 hover:underline hover:text-blue-800"
+                            >
+                                #{row.id}
+                            </button>
+                        </div>
+
+                        {/* Invoice Date */}
+                        <div className="flex flex-row mt-1">
+                            <span className="font-medium text-black">Invoice Date: </span>
+                            <span className="text-black ">
+                                {row.createdAt ? formatDate(row.createdAt, "DD-MM-YYYY") : "—"}
+                            </span>
+                        </div>
+
+                    </div>
                 ),
             },
             {
+                name: "Subscription Period",
+                width: "16%",
+                selector: (row) => row.created,
+                cell: (row) => {
+                    const isExpired = row.expiry_date && new Date(row.expiry_date) < new Date();
+
+                    return (<div className="flex flex-col text-xs leading-tight">
+
+                        <span className="text-black">
+                            <span className="font-medium text-black">Start: </span>
+                            {row.created ? formatDate(row.created, "DD-MM-YYYY") : "—"}
+                        </span>
+
+                        <span className={isExpired ? "text-red-600 font-semibold" : "text-black"}>
+                            <span className="font-medium text-black">End: </span>
+                            {row.expiry_date ? formatDate(row.expiry_date, "DD-MM-YYYY") : "—"}
+                        </span>
+
+                    </div>
+                    )
+                }
+            },
+            // {
+            //     name: "Start Date",
+            //     selector: (row) =>
+            //         row.created
+            //             ? formatDate(row.created, "DD-MM-YYYY")
+            //             : "—",
+            //     sortable: true,
+            // },
+            // {
+            //     name: "Expiry Date",
+            //     selector: (row) =>
+            //         row.expiry_date
+            //             ? formatDate(row.expiry_date, "DD-MM-YYYY")
+            //             : "—",
+            //     sortable: true,
+            // },
+            // {
+            //     name: "Invoice Date",
+            //     selector: (row) =>
+            //         row.createdAt
+            //             ? formatDate(row.createdAt, "DD-MM-YYYY")
+            //             : "—",
+            //     sortable: true,
+            // },
+            // {
+            //     name: "Payment Date",
+            //     selector: (row) =>
+            //         row.payment_date
+            //             ? formatDate(row.payment_date, "DD-MM-YYYY")
+            //             : "—",
+            //     sortable: true,
+            // },
+            // {
+            //     name: "Payment Status",
+            //     selector: (row) => row.isdrop,
+            //     sortable: true,
+            //     width: "12%",
+            //     cell: (row) => (
+            //         <span
+            //             className={`px-2 py-1 text-xs font-semibold rounded-md ${row.isdrop === "Y"
+            //                 ? "text-green-700" : "text-red-700 "
+            //                 }`}
+            //         >
+            //             {row.isdrop === "Y" ? "Paid" : "Pending"}
+            //         </span>
+            //     ),
+            // },
+            {
+                name: "Payment Detail",
+                sortable: true,
+                selector: (row) => row.payment_date, // sorting based on payment date
+                cell: (row) => {
+                    const statusText = row.isdrop === "Y" ? "Paid" : "Pending";
+                    const statusColor =
+                        row.isdrop === "Y" ? "text-green-700" : "text-red-700";
+
+                    return (
+                        <div className="flex flex-col text-xs leading-tight">
+
+                            {/* Payment Date */}
+                            <span className="text-black">
+                                <span className="font-medium text-black">Date: </span>
+                                {row.payment_date ? formatDate(row.payment_date, "DD-MM-YYYY") : "—"}
+                            </span>
+
+                            {/* Payment Status */}
+                            <span className={`font-semibold ${statusColor}`}>
+                                <span className="font-medium text-black">Status: </span>
+                                {statusText}
+                            </span>
+
+                        </div>
+                    );
+                },
+            },
+            {
                 name: "Amount",
-                selector: (row) => row.plantotalprice ?? "N/A",
+                width: "10%",
+                selector: (row) => formatPrice(row.plantotalprice) ?? "N/A",
                 // Math.round(Number(row.plantotalprice))
                 sortable: true,
                 sortFunction: (rowA, rowB) => {
@@ -375,19 +472,34 @@ export default function BillingListPage() {
                 cell: (row) => (
                     <div className="flex gap-2">
                         <button
+                            title="Payment"
+                            onClick={() => handlePaymentStatus(row.id, row.isdrop)}
+                        // className={
+                        //     row.isdrop === "Y"
+                        //         ? "px-1 py-0.5 bg-green-500 text-white rounded-[5px]"
+                        //         : "px-1 py-0.5 bg-red-500 text-white rounded-[5px]"
+                        // }
+                        >
+                            {row.isdrop === "Y" ? (
+                                <Wallet size={18} className="text-green-600 hover:text:green-800" />
+                            ) : (
+                                <Wallet size={18} className="text-red-600 hover:text:red-800" />
+                            )}
+                        </button>
+                        <button
                             title="status"
                             onClick={() => handleStatusChange(row.id, row.status)}>
                             {row.status === "Y"
                                 ? <ToggleRight size={20} className="text-green-500" />
                                 : <ToggleLeft size={20} className="text-red-500" />}
                         </button>
-                        <button
+                        {/* <button
                             title="view"
                             onClick={() => handleView(Number(row.id))}>
                             <Eye size={18} className="text-blue-500 hover:text-blue-700" />
-                        </button>
+                        </button> */}
                         <button
-                            title="pdf"
+                            title="invoice"
                             onClick={() => handleExportPDF(row.id)}>
                             <FileText size={18} className="text-red-600 hover:text-red-800" />
                         </button>

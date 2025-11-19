@@ -9,6 +9,7 @@ import { formatDate } from "@/lib/date";
 import PaginatedDataTable from "@/components/PaginatedDataTablet";
 import { SubscriptionAttribute } from "@/types/subscription";
 import { Button } from "@/components/ui/Button";
+import { formatPrice } from "@/lib/price";
 import { Input } from "@/components/ui/Input";
 import Loader from '@/components/ui/loader'
 
@@ -173,7 +174,7 @@ export default function SubscriptionListPage() {
 
             {/* Plan Description */}
             <span className="text-gray-500 text-sm">
-              {`Plan @ Rs.${row?.Plan?.price || 0}`}
+              {`Plan @ Rs.${formatPrice(row?.Plan?.price) || 0}`}
             </span>
           </div>
         ),
@@ -189,12 +190,18 @@ export default function SubscriptionListPage() {
       },
       {
         name: "Expiry Date",
-        selector: (row) =>
-          row.expiry_date
-            ? formatDate(row.expiry_date, "DD-MM-YYYY")
-            : "—",
-        sortable: true,
+        selector: (row) => row.expiry_date ? formatDate(row.expiry_date, "DD-MM-YYYY") : "—",
         width: "15%",
+        sortable: true,
+        cell: (row) => {
+          const isExpired = row.expiry_date && new Date(row.expiry_date) < new Date();
+
+          return (
+            <span className={isExpired ? "text-red-600 font-semibold" : "text-gray-700"}>
+              {row.expiry_date ? formatDate(row.expiry_date, "DD-MM-YYYY") : "—"}
+            </span>
+          );
+        },
       },
       {
         name: "Status",

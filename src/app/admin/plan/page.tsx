@@ -9,6 +9,7 @@ import {
   getAllPlans, deletePlan, updatePlanStatus,
   createPlan, getPlanById, updatePlan
 } from "@/services/plan.service";
+import { formatPrice } from "@/lib/price";
 import { PlanAttribute } from "@/types/plan";
 import { createPlanSchema } from "@/schemas/plan.schema";
 import PaginatedDataTable from "@/components/PaginatedDataTablet";
@@ -203,7 +204,7 @@ export default function PlanPage() {
     },
     {
       name: "Price",
-      selector: (row) => row.price,
+      selector: (row) => formatPrice(row.price) ?? row.price,
       sortable: true,
       sortFunction: (rowA, rowB) => {
         return Number(rowA.price) - Number(rowB.price);
@@ -212,6 +213,7 @@ export default function PlanPage() {
     {
       name: "Status",
       width: "16%",
+      selector: (row) => row.status,
       sortable: true,
       cell: (row) => {
         const status = row.status === "Y" ? "Active" : "Inactive";

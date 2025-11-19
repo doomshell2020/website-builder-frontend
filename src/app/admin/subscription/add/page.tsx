@@ -41,6 +41,7 @@ export default function AddSubscriptionForm() {
         email: "",
         mobile_no: "",
         address: "",
+        gst_type: "",
     });
 
     useEffect(() => {
@@ -57,7 +58,7 @@ export default function AddSubscriptionForm() {
 
                 const planData = Array.isArray(planRes?.result?.data)
                     ? planRes.result.data : [];
-                    
+
                 if (!isMounted) return;
 
                 setCompanies(companyData);
@@ -79,6 +80,7 @@ export default function AddSubscriptionForm() {
                 email: "",
                 mobile_no: "",
                 address: "",
+                gst_type: "",
             });
             return;
         }
@@ -90,6 +92,7 @@ export default function AddSubscriptionForm() {
                 email: user?.email || "",
                 mobile_no: user?.mobile_no || "",
                 address: user?.address1 || "",
+                gst_type: user?.gst_type || "",
             });
 
         } catch (err: any) {
@@ -98,16 +101,9 @@ export default function AddSubscriptionForm() {
                 email: "",
                 mobile_no: "",
                 address: "",
+                gst_type: "",
             });
         }
-    };
-
-    const PLAN_DURATIONS = {
-        "Monthly": { months: 1 },
-        "Quarterly": { months: 3 },
-        "Half Yearly": { months: 6 },
-        "Yearly": { months: 12 },
-        "Free Trial-7 Days": { days: 7 }
     };
 
     const [selectedCompany, setSelectedCompany] = useState(null);
@@ -141,17 +137,15 @@ export default function AddSubscriptionForm() {
         setSelectedPlanPrice(selected.price);
         setSelectedPlanUsers(1);
 
-        const duration = PLAN_DURATIONS[selected.name];
+        const PLAN_DURATIONS = {
+            All: { months: 12 }
+        };
+
+        const duration = PLAN_DURATIONS["All"];
         const startDate = new Date();
 
         let endDate = new Date(startDate);
-
-        if (duration.months) {
-            endDate.setMonth(endDate.getMonth() + duration.months);
-        }
-        if (duration.days) {
-            endDate.setDate(endDate.getDate() + duration.days);
-        }
+        endDate.setMonth(endDate.getMonth() + duration.months);
         setBillingStart(startDate);
         setBillingEnd(endDate);
     };
@@ -363,9 +357,10 @@ export default function AddSubscriptionForm() {
                             billingStart={billingStart.toLocaleDateString("en-GB")}
                             billingEnd={billingEnd.toLocaleDateString("en-GB")}
                             planName={selectedPlanName}
-                            gstType="INTRA"
+                            gstType={companyDetails?.gst_type == "IGST" ? "INTER" : "INTRA"}
                             onTotalsChange={(totals) => {
                                 console.log("Invoice calculated totals:", totals);
+                                console.log("companyDetails", companyDetails, companyDetails?.gst_type);
                                 setInvoiceTotals(totals);
                             }}
                         />

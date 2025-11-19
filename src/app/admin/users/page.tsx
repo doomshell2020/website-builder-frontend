@@ -12,6 +12,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { formatDate } from "@/lib/date";
 import Swal from "sweetalert2";
 import { getAllUsers, deleteUser, updateUserStatus, searchUsers, approveUser } from "@/services/userService";
+import { updateSubscriptionStatus } from "@/services/subscription.service";
 import PaginatedDataTable from "@/components/PaginatedDataTablet";
 import { User } from "@/types/user";
 import { Button } from "@/components/ui/Button";
@@ -203,6 +204,27 @@ const UsersListPage = () => {
 
     };
 
+    const handleSubsStatusChange = async (id: number, currentStatus: string) => {
+        const newStatus = currentStatus === "Y" ? "N" : "Y";
+        const result = await Swal.fire({
+            title: "Are you sure",
+            text: `You want to ${newStatus === "Y" ? "active" : "inactive"} the subscription?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: `Yes, ${newStatus === "Y" ? "active" : "inactive"}`,
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await updateSubscriptionStatus(id, { status: newStatus });
+                Swal.fire("Updated!", "Subscription status has been changed.", "success");
+                fetchData();
+            } catch {
+                Swal.fire("Error", "Failed to update status.", "error");
+            }
+        }
+    };
+
     const columns = useMemo(
         () => [
             {
@@ -364,104 +386,112 @@ const UsersListPage = () => {
                             ? "Inactive"
                             : "N/A";
 
-                    const statusColor =
+                    const statusClasses =
                         sub?.status === "Y"
-                            ? "text-green-600"
+                            ? "bg-green-100 text-green-700"
                             : sub?.status === "N"
-                                ? "text-red-600"
-                                : "text-gray-500";
+                                ? "bg-red-100 text-red-700"
+                                : "bg-gray-200 text-gray-600 opacity-60 cursor-not-allowed";
+
 
                     // Expiry date color
                     const expiryColor = isExpired ? "text-red-600" : "text-gray-700";
 
                     return (
-                        <div className="flex flex-col text-xs leading-tight">
-                            <span><strong>Start:</strong> {start}</span>
+                        <div className="flex flex-col text-xs leading-tight gap-1">
 
-                            <span>
-                                <strong>End:</strong>{" "}
-                                <span className={expiryColor}>{end}</span>
+                            {/* Date Range */}
+                            <span className="flex items-center gap-1">
+                                <span>{start}</span>
+                                <span>-</span>
+                                <strong className={expiryColor}>{end}</strong>
                             </span>
 
-                            <span>
-                                <strong>Status:</strong>{" "}
-                                <span className={statusColor}>{status}</span>
-                            </span>
+                            {/* Status Badge */}
+                            <button
+                                title={sub?.status ? "Click to update" : undefined}
+                                disabled={!sub?.status}
+                                onClick={() => handleSubsStatusChange(sub?.id, sub?.status)}
+                                className="w-fit"
+                            >
+                                <span
+                                    className={`px-2 py-0.5 text-[12px] font-semibold rounded-full 
+                                        ${statusClasses}`}
+                                >
+                                    {status}
+                                </span>
+                            </button>
+
                         </div>
                     );
+
                 },
-            },
-            {
-                name: "Approval",
-                cell: (row: User) => (
-                    <div className="flex space-x-3 items-center w-full justify-center">
-                        {row?.roleData?.id === 2 && ( // ✅ Show only if role ID is 2
-                            <div
-                                className={`${row.approval === "Y" ? "cursor-not-allowed opacity-60" : "cursor-pointer"
-                                    }`}
-                                title={
-                                    row.approval === "Y"
-                                        ? "Already approved"
-                                        : "Click to approve this user"
-                                }
-                                onClick={async () => {
-                                    if (row.approval === "Y") return;
-
-                                    try {
-                                        const result = await Swal.fire({
-                                            title: "Are you sure?",
-                                            text: "You want to approve this user?",
-                                            icon: "warning",
-                                            showCancelButton: true,
-                                            confirmButtonColor: "#506ae5",
-                                            cancelButtonColor: "#d33",
-                                            confirmButtonText: "Yes, approve!",
-                                        });
-
-                                        if (!result.isConfirmed) return;
-
-                                        try {
-                                            const response: any = await approveUser(row.id!.toString(), {
-                                                approval: "Y",
-                                                newSchema: row.schema_name!.toString(),
-                                                role: row?.roleData?.id,
-                                            });
-
-                                            if (response?.status === 400) {
-                                                Swal.fire("Error", response?.message || "Failed to approve user", "error");
-                                                return;
-                                            }
-
-                                            Swal.fire("Approved", "User has been approved successfully", "success");
-                                            await fetchData();
-                                        } catch (apiError: any) {
-                                            Swal.fire(
-                                                "Error",
-                                                apiError?.response?.data?.message || apiError?.message || "Something went wrong while approving",
-                                                "error"
-                                            );
-                                        }
-                                    } catch (outerError: any) {
-                                        Swal.fire("Error", "Unexpected error occurred. Please try again later.", "error");
-                                    }
-                                }}
-                            >
-                                {row.approval === "Y" ? (
-                                    <CircleCheckBig size={20} className="text-green-500" />
-                                ) : (
-                                    <CircleAlert size={20} className="text-red-500" />
-                                )}
-                            </div>
-                        )}
-                    </div>
-                ),
-                width: "6%",
             },
             {
                 name: "Actions",
                 cell: (row: User) => (
-                    <div className="flex space-x-3 items-center">
-                        {/* Status toggle - implement updateStatusEnjoyer when available */}
+                    <div className="flex space-x-2 items-center">
+
+                        <div className="flex space-x-3 items-center w-full justify-center">
+                            {row?.roleData?.id === 2 && ( // ✅ Show only if role ID is 2
+                                <div
+                                    className={`${row.approval === "Y" ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+                                        }`}
+                                    title={
+                                        row.approval === "Y"
+                                            ? "Already approved"
+                                            : "Click to approve this user"
+                                    }
+                                    onClick={async () => {
+                                        if (row.approval === "Y") return;
+
+                                        try {
+                                            const result = await Swal.fire({
+                                                title: "Are you sure?",
+                                                text: "You want to approve this user?",
+                                                icon: "warning",
+                                                showCancelButton: true,
+                                                confirmButtonColor: "#506ae5",
+                                                cancelButtonColor: "#d33",
+                                                confirmButtonText: "Yes, approve!",
+                                            });
+
+                                            if (!result.isConfirmed) return;
+
+                                            try {
+                                                const response: any = await approveUser(row.id!.toString(), {
+                                                    approval: "Y",
+                                                    newSchema: row.schema_name!.toString(),
+                                                    role: row?.roleData?.id,
+                                                });
+
+                                                if (response?.status === 400) {
+                                                    Swal.fire("Error", response?.message || "Failed to approve user", "error");
+                                                    return;
+                                                }
+
+                                                Swal.fire("Approved", "User has been approved successfully", "success");
+                                                await fetchData();
+                                            } catch (apiError: any) {
+                                                Swal.fire(
+                                                    "Error",
+                                                    apiError?.response?.data?.message || apiError?.message || "Something went wrong while approving",
+                                                    "error"
+                                                );
+                                            }
+                                        } catch (outerError: any) {
+                                            Swal.fire("Error", "Unexpected error occurred. Please try again later.", "error");
+                                        }
+                                    }}
+                                >
+                                    {row.approval === "Y" ? (
+                                        <CircleCheckBig size={20} className="text-green-500" />
+                                    ) : (
+                                        <CircleAlert size={20} className="text-red-500" />
+                                    )}
+                                </div>
+                            )}
+                        </div>
                         <div
                             className="cursor-pointer"
                             title={`Click to mark as ${row.status == "Y" ? "Inactive" : "Active"}`}

@@ -36,6 +36,11 @@ export const updateSubscriptionStatus = async (id: number, data: { status: strin
     return response.data;
 };
 
+export const updatePaymentStatus = async (id: number, data: { isdrop: string },): Promise<SubscriptionAttribute> => {
+    const response = await API.patch(`/subscription/payment/${id}`, data);
+    return response.data;
+};
+
 export const searchSubscription = async (
     params: { searchParams?: string; fromDate?: string; toDate?: string }, page: number, limit: number,
 ) => {

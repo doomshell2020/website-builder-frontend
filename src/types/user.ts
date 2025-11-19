@@ -27,6 +27,7 @@ export interface User {
   image?: string | null;
   subscriptionData?: any;
   status?: 'Y' | 'N';
+  gst_type?: 'IGST' | 'CGST_SGST';
   approval?: 'Y' | 'N';
   createdAt?: Date;
   updatedAt?: Date;

@@ -74,6 +74,7 @@ export const userSchema = z.object({
     // company_name: z.string({ required_error: "Company name is required" }).nonempty("Company is required"),
     // schema_name: z.string().nonempty("DB name is required"),
     // subdomain: z.string().nonempty("Sub-domain is required"),
+    gst_type: z.enum(["IGST", "CGST_SGST"]).optional().default("CGST_SGST"),
     createdAt: z.string().datetime().optional(),
     updatedAt: z.string().datetime().optional(),
     company_name: z.string().optional(),
@@ -171,6 +172,7 @@ export const addUserSchema = z.object({
     gstin: z.string().trim().nullable().optional(),
     company_name: z.string().nonempty("Company name is required"),
     subdomain: z.string().nonempty("Company sub-domain is required"),
+    gst_type: z.enum(["IGST", "CGST_SGST"]).optional().default("CGST_SGST"),
     createdAt: z.string().datetime().optional(),
     updatedAt: z.string().datetime().optional(),
 });

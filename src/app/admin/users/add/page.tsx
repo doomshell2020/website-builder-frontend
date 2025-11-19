@@ -35,8 +35,10 @@ export default function AddUser() {
         shouldFocusError: true,
         defaultValues: {
             company_logo: null,
+            gst_type: "CGST_SGST"
         },
     });
+    // console.log("errors: ", errors);
     const [showPassword, setShowPassword] = useState(false);
     const [selectedCompanyLogo, setSelectedCompanyLogo] = useState<File | null>(null);
     const [websiteTypes, setWebsiteTypes] = useState<ThemeAttribute[]>([]);
@@ -89,6 +91,7 @@ export default function AddUser() {
             formData.append("address1", data.address1);
             formData.append("address2", data.address2);
             formData.append("gstin", data.gstin);
+            formData.append("gst_type", data.gst_type);
             if (selectedCompanyLogo) {
                 formData.append("company_logo", data.company_logo);
             }
@@ -414,6 +417,39 @@ export default function AddUser() {
                                     </div>
 
                                 </div>
+                            </div>
+
+                            {/* GST type */}
+                            <div className="flex flex-col gap-2">
+                                <Label className="mb-1 font-medium">
+                                    GST Type <span className="text-red-600">*</span>
+                                </Label>
+
+                                <div className="flex gap-6">
+                                    <label className="flex items-center gap-2 cursor-pointer font-medium">
+                                        <input
+                                            type="radio"
+                                            value="CGST_SGST"
+                                            {...register("gst_type")}
+                                            className="cursor-pointer"
+                                        />
+                                        CGST + SGST
+                                    </label>
+
+                                    <label className="flex items-center gap-2 cursor-pointer font-medium">
+                                        <input
+                                            type="radio"
+                                            value="IGST"
+                                            {...register("gst_type")}
+                                            className="cursor-pointer"
+                                        />
+                                        IGST
+                                    </label>
+                                </div>
+
+                                {errors.gst_type && (
+                                    <p className="text-red-500 text-sm">{errors.gst_type.message}</p>
+                                )}
                             </div>
 
                             {/* Company Phone No. */}

@@ -154,13 +154,13 @@ const Navigation = () => {
       icon: <User size={16} strokeWidth={2.5} />,
       visibleFor: ["1"],
     },
-    {
-      key: "schemas",
-      label: "Platform",
-      href: "/admin/schemas",
-      icon: <Database size={16} strokeWidth={2.5} />,
-      visibleFor: ["1"],
-    },
+    // {
+    //   key: "schemas",
+    //   label: "Platform",
+    //   href: "/admin/schemas",
+    //   icon: <Database size={16} strokeWidth={2.5} />,
+    //   visibleFor: ["1"],
+    // },
     {
       key: "theme",
       label: "Theme Store",

@@ -87,11 +87,12 @@ export default function UpdateUser() {
                         address1: data.address1 || "",
                         address2: data.address2 || "",
                         gstin: data.gstin || "",
+                        gst_type: data.gst_type,
                         website_type: data?.Theme?.id ? data.Theme.id.toString() : "",
                     });
 
                     setImageFolder(data?.imageFolder);
-                    
+
                     if (data?.company_logo) {
                         setPreviewCompanyLogo(`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.company_logo}`);
                     }
@@ -138,6 +139,7 @@ export default function UpdateUser() {
             appendIfValid("address1", data.address1);
             appendIfValid("address2", data.address2);
             appendIfValid("gstin", data.gstin);
+            appendIfValid("gst_type", data.gst_type);
             appendIfValid("imageFolder", imageFolder);
             appendIfValid("website_type", data.website_type);
             if (selectedCompanyLogo instanceof File && selectedCompanyLogo.size > 0) {
@@ -476,6 +478,39 @@ export default function UpdateUser() {
                                     />
                                     {errors?.gstin?.message && (
                                         <p className="text-red-500 text-sm mt-1">{errors.gstin.message}</p>
+                                    )}
+                                </div>
+
+                                {/* GST type */}
+                                <div className="flex flex-col gap-2">
+                                    <Label className="mb-1 font-medium">
+                                        GST Type <span className="text-red-600">*</span>
+                                    </Label>
+
+                                    <div className="flex gap-6">
+                                        <label className="flex items-center gap-2 cursor-pointer font-medium">
+                                            <input
+                                                type="radio"
+                                                value="CGST_SGST"
+                                                {...register("gst_type")}
+                                                className="cursor-pointer"
+                                            />
+                                            CGST + SGST
+                                        </label>
+
+                                        <label className="flex items-center gap-2 cursor-pointer font-medium">
+                                            <input
+                                                type="radio"
+                                                value="IGST"
+                                                {...register("gst_type")}
+                                                className="cursor-pointer"
+                                            />
+                                            IGST
+                                        </label>
+                                    </div>
+
+                                    {errors.gst_type && (
+                                        <p className="text-red-500 text-sm">{errors.gst_type.message}</p>
                                     )}
                                 </div>
 
