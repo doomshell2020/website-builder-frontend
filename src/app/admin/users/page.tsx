@@ -341,27 +341,52 @@ const UsersListPage = () => {
                 name: "Subscription",
                 width: "15%",
                 cell: (row: User) => {
-                    const sub = row?.subscriptionData?.[0]; // shorter & safer
+                    const sub = row?.subscriptionData?.[0];
 
                     const start = sub?.created
                         ? formatDate(sub.created, "DD-MM-YYYY")
                         : "—";
 
+                    const expiryDate = sub?.expiry_date ? new Date(sub.expiry_date) : null;
+                    const today = new Date();
+
+                    // Check expiry
+                    const isExpired = expiryDate ? expiryDate < today : false;
+
                     const end = sub?.expiry_date
                         ? formatDate(sub.expiry_date, "DD-MM-YYYY")
                         : "—";
 
+                    // Status color
                     const status = sub?.status === "Y"
                         ? "Active"
                         : sub?.status === "N"
                             ? "Inactive"
                             : "N/A";
 
+                    const statusColor =
+                        sub?.status === "Y"
+                            ? "text-green-600"
+                            : sub?.status === "N"
+                                ? "text-red-600"
+                                : "text-gray-500";
+
+                    // Expiry date color
+                    const expiryColor = isExpired ? "text-red-600" : "text-gray-700";
+
                     return (
                         <div className="flex flex-col text-xs leading-tight">
                             <span><strong>Start:</strong> {start}</span>
-                            <span><strong>End:</strong> {end}</span>
-                            <span><strong>Status:</strong> {status}</span>
+
+                            <span>
+                                <strong>End:</strong>{" "}
+                                <span className={expiryColor}>{end}</span>
+                            </span>
+
+                            <span>
+                                <strong>Status:</strong>{" "}
+                                <span className={statusColor}>{status}</span>
+                            </span>
                         </div>
                     );
                 },

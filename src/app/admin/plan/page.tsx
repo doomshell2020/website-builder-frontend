@@ -211,9 +211,13 @@ export default function PlanPage() {
     },
     {
       name: "Status",
-      selector: (row) => (row.status === "Y" ? "Active" : "Inactive"),
       width: "16%",
-      sortable: true
+      sortable: true,
+      cell: (row) => {
+        const status = row.status === "Y" ? "Active" : "Inactive";
+        const statusColor = row.status === "Y" ? "text-green-600" : "text-red-600";
+        return (<span className={`text-sm font-medium ${statusColor}`}> {status} </span>);
+      },
     },
     {
       name: "Actions",

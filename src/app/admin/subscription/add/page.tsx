@@ -14,7 +14,7 @@ import InvoiceBreakdown from "@/components/InvoiceBreakdown";
 import { subscriptionSchema } from "@/schemas/subscription.schema";
 import { createSubscription } from "@/services/subscription.service";
 import { getAllUsers, getUserById } from "@/services/userService";
-import { getAllPlans } from "@/services/plan.service";
+import { viewAllPlans } from "@/services/plan.service";
 import { SubscriptionAttribute } from '@/types/subscription'
 type FormData = z.infer<typeof subscriptionSchema>;
 
@@ -49,7 +49,7 @@ export default function AddSubscriptionForm() {
             try {
                 // Run both APIs in parallel
                 const [companyRes, planRes]: any = await Promise.all([
-                    getAllUsers(), getAllPlans(),
+                    getAllUsers(), viewAllPlans(),
                 ]);
 
                 const companyData = Array.isArray(companyRes?.result?.data)
@@ -57,7 +57,7 @@ export default function AddSubscriptionForm() {
 
                 const planData = Array.isArray(planRes?.result?.data)
                     ? planRes.result.data : [];
-
+                    
                 if (!isMounted) return;
 
                 setCompanies(companyData);
