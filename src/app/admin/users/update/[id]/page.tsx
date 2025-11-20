@@ -87,7 +87,7 @@ export default function UpdateUser() {
                         address1: data.address1 || "",
                         address2: data.address2 || "",
                         gstin: data.gstin || "",
-                        gst_type: data.gst_type,
+                        gst_type: data.gst_type ?? 'CGST_SGST',
                         website_type: data?.Theme?.id ? data.Theme.id.toString() : "",
                     });
 

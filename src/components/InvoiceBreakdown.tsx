@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { formatPrice } from "@/lib/price";
 export default function InvoiceBreakdown({
     companyName, users, pricePerUser, billingStart, billingEnd, planName,
     discount = 0, gstType = "INTRA", onTotalsChange,
@@ -32,6 +33,7 @@ export default function InvoiceBreakdown({
         return {
             basePrice,
             discountAmount: finalDiscount,
+            taxableAmount,
             cgst,
             sgst,
             igst,
@@ -46,6 +48,7 @@ export default function InvoiceBreakdown({
             onTotalsChange({
                 basePrice: calculations.basePrice,
                 discount: calculations.discountAmount,
+                taxableAmount: calculations.taxableAmount,
                 cgst: calculations.cgst,
                 sgst: calculations.sgst,
                 igst: calculations.igst,
@@ -82,7 +85,7 @@ export default function InvoiceBreakdown({
                 <div className="grid grid-cols-2 p-3">
                     <div className="text-gray-700">
                         {/* - {users} Users */}
-                        Plan @ ₹{pricePerUser} / {planName}
+                        {planName} Plan — ₹{formatPrice(pricePerUser)} / year
                     </div>
                     <div className="text-right text-gray-800">
                         {calculations.basePrice.toFixed(2)}
@@ -144,6 +147,14 @@ export default function InvoiceBreakdown({
                         <span className="text-gray-600">
                             {discountType === "percent" ? "%" : "₹"}
                         </span>
+                    </div>
+                </div>
+
+                {/* Taxable Amount */}
+                <div className="grid grid-cols-2 p-3">
+                    <div className="text-gray-700">Discounted Price</div>
+                    <div className="text-right text-gray-800">
+                        {calculations.taxableAmount.toFixed(2)}
                     </div>
                 </div>
 

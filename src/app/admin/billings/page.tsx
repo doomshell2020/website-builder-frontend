@@ -362,7 +362,8 @@ export default function BillingListPage() {
             {
                 name: "Subscription Period",
                 width: "16%",
-                selector: (row) => row.created,
+                selector: (row) => row.expiry_date,
+                sortable: true,
                 cell: (row) => {
                     const isExpired = row.expiry_date && new Date(row.expiry_date) < new Date();
 
@@ -431,8 +432,8 @@ export default function BillingListPage() {
             // },
             {
                 name: "Payment Detail",
+                selector: (row) => row.isdrop, // sorting based on payment date
                 sortable: true,
-                selector: (row) => row.payment_date, // sorting based on payment date
                 cell: (row) => {
                     const statusText = row.isdrop === "Y" ? "Paid" : "Pending";
                     const statusColor =

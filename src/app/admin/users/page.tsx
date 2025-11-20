@@ -3,9 +3,8 @@
 import React, { useMemo, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-    Trash2, ToggleRight, ToggleLeft, Edit, Plus,
-    CornerRightDown, CircleAlert, CircleCheckBig, ExternalLink, Link as LinkIcon,
-    EyeIcon
+    Trash2, ToggleRight, ToggleLeft, Edit, CornerRightDown, EyeIcon, History,
+    Plus, CircleAlert, CircleCheckBig, ExternalLink, Link as LinkIcon
 } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -400,20 +399,33 @@ const UsersListPage = () => {
                                 <strong className={expiryColor}>{end}</strong>
                             </span>
 
-                            {/* Status Badge */}
-                            <button
-                                title={sub?.status ? "Click to update" : undefined}
-                                disabled={!sub?.status}
-                                onClick={() => handleSubsStatusChange(sub?.id, sub?.status)}
-                                className="w-fit"
-                            >
-                                <span
-                                    className={`px-2 py-0.5 text-[12px] font-semibold rounded-full 
-                                        ${statusClasses}`}
+                            <div className='flex flex-row gap-2'>
+                                {/* Status Badge */}
+                                <button
+                                    title={sub?.status ? "Click to update" : undefined}
+                                    disabled={!sub?.status}
+                                    onClick={() => handleSubsStatusChange(sub?.id, sub?.status)}
+                                    className="w-fit"
                                 >
-                                    {status}
-                                </span>
-                            </button>
+                                    <span
+                                        className={`px-2 py-0.5 text-[12px] font-semibold rounded-full 
+                                        ${statusClasses}`}
+                                    >
+                                        {status}
+                                    </span>
+                                </button>
+
+                                {/* Status Badge */}
+                                <button
+                                    title='History'
+                                    disabled={!sub?.status}
+                                    onClick={() => router.push('/admin/subscription')}
+                                    className="w-fit"
+                                >
+                                    <History size={16} color="black" />
+                                    {/* <span className={`${statusClasses}`} > </span> */}
+                                </button>
+                            </div>
 
                         </div>
                     );
