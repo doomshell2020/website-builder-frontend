@@ -2,7 +2,7 @@
 
 import React, { useMemo, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ToggleRight, ToggleLeft, Plus, ChevronDown, History, Eye, Wallet, Mail, FileText } from "lucide-react";
+import { ToggleRight, ToggleLeft, Edit, Plus, ChevronDown, History, Eye, Wallet, Mail, FileText } from "lucide-react";
 import Swal from "sweetalert2";
 import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
 import DatePicker from "react-datepicker";
@@ -346,19 +346,19 @@ export default function BillingListPage() {
                     : "/assest/image/defaultUser.webp";
 
                 return (
-                    <button
-                        title="View Company"
-                        onClick={() => router.push(`/admin/users/view/${sub.id}`)}
-                        className="flex items-center gap-2 text-left"
-                    >
-                        <LogoImage src={logo} />
-
-                        <div className="flex flex-col">
-                            <span className="font-semibold text-gray-800 truncate max-w-[180px]">
-                                {sub.company_name || "N/A"}
-                            </span>
-                        </div>
-                    </button>
+                    <div className="flex flex-row items-center gap-2">
+                        <button
+                            title="View Company"
+                            onClick={() => router.push(`/admin/users/view/${sub.id}`)}
+                            className="flex items-center gap-2 text-left transition-transform duration-200 hover:scale-105"
+                        > <LogoImage src={logo} />
+                            <div className="flex flex-col">
+                                <span className="font-semibold text-gray-800 truncate max-w-[180px]">
+                                    {sub.company_name || "N/A"}
+                                </span>
+                            </div>
+                        </button>
+                    </div>
                 );
             }
         },
@@ -391,6 +391,7 @@ export default function BillingListPage() {
                     <span className="flex items-center gap-1">
                         <span className="font-semibold text-gray-900">ID:</span>
                         <button
+                            title="View Invoice"
                             onClick={() => handleExportPDF(row.id)}
                             className="text-blue-600 hover:underline"
                         >
@@ -517,40 +518,56 @@ export default function BillingListPage() {
         {
             name: "Actions",
             width: "10%",
-            cell: (row) => (
-                <div className="flex gap-2">
-                    <button
-                        title={row.isdrop === "Y" ? "Mark as unpaid" : "Mark as paid"}
-                        onClick={() => handlePaymentStatus(row.id, row.isdrop)}
-                    >
-                        <Wallet
-                            size={18}
-                            className={row.isdrop === "Y"
-                                ? "text-green-600 hover:text-green-800"
-                                : "text-red-600 hover:text-red-800"}
-                        />
-                    </button>
+            cell: (row) => {
 
-                    <button
-                        title="View Invoice"
-                        onClick={() => handleExportPDF(row.id)}>
-                        <FileText size={18} className="text-red-600 hover:text-red-800" />
-                    </button>
+                const expiryDate = row?.expiry_date ? new Date(row.expiry_date) : null;
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                if (expiryDate) { expiryDate.setHours(0, 0, 0, 0); }
+                const isExpired = expiryDate ? expiryDate < today : false;
 
-                    <button
-                        title="Send Email"
-                        disabled={row.status === "N"}
-                        onClick={() => handleSendEmail(row.Customer.id)}
-                    >
-                        <Mail
-                            size={18}
-                            className={row.status === "N"
-                                ? "text-gray-400 cursor-not-allowed"
-                                : "text-purple-600 hover:text-purple-800"}
-                        />
-                    </button>
-                </div>
-            )
+                return (
+                    <div className="flex gap-2">
+                        <button
+                            title={row.isdrop === "Y" ? "Mark as unpaid" : "Mark as paid"}
+                            onClick={() => handlePaymentStatus(row.id, row.isdrop)}
+                        >
+                            <Wallet
+                                size={18}
+                                className={row.isdrop === "Y"
+                                    ? "text-green-600 hover:text-green-800"
+                                    : "text-red-600 hover:text-red-800"}
+                            />
+                        </button>
+
+                        <button
+                            title="View Invoice"
+                            onClick={() => handleExportPDF(row.id)}>
+                            <FileText size={18} className="text-red-600 hover:text-red-800" />
+                        </button>
+
+                        <button
+                            title="Update Subscription"
+                            disabled={isExpired}
+                            onClick={() => router.push(`/admin/subscription/update/${row.id}`)}
+                        >
+                            <Edit size={18} color={isExpired ? "gray" : "green"} />
+                        </button>
+
+                        <button
+                            title="Send Email"
+                            disabled={row.status === "N" || isExpired}
+                            onClick={() => handleSendEmail(row.Customer.id)}
+                        >
+                            <Mail
+                                size={18}
+                                className={row.status === "N"
+                                    ? "text-gray-400 cursor-not-allowed"
+                                    : "text-purple-600 hover:text-purple-800"}
+                            />
+                        </button>
+                    </div>)
+            }
         }
     ], [page, limit]);
 
