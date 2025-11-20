@@ -16,6 +16,11 @@ export const getAllSubscriptions = async (page = 1, limit = 10,): Promise<Subscr
     return response.data;
 };
 
+export const getSubscriptionsByUserId = async (id: string | number, page = 1, limit = 10,): Promise<SubscriptionAttribute[]> => {
+    const response = await API.get(`/subscription/user-wise/${id}`, { params: { page, limit }, });
+    return response.data;
+};
+
 export const createSubscription = async (payload: SubscriptionAttribute): Promise<SubscriptionAttribute> => {
     const response = await API.post("/subscription/create", payload);
     return response.data;

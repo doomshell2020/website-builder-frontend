@@ -435,7 +435,7 @@ const UsersListPage = () => {
                                 {/* HISTORY BUTTON */}
                                 <button
                                     title="Click to view history"
-                                    onClick={() => router.push("/admin/billings")}
+                                    onClick={() => router.push(`/admin/subscription/history/${row?.id}`)}
                                     className="w-fit"
                                 >
                                     <History size={16} color="black" />

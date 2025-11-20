@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useMemo, useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { ToggleRight, ToggleLeft, Edit, Plus, ChevronDown, History, Eye, Wallet, Mail, FileText } from "lucide-react";
 import Swal from "sweetalert2";
 import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { getAllSubscriptions, updateSubscriptionStatus, updatePaymentStatus, searchSubscription, sendEmail, InactivateExpiredSubs } from "@/services/subscription.service";
+import { getSubscriptionsByUserId, updateSubscriptionStatus, updatePaymentStatus, searchSubscription, sendEmail, InactivateExpiredSubs } from "@/services/subscription.service";
 import { getAllUsers } from "@/services/userService";
 import { formatDate } from "@/lib/date";
 import { formatPrice } from "@/lib/price";
@@ -23,6 +23,8 @@ import { generateInvoicePdf } from "@/components/InvoicePdf"
 
 export default function BillingListPage() {
     const router = useRouter();
+    const params = useParams();
+    const id = String(params.id);
     const [isLoading, setIsLoading] = useState(false);
     const [data, setData] = useState<SubscriptionAttribute[]>([]);
     const [filteredData, setFilteredData] = useState<SubscriptionAttribute[]>([]);
@@ -91,7 +93,7 @@ export default function BillingListPage() {
 
                 const res = isSearchActive
                     ? await searchSubscription(searchParams, currentPage, currentLimit)
-                    : await getAllSubscriptions(currentPage, currentLimit);
+                    : await getSubscriptionsByUserId(id, currentPage, currentLimit);
 
                 const result = res?.result;
                 const data: SubscriptionAttribute[] = Array.isArray(result?.data) ? result.data : [];
@@ -131,59 +133,97 @@ export default function BillingListPage() {
     }, []);
 
     // RUNTIME SEARCH
+    const normalize = (str: string) => str.toLowerCase().trim().replace(/[\s₹,.-]/g, "");
+    const normalizeNumber = (num: any) => String(num || "").toLowerCase().replace(/[^0-9]/g, "");
+
+    const formatForSearch = (dateStr: string) => {
+        if (!dateStr) return "";
+        return dateStr.replace(/[-\/]/g, ""); // convert 17-11-2025 → 17112025
+    };
+
     const handleSearch = (value: string) => {
         setSearchText(value);
 
-        if (value.trim() === "") {
-            setFilteredData(data);
-            return;
-        }
-
-        const query = value.toLowerCase();
+        const q = normalize(value);
+        if (!q) { setFilteredData(data); return; }
 
         const filtered = data.filter((item) => {
-            // =============== CUSTOMER ===============
-            const company = (item.Customer?.company_name || "").toLowerCase();
-            const email = (item.Customer?.email || "").toLowerCase();
+            // ================= CUSTOMER FIELDS =================
+            const company = normalize(item.Customer?.company_name || "");
+            const email = normalize(item.Customer?.email || "");
 
-            // =============== PLAN ===============
-            const planName = (item.Plan?.name || "").toLowerCase();
-            const planPrice = String(item.Plan?.price || "").toLowerCase();
-            const planDesc = `${item.totaluser || 0} users plan @ rs.${item.Plan?.price || 0}`.toLowerCase();
+            // ================= PLAN FIELDS =================
+            const planName = normalize(item.Plan?.name || "") + "plans";
+            const planPrice = normalizeNumber(item.Plan?.price);
+            const planTotalPrice = normalizeNumber(item.plantotalprice);
 
-            // =============== INVOICE FIELDS ===============
-            const invoiceId = String(item.id || "").toLowerCase();
-            const amount = String(item.plantotalprice || "").toLowerCase();
-            const status = (item.status || "").toLowerCase();
-            const isdrop = (item.isdrop || "").toLowerCase();
+            const planDesc = normalize(
+                `${item.totaluser || 0} users plan @ rs.${item.Plan?.price || 0}`
+            );
 
-            // =============== DATES (formatted text) ===============
-            const startDate = item.created ? formatDate(item.created, "DD-MM-YYYY").toLowerCase() : "";
-            const expiryDate = item.expiry_date ? formatDate(item.expiry_date, "DD-MM-YYYY").toLowerCase() : "";
-            const invoiceDate = item.createdAt ? formatDate(item.createdAt, "DD-MM-YYYY").toLowerCase() : "";
-            const paymentDate = item.payment_date ? formatDate(item.payment_date, "DD-MM-YYYY").toLowerCase() : "";
+            const invoiceId = "#" + String(item.id);
+            const invoiceIdNormalized = normalize(invoiceId);
+
+            // ================= STATUS FIELDS =================
+            const q = normalize(value);
+
+            const statusText =
+                item.status === "Y" ? "active" :
+                    item.status === "N" ? "inactive" : "";
+
+            const dropText =
+                item.isdrop === "Y" ? "paid" :
+                    item.isdrop === "N" ? "unpaid" : "";
+
+            // PARTIAL STATUS MATCH
+            if (["active", "inactive"].some(s => s.startsWith(q))) {
+                return statusText.startsWith(q);
+            }
+
+            // PARTIAL PAYMENT MATCH
+            if (["paid", "unpaid"].some(s => s.startsWith(q))) {
+                return dropText.startsWith(q);
+            }
+
+            // ================= DATES =================
+            const startDate = item.created
+                ? formatForSearch(formatDate(item.created, "DD-MM-YYYY"))
+                : "";
+
+            const expiryDate = item.expiry_date
+                ? formatForSearch(formatDate(item.expiry_date, "DD-MM-YYYY"))
+                : "";
+
+            const invoiceDate = item.createdAt
+                ? formatForSearch(formatDate(item.createdAt, "DD-MM-YYYY"))
+                : "";
+
+            const paymentDate = item.payment_date
+                ? formatForSearch(formatDate(item.payment_date, "DD-MM-YYYY"))
+                : "";
+
+            const dateQuery = q.replace(/[-\/]/g, ""); // allow user to type 17-11-25 or 171125
 
             return (
-                // -------- CUSTOMER --------
-                company.includes(query) ||
-                email.includes(query) ||
+                // ================= CUSTOMER =================
+                company.includes(q) ||
+                email.includes(q) ||
 
-                // -------- PLAN --------
-                planName.includes(query) ||
-                planPrice.includes(query) ||
-                planDesc.includes(query) ||
+                // ================= PLAN =================
+                planName.includes(q) ||
+                planPrice.includes(q) ||
+                planTotalPrice.includes(q) ||
+                planDesc.includes(q) ||
 
-                // -------- INVOICE --------
-                invoiceId.includes(query) ||
-                amount.includes(query) ||
-                status.includes(query) ||
-                isdrop.includes(query) ||
+                // ================= INVOICE =================
+                invoiceIdNormalized.includes(q) ||
+                String(item.id).includes(q) ||
 
-                // -------- DATES --------
-                startDate.includes(query) ||
-                expiryDate.includes(query) ||
-                invoiceDate.includes(query) ||
-                paymentDate.includes(query)
+                // ================= DATE SEARCH =================
+                startDate.includes(dateQuery) ||
+                expiryDate.includes(dateQuery) ||
+                invoiceDate.includes(dateQuery) ||
+                paymentDate.includes(dateQuery)
             );
         });
 
@@ -479,16 +519,7 @@ export default function BillingListPage() {
                                     className={`px-2 py-0.5 text-[12px] font-semibold rounded-full ${statusClasses}`}
                                 > {status} </span>
                             </button>
-
-                            {/* HISTORY BUTTON */}
-                            <button
-                                title="Click to view history"
-                                onClick={() => router.push(`/admin/subscription/history/${row?.Customer?.id}`)}
-                                className="w-fit">
-                                <History size={16} color="black" />
-                            </button>
                         </div>
-
                     </div>
                 );
             },
@@ -585,14 +616,14 @@ export default function BillingListPage() {
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-xl font-medium text-gray-800">
                             {/* Billing Manager */}
-                            Orders/Invoice Manager
+                            Subscription Records
                         </h2>
                     </div>
 
                     <header className="bg-white shadow-sm border-b">
                         <div className="mx-auto px-4 sm:px-6 lg:px-4 bg-white rounded-lg shadow-sm border py-4 px-4">
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                                <div className="flex md:col-span-3 gap-4 items-end">
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+                                {/* <div className="flex md:col-span-3 gap-4 items-end">
                                     <div className="flex flex-col w-[70%]">
                                         <Label className="text-sm font-medium">Company</Label>
                                         <div className="relative">
@@ -667,6 +698,20 @@ export default function BillingListPage() {
                                             className={`max-w-[30] text-white rounded-[5px] bg-yellow-600 hover:bg-yellow-700`} >
                                             Reset
                                         </Button>
+                                    </div>
+                                </div> */}
+                                <div className="flex md:col-span-3 gap-4 items-end">
+                                    <div className="flex justify-between items-center">
+                                        <h2 className="text-xl font-medium text-gray-800">
+                                            {/* Billing Manager
+                                            Orders/Invoice Manager */}
+                                        </h2>
+                                        <Input
+                                            placeholder="Search"
+                                            value={searchText}
+                                            onChange={(e) => handleSearch(e.target.value)}
+                                            className="max-w-[200px]"
+                                        />
                                     </div>
                                 </div>
 

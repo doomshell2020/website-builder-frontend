@@ -152,7 +152,7 @@ export default function InvoiceBreakdown({
 
                 {/* Taxable Amount */}
                 <div className="grid grid-cols-2 p-3">
-                    <div className="text-gray-700">Discounted Price</div>
+                    <div className="text-gray-700">Price After Discount</div>
                     <div className="text-right text-gray-800">
                         {calculations.taxableAmount.toFixed(2)}
                     </div>
