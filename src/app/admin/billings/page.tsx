@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useCallback, useEffect, useState } from "react";
+import React, { useMemo, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ToggleRight, ToggleLeft, Plus, ChevronDown, Eye, Wallet, Mail, FileText } from "lucide-react";
+import { ToggleRight, ToggleLeft, Plus, ChevronDown, History, Eye, Wallet, Mail, FileText } from "lucide-react";
 import Swal from "sweetalert2";
 import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
 import DatePicker from "react-datepicker";
@@ -14,6 +14,8 @@ import { formatPrice } from "@/lib/price";
 import PaginatedDataTable from "@/components/PaginatedDataTablet";
 import { SubscriptionAttribute } from "@/types/subscription";
 import { Button } from "@/components/ui/Button";
+import Image from "next/image";
+import Link from "next/link";
 import { Input } from "@/components/ui/Input";
 import Loader from '@/components/ui/loader'
 import { Label } from "@/components/ui/Label";
@@ -213,7 +215,7 @@ export default function BillingListPage() {
         const newStatus = currentStatus === "Y" ? "N" : "Y";
         const result = await Swal.fire({
             title: "Are you sure",
-            text: `You want to mark payment as ${newStatus === "Y" ? "paid" : "pending"}?`,
+            text: `You want to mark payment as ${newStatus === "Y" ? "paid" : "unpaid"}?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Yes, change it!",
@@ -291,235 +293,224 @@ export default function BillingListPage() {
     const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null);
     const [openCustomerDetail, setOpenCustomerDetail] = useState(false);
 
-    const columns = useMemo(
-        () => [
-            {
-                name: "S.No",
-                selector: (row) => row.id,
-                sortable: true,
-                cell: (_row: SubscriptionAttribute, index: number) => (page - 1) * limit + index + 1,
-                width: "6%",
-            },
-            {
-                name: "Company Detail",
-                selector: (row) => row?.Customer?.company_name || "",
-                sortable: true,
-                cell: (row) => (
-                    <div className="flex flex-col leading-5">
-                        {/* Company Name */}
-                        <span className="font-semibold text-gray-900">
-                            {row?.Customer?.company_name || "N/A"}
-                        </span>
+    const LogoImage = ({ src }) => {
+        const [imgSrc, setImgSrc] = React.useState(src);
 
-                        {/* Email */}
-                        <span className="text-gray-600 text-sm">
-                            {row?.Customer?.email || "N/A"}
-                        </span>
+        return (
+            <div className="flex-shrink-0 w-8 h-8 md:w-9 md:h-9 overflow-hidden flex items-center justify-center bg-gray-100 border border-gray-200 rounded-full">
+                <Image
+                    src={imgSrc}
+                    alt="Logo"
+                    width={40}
+                    height={40}
+                    className="object-cover"
+                    onError={() => setImgSrc("/assest/image/defaultUser.webp")}
+                />
+            </div>
+        );
+    };
 
-                        {/* Plan */}
-                        <span className="text-gray-700 text-sm mt-1">
-                            {row?.Plan?.name || "N/A"}
-                        </span>
+    const StatusPill = ({ type }) => {
+        const styles = {
+            Y: "bg-green-100 text-green-700",
+            N: "bg-red-100 text-red-700",
+            default: "bg-gray-200 text-gray-600"
+        };
+        return (
+            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${styles[type] || styles.default}`}>
+                {type === "Y" ? "Active" : type === "N" ? "Inactive" : "N/A"}
+            </span>
+        );
+    };
 
-                        {/* Plan Description */}
-                        <span className="text-gray-500 text-sm">
-                            {/* ${row?.totaluser || 0} Users */}
-                            {`Plan @ Rs.${formatPrice(row?.Plan?.price) || 0}`}
+    const columns = useMemo(() => [
+        {
+            name: "S.No",
+            width: "60px",
+            cell: (_row, index) => (
+                <span className="text-gray-600">
+                    {(page - 1) * limit + index + 1}
+                </span>
+            )
+        },
+        {
+            name: "Company Detail",
+            selector: (row) => row?.Customer?.company_name || "",
+            sortable: true,
+            cell: (row) => {
+                const sub = row.Customer;
+                const logo = sub?.company_logo
+                    ? sub.company_logo.startsWith("http")
+                        ? sub.company_logo
+                        : `${process.env.NEXT_PUBLIC_IMAGE_URL}${sub.company_logo}`
+                    : "/assest/image/defaultUser.webp";
+
+                return (
+                    <button
+                        title="View Company"
+                        onClick={() => router.push(`/admin/users/view/${sub.id}`)}
+                        className="flex items-center gap-2 text-left"
+                    >
+                        <LogoImage src={logo} />
+
+                        <div className="flex flex-col">
+                            <span className="font-semibold text-gray-800 truncate max-w-[180px]">
+                                {sub.company_name || "N/A"}
+                            </span>
+                        </div>
+                    </button>
+                );
+            }
+        },
+        {
+            name: "Plan Details",
+            selector: (row) => row?.Plan?.name,
+            sortable: true,
+            cell: (row) => {
+                const plan = row.Plan;
+
+                return (
+                    <div className="flex flex-col">
+                        <span className="font-semibold text-gray-800">
+                            {plan.name} Plan
+                        </span>
+                        <span className="text-xs text-gray-500">
+                            ₹{formatPrice(plan.price)} / year
                         </span>
                     </div>
-                ),
-            },
-            {
-                name: "Invoice Detail",
-                selector: (row) => row.id,
-                sortable: true,
-                cell: (row) => (
-                    <div className="flex flex-col text-xs leading-tight">
+                );
+            }
+        },
+        {
+            name: "Invoice Details",
+            selector: (row) => row.id,
+            sortable: true,
+            width: "170px",
+            cell: (row) => (
+                <div className="flex flex-col text-xs">
+                    <span className="flex items-center gap-1">
+                        <span className="font-semibold text-gray-900">ID:</span>
+                        <button
+                            onClick={() => handleExportPDF(row.id)}
+                            className="text-blue-600 hover:underline"
+                        >
+                            #{row.id}
+                        </button>
+                    </span>
 
-                        {/* Invoice ID */}
-                        <div className="flex flex-row">
-                            <span className="font-medium text-black">Invoice ID: </span>
+                    <span className="flex items-center gap-1">
+                        <span className="font-semibold text-gray-900">Date:</span>
+                        {row.createdAt ? formatDate(row.createdAt) : "—"}
+                    </span>
+                </div>
+            )
+        },
+        {
+            name: "Subscription Details",
+            width: "200px",
+            cell: (row) => {
+                const start = row.created ? formatDate(row.created) : "—";
+                const end = row.expiry_date ? formatDate(row.expiry_date) : "—";
+                return (
+                    <div className="flex flex-col gap-1 text-xs">
+
+                        {/* Date Range */}
+                        <span className="text-gray-700">
+                            {start} → <span className="font-semibold">{end}</span>
+                        </span>
+
+                        {/* Status row */}
+                        <div className="flex items-center gap-2">
                             <button
-                                title="Invoice"
-                                onClick={() => handleExportPDF(row.id)}
-                                className="w-fit text-blue-600 hover:underline hover:text-blue-800"
+                                title={row.status === "Y" ? "Click to deactivate" : "Click to activate"}
+                                onClick={() => handleStatusChange(row.id, row.status)}
                             >
-                                #{row.id}
+                                <StatusPill type={row.status} />
+                            </button>
+
+                            <button
+                                title="View history"
+                                onClick={() => router.push("/admin/subscription")}
+                            >
+                                <History size={15} className="text-gray-700" />
                             </button>
                         </div>
-
-                        {/* Invoice Date */}
-                        <div className="flex flex-row mt-1">
-                            <span className="font-medium text-black">Invoice Date: </span>
-                            <span className="text-black ">
-                                {row.createdAt ? formatDate(row.createdAt, "DD-MM-YYYY") : "—"}
-                            </span>
-                        </div>
-
                     </div>
-                ),
-            },
-            {
-                name: "Subscription Period",
-                width: "16%",
-                selector: (row) => row.expiry_date,
-                sortable: true,
-                cell: (row) => {
-                    const isExpired = row.expiry_date && new Date(row.expiry_date) < new Date();
-
-                    return (<div className="flex flex-col text-xs leading-tight">
-
-                        <span className="text-black">
-                            <span className="font-medium text-black">Start: </span>
-                            {row.created ? formatDate(row.created, "DD-MM-YYYY") : "—"}
-                        </span>
-
-                        <span className={isExpired ? "text-red-600 font-semibold" : "text-black"}>
-                            <span className="font-medium text-black">End: </span>
-                            {row.expiry_date ? formatDate(row.expiry_date, "DD-MM-YYYY") : "—"}
-                        </span>
-
-                    </div>
-                    )
-                }
-            },
-            // {
-            //     name: "Start Date",
-            //     selector: (row) =>
-            //         row.created
-            //             ? formatDate(row.created, "DD-MM-YYYY")
-            //             : "—",
-            //     sortable: true,
-            // },
-            // {
-            //     name: "Expiry Date",
-            //     selector: (row) =>
-            //         row.expiry_date
-            //             ? formatDate(row.expiry_date, "DD-MM-YYYY")
-            //             : "—",
-            //     sortable: true,
-            // },
-            // {
-            //     name: "Invoice Date",
-            //     selector: (row) =>
-            //         row.createdAt
-            //             ? formatDate(row.createdAt, "DD-MM-YYYY")
-            //             : "—",
-            //     sortable: true,
-            // },
-            // {
-            //     name: "Payment Date",
-            //     selector: (row) =>
-            //         row.payment_date
-            //             ? formatDate(row.payment_date, "DD-MM-YYYY")
-            //             : "—",
-            //     sortable: true,
-            // },
-            // {
-            //     name: "Payment Status",
-            //     selector: (row) => row.isdrop,
-            //     sortable: true,
-            //     width: "12%",
-            //     cell: (row) => (
-            //         <span
-            //             className={`px-2 py-1 text-xs font-semibold rounded-md ${row.isdrop === "Y"
-            //                 ? "text-green-700" : "text-red-700 "
-            //                 }`}
-            //         >
-            //             {row.isdrop === "Y" ? "Paid" : "Pending"}
-            //         </span>
-            //     ),
-            // },
-            {
-                name: "Payment Detail",
-                selector: (row) => row.isdrop, // sorting based on payment date
-                sortable: true,
-                cell: (row) => {
-                    const statusText = row.isdrop === "Y" ? "Paid" : "Pending";
-                    const statusColor =
-                        row.isdrop === "Y" ? "text-green-700" : "text-red-700";
-
-                    return (
-                        <div className="flex flex-col text-xs leading-tight">
-
-                            {/* Payment Date */}
-                            <span className="text-black">
-                                <span className="font-medium text-black">Date: </span>
-                                {row.payment_date ? formatDate(row.payment_date, "DD-MM-YYYY") : "—"}
-                            </span>
-
-                            {/* Payment Status */}
-                            <span className={`font-semibold ${statusColor}`}>
-                                <span className="font-medium text-black">Status: </span>
-                                {statusText}
-                            </span>
-
-                        </div>
-                    );
-                },
-            },
-            {
-                name: "Amount",
-                width: "10%",
-                selector: (row) => formatPrice(row.plantotalprice) ?? "N/A",
-                // Math.round(Number(row.plantotalprice))
-                sortable: true,
-                sortFunction: (rowA, rowB) => {
-                    return Number(rowA.plantotalprice) - Number(rowB.plantotalprice);
-                }
-            },
-            {
-                name: "Actions",
-                cell: (row) => (
-                    <div className="flex gap-2">
-                        <button
-                            title="Payment"
-                            onClick={() => handlePaymentStatus(row.id, row.isdrop)}
-                        // className={
-                        //     row.isdrop === "Y"
-                        //         ? "px-1 py-0.5 bg-green-500 text-white rounded-[5px]"
-                        //         : "px-1 py-0.5 bg-red-500 text-white rounded-[5px]"
-                        // }
-                        >
-                            {row.isdrop === "Y" ? (
-                                <Wallet size={18} className="text-green-600 hover:text:green-800" />
-                            ) : (
-                                <Wallet size={18} className="text-red-600 hover:text:red-800" />
-                            )}
-                        </button>
-                        <button
-                            title="status"
-                            onClick={() => handleStatusChange(row.id, row.status)}>
-                            {row.status === "Y"
-                                ? <ToggleRight size={20} className="text-green-500" />
-                                : <ToggleLeft size={20} className="text-red-500" />}
-                        </button>
-                        {/* <button
-                            title="view"
-                            onClick={() => handleView(Number(row.id))}>
-                            <Eye size={18} className="text-blue-500 hover:text-blue-700" />
-                        </button> */}
-                        <button
-                            title="invoice"
-                            onClick={() => handleExportPDF(row.id)}>
-                            <FileText size={18} className="text-red-600 hover:text-red-800" />
-                        </button>
-                        <button
-                            title="email"
-                            onClick={() => handleSendEmail(row?.Customer?.id)}
-                            disabled={row?.status === 'N'}
-                        >
-                            <Mail size={18} className={`${row?.status === 'N'
-                                ? "text-gray-400 cursor-not-allowed"
-                                : "text-purple-600 hover:text-purple-800"}`}
-                            />
-                        </button>
-                    </div>
-                ),
-                width: "10%",
+                );
             }
-        ], [data, page, limit]
-    );
+        },
+        {
+            name: "Payment Details",
+            selector: (row) => row.isdrop, // sorting based on payment date
+            sortable: true,
+            width: "12%",
+            cell: (row) => {
+                const statusText = row.isdrop === "Y" ? "Paid" : "Unpaid";
+                return (
+                    <div className="flex flex-col text-xs">
+                        <span>
+                            <span className="font-semibold text-gray-900">Date:</span>{" "}
+                            {row.payment_date ? formatDate(row.payment_date) : "—"}
+                        </span>
+
+                        <span className={`font-semibold ${row.isdrop === "Y" ? "text-green-700" : "text-red-700"}`}>
+                            {statusText}
+                        </span>
+                    </div>
+                );
+            }
+        },
+        {
+            name: <div className="w-full text-right pr-2">Amount</div>,
+            width: "10%",
+            sortable: true,
+            selector: (row) => row.plantotalprice,
+            cell: (row) => (
+                <div className="w-full text-right pr-2 font-semibold text-gray-800">
+                    ₹{formatPrice(row.plantotalprice)}
+                </div>
+            ),
+            sortFunction: (a, b) => Number(a.plantotalprice) - Number(b.plantotalprice)
+        },
+        {
+            name: "Actions",
+            width: "10%",
+            cell: (row) => (
+                <div className="flex gap-2">
+                    <button
+                        title={row.isdrop === "Y" ? "Mark as unpaid" : "Mark as paid"}
+                        onClick={() => handlePaymentStatus(row.id, row.isdrop)}
+                    >
+                        <Wallet
+                            size={18}
+                            className={row.isdrop === "Y"
+                                ? "text-green-600 hover:text-green-800"
+                                : "text-red-600 hover:text-red-800"}
+                        />
+                    </button>
+
+                    <button
+                        title="View Invoice"
+                        onClick={() => handleExportPDF(row.id)}>
+                        <FileText size={18} className="text-red-600 hover:text-red-800" />
+                    </button>
+
+                    <button
+                        title="Send Email"
+                        disabled={row.status === "N"}
+                        onClick={() => handleSendEmail(row.Customer.id)}
+                    >
+                        <Mail
+                            size={18}
+                            className={row.status === "N"
+                                ? "text-gray-400 cursor-not-allowed"
+                                : "text-purple-600 hover:text-purple-800"}
+                        />
+                    </button>
+                </div>
+            )
+        }
+    ], [page, limit]);
 
     const handleClick = () => { setIsLoading(true); router.push("/admin/subscription/add"); };
 
@@ -534,101 +525,110 @@ export default function BillingListPage() {
                         </h2>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end mb-4">
-                        <div className="flex md:col-span-3">
-                            <div className="flex flex-col mr-2">
-                                <Label className="text-sm font-medium">Company</Label>
-                                <div className="relative">
-                                    <select
-                                        id="company"
-                                        className="max-w-[260px] py-2 pl-3 pr-8 text-sm text-gray-800 bg-white border border-gray-300 rounded-[5px] appearance-none dark:bg-dark-900 h-10 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 cursor-pointer"
-                                        value={search.searchTerm}
-                                        onChange={(e) =>
-                                            setsearch((prev) => ({
-                                                ...prev,
-                                                searchTerm: e.target.value,
-                                            }))
-                                        }
-                                    >
-                                        <option value="">
-                                            -- Select Company --
-                                        </option>
-                                        {company.map((type) => (
-                                            <option key={type.id} value={type.id}>
-                                                {type.company_name}
-                                            </option>
-                                        ))}
-                                    </select>
+                    <header className="bg-white shadow-sm border-b">
+                        <div className="mx-auto px-4 sm:px-6 lg:px-4 bg-white rounded-lg shadow-sm border py-4 px-4">
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                                <div className="flex md:col-span-3 gap-4 items-end">
+                                    <div className="flex flex-col w-[70%]">
+                                        <Label className="text-sm font-medium">Company</Label>
+                                        <div className="relative">
+                                            <select
+                                                id="company"
+                                                className="w-full py-2 pl-3 pr-8 text-sm text-gray-800 bg-white border border-gray-300 rounded-[5px] appearance-none dark:bg-dark-900 h-10 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 cursor-pointer"
+                                                value={search.searchTerm}
+                                                onChange={(e) =>
+                                                    setsearch((prev) => ({
+                                                        ...prev,
+                                                        searchTerm: e.target.value,
+                                                    }))
+                                                }
+                                            >
+                                                <option value="">
+                                                    -- Select Company --
+                                                </option>
+                                                {company.map((type) => (
+                                                    <option key={type.id} value={type.id}>
+                                                        {type.company_name}
+                                                    </option>
+                                                ))}
+                                            </select>
 
-                                    <ChevronDown
-                                        size={16}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
-                                    />
+                                            <ChevronDown
+                                                size={16}
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col w-[120%]">
+                                        <div className="w-full flex gap-2">
+                                            <div>
+                                                <Label className="text-sm font-medium">Invoice From Date</Label>
+                                                <DatePicker
+                                                    selected={search.fromDate}
+                                                    maxDate={search.toDate}
+                                                    onChange={(date: Date | null) =>
+                                                        setsearch((prev) => ({ ...prev, fromDate: date }))
+                                                    }
+                                                    placeholderText="From Date"
+                                                    className="w-full text-sm h-10 px-2 border border-gray-200 shadow-lg rounded-[5px] text-black"
+                                                    dateFormat="dd/MM/yyyy"
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <Label className="text-sm font-medium">Invoice To Date</Label>
+                                                <DatePicker
+                                                    selected={search.toDate}
+                                                    minDate={search.fromDate}
+                                                    onChange={(date: Date | null) =>
+                                                        setsearch((prev) => ({ ...prev, toDate: date }))
+                                                    }
+                                                    placeholderText="To Date"
+                                                    className="w-full text-sm h-10 px-2 border border-gray-200 shadow-lg rounded-[5px] text-black"
+                                                    dateFormat="dd/MM/yyyy"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="w-full flex gap-2 items-end">
+                                        <Button
+                                            onClick={handleSubscriptionSearch}
+                                            className={`max-w-[30] text-white rounded-[5px] bg-blue-500 hover:bg-blue-700`}  >
+                                            Search
+                                        </Button>
+                                        <Button
+                                            onClick={handleReset}
+                                            className={`max-w-[30] text-white rounded-[5px] bg-yellow-600 hover:bg-yellow-700`} >
+                                            Reset
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-end relative">
+                                    <div className="ml-2">
+                                        <Button
+                                            title="Add Subscription"
+                                            onClick={handleClick}
+                                            className="min-w-[80px] p-2 rounded-[5px] bg-blue-600 text-white hover:bg-blue-700"
+                                        >
+                                            {isLoading
+                                                ? (<span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>)
+                                                : (<> <Plus className="h-5 w-5 text-white" /> Add Subscription </>)}
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div className="flex flex-col">
-                                <Label className="text-sm font-medium ml-2">Invoice Date</Label>
-                                <div className="w-full flex gap-1 ml-2 min-w-[220px] max-w-[260px] ">
-                                    <DatePicker
-                                        selected={search.fromDate}
-                                        maxDate={search.toDate}
-                                        onChange={(date: Date | null) =>
-                                            setsearch((prev) => ({ ...prev, fromDate: date }))
-                                        }
-                                        placeholderText="From Date"
-                                        className="w-full text-sm h-10 px-2 border border-gray-200 shadow-lg rounded-[5px] text-black"
-                                        dateFormat="dd/MM/yyyy"
-                                    />
-
-                                    <DatePicker
-                                        selected={search.toDate}
-                                        minDate={search.fromDate}
-                                        onChange={(date: Date | null) =>
-                                            setsearch((prev) => ({ ...prev, toDate: date }))
-                                        }
-                                        placeholderText="To Date"
-                                        className="w-full text-sm h-10 px-2 border border-gray-200 shadow-lg rounded-[5px] text-black"
-                                        dateFormat="dd/MM/yyyy"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="w-full flex gap-2 ml-6 items-end">
-                                <Button
-                                    onClick={handleSubscriptionSearch}
-                                    className={`max-w-[30] text-white rounded-[5px] bg-blue-500 hover:bg-blue-700`}  >
-                                    Search
-                                </Button>
-                                <Button
-                                    onClick={handleReset}
-                                    className={`max-w-[30] text-white rounded-[5px] bg-yellow-600 hover:bg-yellow-700`} >
-                                    Reset
-                                </Button>
-                            </div>
                         </div>
+                    </header>
 
-                        <div className="flex justify-end relative">
-                            <div className="ml-2">
-                                <Button
-                                    title="Add Users"
-                                    onClick={handleClick}
-                                    className="min-w-[80px] p-2 rounded-[5px] bg-blue-600 text-white hover:bg-blue-700"
-                                >
-                                    {isLoading
-                                        ? (<span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>)
-                                        : (<> <Plus className="h-5 w-5 text-white" /> Add Subscription </>)}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
+                    {/* <hr /> */}
 
-                    <hr />
-
-                    <div className="flex justify-between items-center mt-2 mb-6">
+                    {/* <div className="flex justify-between items-center mt-2 mb-6">
                         <h2 className="text-xl font-medium text-gray-800">
-                            {/* Billing Manager  */}
-                            {/* Orders/Invoice Manager */}
+                             Billing Manager  
+                            Orders/Invoice Manager 
                         </h2>
                         <Input
                             placeholder="Search"
@@ -636,7 +636,7 @@ export default function BillingListPage() {
                             onChange={(e) => handleSearch(e.target.value)}
                             className="max-w-[200px]"
                         />
-                    </div>
+                    </div> */}
 
                     <div className="relative">
                         {loading ? (<Loader />) : (

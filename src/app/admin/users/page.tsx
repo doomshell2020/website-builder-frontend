@@ -20,6 +20,7 @@ import { exportToPdf } from "@/lib/exportToPdf";
 import Image from "next/image";
 import Link from "next/link";
 import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
 import Loader from "@/components/ui/loader";
 import DomainSetup from "@/components/domains/CustomDomainSetup";
 
@@ -284,7 +285,7 @@ const UsersListPage = () => {
                 sortable: true,
             },
             {
-                name: "Customer Detail",
+                name: "Customer Details",
                 selector: (row: User) => row.name || row.email || row.mobile_no || "N/A",
                 sortable: true,
                 cell: (row: User) => (
@@ -369,7 +370,7 @@ const UsersListPage = () => {
                 sortable: false,
             },
             {
-                name: "Subscription",
+                name: "Subscription Details",
                 width: "15%",
                 cell: (row: User) => {
                     const sub = row?.subscriptionData?.[0];
@@ -402,7 +403,10 @@ const UsersListPage = () => {
                             <div className='flex flex-row gap-2'>
                                 {/* Status Badge */}
                                 <button
-                                    title={sub?.status ? "Click to update" : undefined}
+                                    title={sub?.status === "Y" ? "Click to inactive status"
+                                        : sub?.status === "N"
+                                            ? "Click to active status" : undefined
+                                    }
                                     disabled={!sub?.status}
                                     onClick={() => handleSubsStatusChange(sub?.id, sub?.status)}
                                     className="w-fit"
@@ -417,9 +421,9 @@ const UsersListPage = () => {
 
                                 {/* Status Badge */}
                                 <button
-                                    title='History'
+                                    title='Click to view history'
                                     disabled={!sub?.status}
-                                    onClick={() => router.push('/admin/subscription')}
+                                    onClick={() => router.push('/admin/billings')}
                                     className="w-fit"
                                 >
                                     <History size={16} color="black" />
@@ -558,45 +562,54 @@ const UsersListPage = () => {
                         <header className="bg-white shadow-sm border-b">
                             <div className="mx-auto px-4 sm:px-6 lg:px-4 bg-white rounded-lg shadow-sm border py-4 px-4">
                                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                                    <div className="flex md:col-span-3">
-                                        <Input
-                                            type="text"
-                                            placeholder="Search by company name / email"
-                                            className="h-10 text-black text-sm border max-w-[240px] border-gray-200 rounded-[5px] px-3"
-                                            value={search.searchTerm}
-                                            onChange={(e) =>
-                                                setsearch((prev) => ({
-                                                    ...prev,
-                                                    searchTerm: e.target.value,
-                                                }))
-                                            }
-                                        />
-
-                                        <div className="w-full flex gap-1 ml-4 min-w-[200px] max-w-[260px] ">
-                                            <DatePicker
-                                                selected={search.fromDate}
-                                                maxDate={search.toDate}
-                                                onChange={(date: Date | null) =>
-                                                    setsearch((prev) => ({ ...prev, fromDate: date }))
+                                    <div className="flex md:col-span-3 gap-4 items-end">
+                                        <div className="flex flex-col w-[60%]">
+                                            <Label className="text-sm font-medium ml-1">Company / Email</Label>
+                                            <Input
+                                                type="text"
+                                                placeholder="Enter company name / email"
+                                                className="w-full h-10 text-black text-sm border border-gray-200 rounded-[5px] px-3"
+                                                value={search.searchTerm}
+                                                onChange={(e) =>
+                                                    setsearch((prev) => ({
+                                                        ...prev,
+                                                        searchTerm: e.target.value,
+                                                    }))
                                                 }
-                                                placeholderText="From Date"
-                                                className="w-full text-sm h-10 px-2 border border-gray-200 shadow-lg rounded-[5px] text-black"
-                                                dateFormat="dd/MM/yyyy"
-                                            />
-
-                                            <DatePicker
-                                                selected={search.toDate}
-                                                minDate={search.fromDate}
-                                                onChange={(date: Date | null) =>
-                                                    setsearch((prev) => ({ ...prev, toDate: date }))
-                                                }
-                                                placeholderText="To Date"
-                                                className="w-full text-sm h-10 px-2 border border-gray-200 shadow-lg rounded-[5px] text-black"
-                                                dateFormat="dd/MM/yyyy"
                                             />
                                         </div>
 
-                                        <div className="w-full flex gap-2 ml-4">
+                                        {/* <div className="w-full flex gap-2 w-[140%]">
+                                            <div>
+                                                <Label className="text-sm font-medium">Enrolled From</Label>
+                                                <DatePicker
+                                                    selected={search.fromDate}
+                                                    maxDate={search.toDate}
+                                                    onChange={(date: Date | null) =>
+                                                        setsearch((prev) => ({ ...prev, fromDate: date }))
+                                                    }
+                                                    placeholderText="From Date"
+                                                    className="w-full text-sm h-10 px-2 border border-gray-200 shadow-lg rounded-[5px] text-black"
+                                                    dateFormat="dd/MM/yyyy"
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <Label className="text-sm font-medium">Enrolled To</Label>
+                                                <DatePicker
+                                                    selected={search.toDate}
+                                                    minDate={search.fromDate}
+                                                    onChange={(date: Date | null) =>
+                                                        setsearch((prev) => ({ ...prev, toDate: date }))
+                                                    }
+                                                    placeholderText="To Date"
+                                                    className="w-full text-sm h-10 px-2 border border-gray-200 shadow-lg rounded-[5px] text-black"
+                                                    dateFormat="dd/MM/yyyy"
+                                                />
+                                            </div>
+                                        </div> */}
+
+                                        <div className="w-full flex gap-2">
                                             <Button
                                                 onClick={handleSearch}
                                                 className={`max-w-[30] text-white rounded-[5px] bg-blue-500 hover:bg-blue-700`}  >
@@ -610,8 +623,6 @@ const UsersListPage = () => {
                                             </Button>
                                         </div>
                                     </div>
-
-
 
                                     <div className="flex justify-end relative">
                                         <div
