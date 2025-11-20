@@ -380,15 +380,21 @@ const UsersListPage = () => {
                     const today = new Date();
                     const isExpired = expiryDate ? expiryDate < today : false;
                     const end = sub?.expiry_date ? formatDate(sub.expiry_date, "DD-MM-YYYY") : "—";
-                    const status = sub?.status === "Y" ? "Active" : sub?.status === "N" ? "Inactive" : "N/A";
 
+                    // Handle status mapping
+                    let status = "N/A";
+                    if (isExpired) status = "Expired";
+                    else status = sub?.status === "Y" ? "Active" : "Inactive";
+
+                    // Colors based on situation
                     const statusClasses =
-                        sub?.status === "Y" ? "bg-green-100 text-green-700"
-                            : sub?.status === "N"
-                                ? "bg-red-100 text-red-700"
-                                : "bg-gray-200 text-gray-600 opacity-60 cursor-not-allowed";
-
-                    const expiryColor = isExpired ? "text-red-600" : "text-gray-700";
+                        isExpired
+                            ? "bg-red-200 text-red-700"
+                            : sub?.status === "Y"
+                                ? "bg-green-100 text-green-700"
+                                : sub?.status === "N"
+                                    ? "bg-red-100 text-red-700"
+                                    : "bg-gray-200 text-gray-600";
 
                     return (
                         <div className="flex flex-col text-xs leading-tight gap-1">
@@ -397,43 +403,47 @@ const UsersListPage = () => {
                             <span className="flex items-center gap-1">
                                 <span>{start}</span>
                                 <span>-</span>
-                                <strong className={expiryColor}>{end}</strong>
+                                <strong className={isExpired ? "text-red-700" : "text-gray-700"}>
+                                    {end}
+                                </strong>
                             </span>
 
-                            <div className='flex flex-row gap-2'>
-                                {/* Status Badge */}
+                            <div className="flex flex-row gap-2 items-center">
+
+                                {/* STATUS PILL */}
                                 <button
-                                    title={sub?.status === "Y" ? "Click to inactive status"
-                                        : sub?.status === "N"
-                                            ? "Click to active status" : undefined
+                                    title={
+                                        isExpired
+                                            ? "Subscription Expired"
+                                            : sub?.status === "Y"
+                                                ? "Click to deactivate"
+                                                : "Click to activate"
                                     }
-                                    disabled={!sub?.status}
-                                    onClick={() => handleSubsStatusChange(sub?.id, sub?.status)}
-                                    className="w-fit"
+                                    disabled={isExpired || !sub?.status}
+                                    onClick={() =>
+                                        !isExpired && handleSubsStatusChange(sub?.id, sub?.status)
+                                    }
+                                    className="w-fit disabled:cursor-not-allowed"
                                 >
                                     <span
-                                        className={`px-2 py-0.5 text-[12px] font-semibold rounded-full 
-                                        ${statusClasses}`}
+                                        className={`px-2 py-0.5 text-[12px] font-semibold rounded-full ${statusClasses}`}
                                     >
                                         {status}
                                     </span>
                                 </button>
 
-                                {/* Status Badge */}
+                                {/* HISTORY BUTTON */}
                                 <button
-                                    title='Click to view history'
-                                    disabled={!sub?.status}
-                                    onClick={() => router.push('/admin/billings')}
+                                    title="Click to view history"
+                                    onClick={() => router.push("/admin/billings")}
                                     className="w-fit"
                                 >
                                     <History size={16} color="black" />
-                                    {/* <span className={`${statusClasses}`} > </span> */}
                                 </button>
                             </div>
 
                         </div>
                     );
-
                 },
             },
             {
@@ -563,8 +573,8 @@ const UsersListPage = () => {
                             <div className="mx-auto px-4 sm:px-6 lg:px-4 bg-white rounded-lg shadow-sm border py-4 px-4">
                                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                                     <div className="flex md:col-span-3 gap-4 items-end">
-                                        <div className="flex flex-col w-[60%]">
-                                            <Label className="text-sm font-medium ml-1">Company / Email</Label>
+                                        <div className="flex flex-col w-[50%]">
+                                            <Label className="text-sm font-medium ml-1">Company Name / Email</Label>
                                             <Input
                                                 type="text"
                                                 placeholder="Enter company name / email"

@@ -158,29 +158,35 @@ export default function InvoiceBreakdown({
                     </div>
                 </div>
 
-                {/* CGST */}
-                <div className="grid grid-cols-2 p-3">
-                    <div className="text-gray-700">CGST (9%)</div>
-                    <div className="text-right text-gray-800">
-                        {calculations.cgst.toFixed(2)}
-                    </div>
-                </div>
+                {/* INTRA – CGST + SGST */}
+                {gstType === "INTRA" && (
+                    <>
+                        <div className="grid grid-cols-2 p-3">
+                            <div className="text-gray-700">CGST (9%)</div>
+                            <div className="text-right text-gray-800">
+                                {calculations.cgst.toFixed(2)}
+                            </div>
+                        </div>
 
-                {/* SGST */}
-                <div className="grid grid-cols-2 p-3">
-                    <div className="text-gray-700">SGST (9%)</div>
-                    <div className="text-right text-gray-800">
-                        {calculations.sgst.toFixed(2)}
-                    </div>
-                </div>
+                        <div className="grid grid-cols-2 p-3">
+                            <div className="text-gray-700">SGST (9%)</div>
+                            <div className="text-right text-gray-800">
+                                {calculations.sgst.toFixed(2)}
+                            </div>
+                        </div>
+                    </>
+                )}
 
-                {/* IGST */}
-                <div className="grid grid-cols-2 p-3">
-                    <div className="text-gray-700">IGST (18%)</div>
-                    <div className="text-right text-gray-800">
-                        {calculations.igst.toFixed(2)}
+                {/* INTER – IGST */}
+                {gstType === "INTER" && (
+                    <div className="grid grid-cols-2 p-3">
+                        <div className="text-gray-700">IGST (18%)</div>
+                        <div className="text-right text-gray-800">
+                            {calculations.igst.toFixed(2)}
+                        </div>
                     </div>
-                </div>
+                )}
+
 
                 {/* Total Tax */}
                 <div className="grid grid-cols-2 p-3 font-semibold">

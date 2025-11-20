@@ -409,35 +409,77 @@ export default function BillingListPage() {
             name: "Subscription Details",
             width: "200px",
             cell: (row) => {
-                const start = row.created ? formatDate(row.created) : "—";
-                const end = row.expiry_date ? formatDate(row.expiry_date) : "—";
+                const sub = row;
+                const start = sub?.created ? formatDate(sub.created, "DD-MM-YYYY") : "—";
+                const expiryDate = sub?.expiry_date ? new Date(sub.expiry_date) : null;
+                const today = new Date();
+                const isExpired = expiryDate ? expiryDate < today : false;
+                const end = sub?.expiry_date ? formatDate(sub.expiry_date, "DD-MM-YYYY") : "—";
+
+                // Handle status mapping
+                let status = "N/A";
+                if (isExpired) status = "Expired";
+                else status = sub?.status === "Y" ? "Active" : "Inactive";
+
+                // Colors based on situation
+                const statusClasses =
+                    isExpired
+                        ? "bg-red-200 text-red-700"
+                        : sub?.status === "Y"
+                            ? "bg-green-100 text-green-700"
+                            : sub?.status === "N"
+                                ? "bg-red-100 text-red-700"
+                                : "bg-gray-200 text-gray-600";
+
                 return (
-                    <div className="flex flex-col gap-1 text-xs">
+                    <div className="flex flex-col text-xs leading-tight gap-1">
 
                         {/* Date Range */}
-                        <span className="text-gray-700">
-                            {start} → <span className="font-semibold">{end}</span>
+                        <span className="flex items-center gap-1">
+                            <span>{start}</span>
+                            <span>-</span>
+                            <strong className={isExpired ? "text-red-700" : "text-gray-700"}>
+                                {end}
+                            </strong>
                         </span>
 
-                        {/* Status row */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-row gap-2 items-center">
+
+                            {/* STATUS PILL */}
                             <button
-                                title={row.status === "Y" ? "Click to deactivate" : "Click to activate"}
-                                onClick={() => handleStatusChange(row.id, row.status)}
+                                title={
+                                    isExpired
+                                        ? "Subscription Expired"
+                                        : sub?.status === "Y"
+                                            ? "Click to deactivate"
+                                            : "Click to activate"
+                                }
+                                disabled={isExpired || !sub?.status}
+                                onClick={() =>
+                                    !isExpired && handleStatusChange(sub?.id, sub?.status)
+                                }
+                                className="w-fit disabled:cursor-not-allowed"
                             >
-                                <StatusPill type={row.status} />
+                                <span
+                                    className={`px-2 py-0.5 text-[12px] font-semibold rounded-full ${statusClasses}`}
+                                >
+                                    {status}
+                                </span>
                             </button>
 
+                            {/* HISTORY BUTTON */}
                             <button
-                                title="View history"
-                                onClick={() => router.push("/admin/subscription")}
+                                title="Click to view history"
+                                onClick={() => router.push("/admin/billings")}
+                                className="w-fit"
                             >
-                                <History size={15} className="text-gray-700" />
+                                <History size={16} color="black" />
                             </button>
                         </div>
+
                     </div>
                 );
-            }
+            },
         },
         {
             name: "Payment Details",
