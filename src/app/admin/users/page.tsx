@@ -573,7 +573,7 @@ const UsersListPage = () => {
                             <div className="mx-auto px-4 sm:px-6 lg:px-4 bg-white rounded-lg shadow-sm border py-4 px-4">
                                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                                     <div className="flex md:col-span-3 gap-4 items-end">
-                                        <div className="flex flex-col w-[50%]">
+                                        <div className="flex flex-col w-[40%]">
                                             <Label className="text-sm font-medium ml-1">Company Name / Email</Label>
                                             <Input
                                                 type="text"
