@@ -536,13 +536,12 @@ export default function BillingListPage() {
             name: "Actions",
             width: "8%",
             cell: (row) => {
-
                 const expiryDate = row?.expiry_date ? new Date(row.expiry_date) : null;
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 if (expiryDate) { expiryDate.setHours(0, 0, 0, 0); }
                 const isExpired = expiryDate ? expiryDate < today : false;
-
+                const paid = row.isdrop === "Y";
                 return (
                     <div className="flex gap-2">
                         <button
@@ -554,8 +553,10 @@ export default function BillingListPage() {
                         <button
                             title="Update Subscription"
                             disabled={isExpired}
+                            // disabled={paid || isExpired}
                             onClick={() => router.push(`/admin/subscription/update/${row.id}`)}
                         >
+                            {/* <Edit size={18} color={(paid || isExpired) ? "gray" : "green"} />*/}
                             <Edit size={18} color={isExpired ? "gray" : "green"} />
                         </button>
 

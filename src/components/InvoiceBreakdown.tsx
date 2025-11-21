@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { formatPrice } from "@/lib/price";
 export default function InvoiceBreakdown({
     companyName, users, pricePerUser, billingStart, billingEnd, planName,
@@ -8,6 +8,11 @@ export default function InvoiceBreakdown({
 }) {
     const [discountType, setDiscountType] = useState("amount");
     const [discountAmount, setDiscountAmount] = useState(0);
+
+    useEffect(() => {
+        setDiscountType("amount");
+        setDiscountAmount(Number(discount) || 0);
+    }, [discount]);
 
     const calculations = useMemo(() => {
         const basePrice = users * pricePerUser;
@@ -62,9 +67,18 @@ export default function InvoiceBreakdown({
         }
     }, [calculations]);
 
+    const firstRender = useRef(true);
     useEffect(() => {
+        // Skip first render (auto-selected old plan)
+        if (firstRender.current) {
+            firstRender.current = false;
+            return;
+        }
+
+        // User changed the plan → reset discount
         setDiscountAmount(0);
-    }, [planName, pricePerUser]);
+
+    }, [planName]);
 
     return (
         <div className="w-full border border-gray-300 rounded-md overflow-hidden mt-4">
@@ -103,7 +117,6 @@ export default function InvoiceBreakdown({
                 <div className="grid grid-cols-2 p-3 items-center">
                     <div className="text-gray-700 flex items-center gap-2">
                         (•) Discount
-
                         <select
                             value={discountType}
                             onChange={(e) => {

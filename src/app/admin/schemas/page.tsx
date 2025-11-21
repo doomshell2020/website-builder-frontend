@@ -1,7 +1,10 @@
 "use client";
 import { useMemo, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAllSchemas, getAllUsers } from "@/services/userService";
+import { getAllSchemas, getAllUsers, downloadSchema } from "@/services/userService";
+import { Download } from "lucide-react";
+import Swal from "sweetalert2";
+import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
 import PaginatedDataTable from "@/components/PaginatedDataTablet";
 import Loader from "@/components/ui/loader";
 import { Schemas, User } from "@/types/user";
@@ -36,6 +39,26 @@ const SchemaListPage = () => {
     useEffect(() => {
         fetchData()
     }, [page, limit]);
+
+    const handleDownload = async (Schema: string) => {
+        const result = await Swal.fire({
+            title: "Are you sure",
+            text: `You want to download .sql file`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, download it!",
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await downloadSchema(Schema);
+                Swal.fire("Updated!", "File downloaded successfully.", "success");
+                fetchData();
+            } catch {
+                Swal.fire("Error", "Failed to download file.", "error");
+            }
+        }
+    };
 
     const columns = useMemo(
         () => [
@@ -97,6 +120,20 @@ const SchemaListPage = () => {
                 width: "15%",
                 sortable: true,
             },
+            // {
+            //     name: "Actions",
+            //     width: "8%",
+            //     cell: (row) => {
+            //         return (<div className="flex gap-2">
+            //             <button
+            //                 title="View Invoice"
+            //                 onClick={() => handleDownload(row?.schemaName)}
+            //             >
+            //                 <Download size={18} className="text-red-600 hover:text-red-800" />
+            //             </button>
+            //         </div>)
+            //     }
+            // }
         ],
         [page, limit]
     );

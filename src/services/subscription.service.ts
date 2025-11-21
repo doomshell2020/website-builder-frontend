@@ -6,7 +6,7 @@ export const viewAllSubscriptions = async (page = 1, limit = 10): Promise<Subscr
     return response.data;
 };
 
-export const getSubscriptionById = async (id: number): Promise<SubscriptionAttribute[]> => {
+export const getSubscriptionById = async (id: string | number): Promise<SubscriptionAttribute[]> => {
     const response = await API.get(`/subscription/view/${id}`);
     return response.data;
 };

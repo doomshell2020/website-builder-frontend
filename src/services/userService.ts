@@ -96,6 +96,11 @@ export const getAllSchemas = async (page = 1, limit = 10): Promise<any> => {
   return response.data;
 };
 
+export const downloadSchema = async (schema: string): Promise<any> => {
+  const response = await API.get(`/schema/download-schema/${schema}`);
+  return response.data;
+};
+
 // ==== FOR DOMAIN SERVICES ==== //
 export const saveDomain = async (id: number, data: FormData): Promise<any> => {
   const response = await API.put(`/users/save/custom-domain/${id}`, data);
