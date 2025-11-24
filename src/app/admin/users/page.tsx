@@ -245,6 +245,8 @@ const UsersListPage = () => {
             },
             {
                 name: "Company Detail",
+                selector: (row: User) => row.company_name || "N/A",
+                sortable: true,
                 cell: (row: User) => {
                     const validLogo =
                         row?.company_logo &&
@@ -282,7 +284,6 @@ const UsersListPage = () => {
                         </button>
                     );
                 },
-                sortable: true,
             },
             {
                 name: "Customer Details",

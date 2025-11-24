@@ -1,11 +1,12 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { formatPrice } from "@/lib/price";
 
 interface GenerateInvoiceOptions {
-    customer: any;        // Customer object from backend
-    plan: any;        // Plan object from backend
-    subscription: any;    // Subscription object from backend
-    filename: string;     // e.g. "invoice_8"
+    customer: any;
+    plan: any;
+    subscription: any;
+    filename: string;
 }
 
 function numberToWords(num: number) {
@@ -29,38 +30,30 @@ export const generateInvoicePdf = async ({
     subscription,
     filename,
 }: GenerateInvoiceOptions) => {
-    // --------------------------
-    // Resolve all fields properly
-    // --------------------------
-    const invoiceNumber = subscription.order_id || subscription.id;
 
+    // Resolve all fields properly
+    const rawInvoice = subscription.order_id || subscription.id;
+    const formattedInvoice = String(rawInvoice).padStart(6, "0").slice(-6);
     const invoiceDate = subscription.created
         ? new Date(subscription.created).toLocaleDateString("en-GB")
         : "-";
-
     const periodStart = subscription.created
         ? new Date(subscription.created).toLocaleDateString("en-GB")
         : "-";
-
     const periodEnd = subscription.expiry_date
         ? new Date(subscription.expiry_date).toLocaleDateString("en-GB")
         : "-";
-
     const users = subscription.totaluser || 0;
-    const rate = subscription.per_user_rate || 0;
     const subtotal = Number(subscription.plantotalprice) || 0;
+    const rate = subscription.per_user_rate || 0;
     const discount = Number(subscription.discount) || 0;
-    const tax = Number(subscription.taxprice) || 0;
+    const tax = (Number(subscription.taxprice) || 0);
     const cgst = Number(subscription.cgst) || 0;
     const sgst = Number(subscription.sgst) || 0;
     const igst = Number(subscription.igst) || 0;
-
     const total = Number(subscription.total) || rate - discount + tax;
 
-    // --------------------------
     // START PDF
-    // --------------------------
-
     const toBase64 = (url: string): Promise<string> =>
         fetch(url)
             .then((res) => res.blob())
@@ -73,51 +66,40 @@ export const generateInvoicePdf = async ({
                     })
             );
 
-    const logoBase64 = await toBase64("/assest/image/logo12.png");
+    const logoBase64 = await toBase64("/assest/image/logo13.png");
 
     const doc = new jsPDF();
+    doc.addImage(logoBase64, "PNG", 10, 4, 80, 16);
     // Draw RED BAR first
-    doc.setFillColor(224, 76, 76);
-    doc.rect(10, 15, 190, 3, "F");
-
+    doc.setFillColor(58, 123, 213);
+    doc.rect(12, 23, 184, 1, "F");
     // Now draw LOGO on top of it
-    doc.addImage(logoBase64, "PNG", 70, 8, 70, 20);
-
 
     // Title
-    doc.setFontSize(16);
-    doc.setTextColor(224, 76, 76);
-    doc.text("Invoice By:", 14, 30);
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(58, 123, 213);
+    doc.text("Invoice By:", 14, 32);
 
-    // --------------------------
     // Invoice By (static company)
-    // --------------------------
     doc.setFontSize(11);
     doc.setTextColor(0);
-    doc.text("Doomshell Academy of Advance Computing", 14, 41);
+    doc.text("Doomshell Softwares Private Limited", 14, 41);
     doc.text("A-3 Mall Road, Near Radhy Bakers,", 14, 46);
     doc.text("Jaipur-303091, Rajasthan", 14, 51);
-    doc.text("GSTIN: 08AAKFD9537B1ZD", 14, 56);
+    doc.text("GSTIN: 08AACCD6890Q1ZU", 14, 56);
 
     // Invoice No & Date
     doc.setFontSize(11);
-    doc.text("Invoice No:", 140, 39);
+    doc.text("Invoice No:", 160, 39);
     doc.setFontSize(10);
-    doc.text(String(invoiceNumber), 190, 39, { align: "right" });
+    doc.text(String(formattedInvoice), 194, 39, { align: "right" });
 
     // // Invoice Date
     // doc.setFontSize(11);
     // doc.text("Invoice Date:", 140, 45);
     // doc.setFontSize(10);
     // doc.text(invoiceDate, 190, 45, { align: "right" });
-
-    // ---------------------------
-    // BILLING TO (FULLY RESPONSIVE)
-    // ---------------------------
-
-    // ---------------------------
-    // BILLING TO (FULLY RESPONSIVE)
-    // ---------------------------
 
     // Wrap long address
     // Clean Address (fixes the spacing issue)
@@ -129,7 +111,6 @@ export const generateInvoicePdf = async ({
     const wrappedAddress = doc.splitTextToSize(cleanAddress, 85);
     const addressLines = wrappedAddress.length;
 
-
     const boxHeight = 55 + (addressLines - 1) * 6;
 
     doc.setFillColor(245, 245, 245);
@@ -139,8 +120,8 @@ export const generateInvoicePdf = async ({
     let leftY = 75;
 
     // Billing To:
-    doc.setFontSize(11);
-    doc.setTextColor(224, 76, 76);
+    doc.setFontSize(12);
+    doc.setTextColor(58, 123, 213);
     doc.text("Billing To:", 18, leftY);
 
     // Customer Name
@@ -159,10 +140,6 @@ export const generateInvoicePdf = async ({
     // GST
     doc.text(`GST: ${customer.gstin || "-"}`, 18, leftY);
 
-    // ---------------------------
-    // RIGHT SIDE = aligned to same vertical spacing as LEFT
-    // ---------------------------
-
     // Top of right side EXACTLY matches top of "Customer Name"
     let rightY = 82;   // = 75 + 7
 
@@ -170,15 +147,13 @@ export const generateInvoicePdf = async ({
     doc.setTextColor(0);
 
     // Invoice Date label + value
-    doc.text("Invoice Date:", 140, rightY);
+    doc.text("Invoice Date:", 150, rightY);
     doc.setFontSize(10);
-    doc.text(invoiceDate, 190, rightY, { align: "right" });
+    doc.text(invoiceDate, 194, rightY, { align: "right" });
 
-    // --------------------------
     // Table Header (Description)
-    // --------------------------
     autoTable(doc, {
-        startY: 100,
+        startY: 106,
         head: [
             [
                 { content: "Description", styles: { halign: "left" } },
@@ -186,23 +161,27 @@ export const generateInvoicePdf = async ({
             ],
         ],
         headStyles: {
-            fillColor: [224, 76, 76],
+            fillColor: [58, 123, 213],
             textColor: 255,
-            fontSize: 11,
+            fontSize: 12,
             halign: "center",
         },
         body: [
             [
                 {
-                    content: `Doomshell Software\n- ${plan?.name} Plan @ Rs. ${rate}\n- Billing Period: ${periodStart} to ${periodEnd}`,
+                    content: `Doomshell Software\n- ${plan?.name} Plan @ Rs. ${formatPrice(rate)}\n- Billing Period: ${periodStart} to ${periodEnd}`,
                     styles: { halign: "left", fontSize: 10 },
                 },
                 {
-                    content: rate.toFixed(2),
+                    content: formatPrice(rate),
                     styles: { halign: "right", fontSize: 10 },
                 },
             ],
         ],
+        bodyStyles: {
+            textColor: [32, 32, 32],  // ★ gray body text
+            cellPadding: { top: 4, bottom: 4, left: 3, right: 3 },
+        },
         styles: {
             fontSize: 10,
             valign: "middle",
@@ -215,67 +194,78 @@ export const generateInvoicePdf = async ({
 
     let finalY = (doc as any).lastAutoTable.finalY + 6;
 
-    // --------------------------
     // Totals Breakdown
-    // --------------------------
     doc.setFontSize(11);
-    doc.setTextColor(224, 76, 76);
+    doc.setTextColor(58, 123, 213);
     doc.text("Thank you for your Business!", 14, finalY);
 
     // Right-side values
     doc.setTextColor(0);
     doc.setFontSize(10);
 
-    const items = [
+    const items: [string, number][] = [
         ["Sub Total", rate],
         ["Discount", discount],
-        ["CGST", cgst],
-        ["SGST", sgst],
-        ["IGST", igst],
-        ["Total Tax", tax],
+        ["Net Price", rate - discount],
     ];
+    if (igst && igst !== 0) {
+        items.push(["IGST", igst]);
+    }
+    else {
+        items.push(["CGST", cgst]);
+        items.push(["SGST", sgst]);
+    }
+    items.push(["Total Tax", tax]);
 
     items.forEach(([label, value], i) => {
-        doc.text(label as string, 140, finalY + i * 7);
-        doc.text(String(Number(value).toFixed(2)), 195, finalY + i * 7, {
-            align: "right",
-        });
+        const y = finalY + 4 + i * 7;
+        doc.text(label, 140, y);
+        doc.text(formatPrice(Number(value)), 194, y, { align: "right" });
     });
 
-    const boxX = 140;
-    const boxWidth = 56;
-    const boxY = finalY + 45;
-    const boxHeights = 10;
+    const roundedValue = Math.round(total)   // increased for better padding
+    const roundedTotal = formatPrice(roundedValue);
+    const roundedTotalForWords = Math.round(total);
 
-    const roundedTotal = Math.round(total); // or Number(total.toFixed(2))
+    // -------- BLUE TOTAL BOX (AUTO POSITIONED) --------
+    // height of tax table:
+    const tableHeight = items.length * 7; // each row 7px
 
-    // Red Total Box
-    doc.setFillColor(224, 76, 76);
-    doc.rect(boxX, boxY, boxWidth, boxHeights, "F");
+    // add extra gap
+    const boxY = finalY + tableHeight;
+    const boxLeftX = 136;
+    const boxRightX = 196;
+    const boxWidth = boxRightX - boxLeftX;
+    const boxXHeight = 10;
 
-    // Center text (white)
-    doc.setTextColor(255);
+    // Draw box
+    doc.setFillColor(58, 123, 213);
+    doc.rect(boxLeftX, boxY, boxWidth, boxXHeight, "F");
+
     doc.setFontSize(11);
+    doc.setTextColor(255);
 
-    const centerX = boxX + boxWidth / 2;
+    const labelY = boxY + 7;
 
-    doc.text(`Total Order Value:  ${roundedTotal}`, centerX, boxY + 7, {
-        align: "center",
-    });
+    // Left label
+    doc.text("Total Order Value:", 140, labelY);
 
-    // Amount in Words label (red)
+    // Right value
+    doc.text(String(roundedTotal), 194, labelY, { align: "right" });
+
+    // -------- AMOUNT IN WORDS --------
     doc.setFontSize(12);
-    doc.setTextColor(224, 76, 76);
-    doc.text("Amount in Words", 14, finalY + 65);
+    doc.setTextColor(58, 123, 213);
+    doc.text("Amount in Words", 14, boxY + 18);
 
-    // Amount in Words (black)
+    const pageWidth = doc.internal.pageSize.getWidth();
+
     doc.setFontSize(11);
     doc.setTextColor(0);
-    doc.text(numberToWords(roundedTotal) + " Only", 200, finalY + 65, {
+    doc.text(numberToWords(roundedTotalForWords) + " Only", pageWidth - 15, boxY + 18, {
         align: "right",
     });
 
-    // Save
     // doc.save(`${filename}.pdf`);
     const pdfURL = doc.output("bloburl");
     window.open(pdfURL, "_blank");

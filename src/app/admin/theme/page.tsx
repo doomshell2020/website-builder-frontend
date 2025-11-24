@@ -119,11 +119,11 @@ export default function ThemeListPage() {
         ),
         width: "15%",
       },
-      {
-        name: "Created",
-        selector: (row: ThemeAttribute) => row.createdAt ? formatDate(row.createdAt, "DD-MM-YYYY hh:mm A") : "—",
-        width: "15%",
-      },
+      // {
+      //   name: "Created",
+      //   selector: (row: ThemeAttribute) => row.createdAt ? formatDate(row.createdAt, "DD-MM-YYYY") : "—",
+      //   width: "15%",
+      // },
       {
         name: "Actions",
         cell: (row: ThemeAttribute) => (

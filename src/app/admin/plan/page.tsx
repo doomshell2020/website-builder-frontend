@@ -213,13 +213,16 @@ export default function PlanPage() {
     {
       name: "Status",
       width: "16%",
-      selector: (row) => row.status,
+      selector: (row) => (row.status === "Y" ? "Active" : "Inactive"),
       sortable: true,
-      cell: (row) => {
-        const status = row.status === "Y" ? "Active" : "Inactive";
-        const statusColor = row.status === "Y" ? "text-green-600" : "text-red-600";
-        return (<span className={`text-sm font-medium ${statusColor}`}> {status} </span>);
-      },
+      cell: (row) => (<span
+        className={`px-2 py-1 rounded text-xs ${row.status === "Y"
+          ? "bg-green-100 text-green-800"
+          : "bg-red-100 text-red-800"
+          }`}
+      >
+        {row.status === "Y" ? "Active" : "Inactive"}
+      </span>)
     },
     {
       name: "Actions",
