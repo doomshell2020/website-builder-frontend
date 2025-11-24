@@ -763,7 +763,7 @@ export default function BillingListPage() {
                     return result.trim() + " Rupees Only";
                 }
                 const roundedPrice = Number(selectedInvoice?.plantotalprice || 0).toFixed(2);
-                const hasIGST = Number(selectedInvoice.igst) > 0;
+                const hasIGST = Number(selectedInvoice?.igst) > 0;
 
                 return (
                     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-2 sm:p-4">
@@ -786,14 +786,14 @@ export default function BillingListPage() {
                                     {/* TOP SECTION */}
                                     <div className="flex flex-col sm:flex-row justify-between border-b pb-4 gap-3">
                                         <div>
-                                            <h3 className="font-bold text-lg">Doomshell</h3>
+                                            <h3 className="font-bold text-lg">Doomshell Software</h3>
                                             <p className="text-xs sm:text-sm text-gray-700">A-3 Mall Road, Vidhyadhar Nagar, jaipur 302039 India</p>
                                         </div>
 
                                         <div className="text-right text-xs sm:text-sm">
                                             <p className="font-semibold">Invoice</p>
                                             <p className="mt-1">
-                                                <span className="font-semibold">Invoice No:</span> {selectedInvoice.id}
+                                                <span className="font-semibold">Invoice No:</span> {selectedInvoice?.id}
                                             </p>
                                         </div>
                                     </div>
@@ -803,16 +803,15 @@ export default function BillingListPage() {
                                         <p className="text-xs sm:text-sm font-semibold text-gray-700 mb-2">Billing To:</p>
 
                                         <div className="flex justify-between items-center">
-                                            <p className="font-bold text-sm sm:text-base">{selectedInvoice.Customer?.company_name}</p>
+                                            <p className="font-bold text-sm sm:text-base">{selectedInvoice?.Customer?.company_name}</p>
                                             <p className="text-gray-600 text-sm whitespace-nowrap font-bold">
-                                                Invoice Date: <span>{formatDate(selectedInvoice.created)}</span>
+                                                Invoice Date: <span>{formatDate(selectedInvoice?.created)}</span>
                                             </p>
                                         </div>
 
-
-                                        <p className="text-xs sm:text-sm text-gray-700">{selectedInvoice.Customer?.mobile_no}</p>
-                                        <p className="text-xs sm:text-sm text-gray-700">{selectedInvoice.Customer?.address1}</p>
-                                        <p className="text-xs sm:text-sm text-gray-700">GST: {selectedInvoice.Customer?.gstin}</p>
+                                        <p className="text-xs sm:text-sm text-gray-700">{selectedInvoice?.Customer?.mobile_no}</p>
+                                        <p className="text-xs sm:text-sm text-gray-700">{selectedInvoice?.Customer?.address1}</p>
+                                        <p className="text-xs sm:text-sm text-gray-700">GST: {selectedInvoice?.Customer?.gstin}</p>
                                     </div>
 
                                     {/* DESCRIPTION TABLE */}
@@ -829,7 +828,7 @@ export default function BillingListPage() {
                                                 <tr className="border-b">
                                                     <td className="p-3">
                                                         <div>
-                                                            <p className="font-semibold">{selectedInvoice.Plan?.name}</p>
+                                                            <p className="font-semibold">{selectedInvoice?.Plan?.name}</p>
                                                         </div>
 
                                                         <p className="mt-1">
@@ -837,14 +836,14 @@ export default function BillingListPage() {
                                                         </p>
 
                                                         <p className="text-gray-600">
-                                                            •Billing Period : {formatDate(selectedInvoice.created, "DD-MM-YYYY")} to {formatDate(selectedInvoice.expiry_date)}
+                                                            •Billing Period : {formatDate(selectedInvoice?.created, "DD-MM-YYYY")} to {formatDate(selectedInvoice?.expiry_date)}
                                                         </p>
 
                                                         <p className="mt-2">Thank you for your Business!</p>
                                                     </td>
 
                                                     <td className="text-right p-3 font-semibold">
-                                                        ₹{selectedInvoice.plantotalprice}
+                                                        ₹{selectedInvoice?.plantotalprice}
                                                     </td>
                                                 </tr>
                                             </tbody>

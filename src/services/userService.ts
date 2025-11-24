@@ -96,12 +96,32 @@ export const getAllSchemas = async (page = 1, limit = 10): Promise<any> => {
   return response.data;
 };
 
-export const downloadSchema = async (schema: string): Promise<any> => {
-  const response = await API.get(`/schema/download-schema/${schema}`);
-  return response.data;
-};
+// export const downloadSchema = async (schema: string): Promise<any> => {
+//   const response = await API.get(`/schema/download-schema/${schema}`);
+//   return response.data;
+// };
 
 // ==== FOR DOMAIN SERVICES ==== //
+
+export const downloadSchemaZip = async (schemaName: string, formats: string[] = ["json","excel","sql"]) => {
+
+  const query = formats.length ? `?format=${formats.join(",")}` : "";
+
+  const response = await API.get(`/schema/backup/${schemaName}/zip${query}`, {
+    responseType: "blob",
+  });
+
+  const fileName = `${schemaName}_backup.zip`;
+
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", fileName);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+};
+
 export const saveDomain = async (id: number, data: FormData): Promise<any> => {
   const response = await API.put(`/users/save/custom-domain/${id}`, data);
   return response.data;

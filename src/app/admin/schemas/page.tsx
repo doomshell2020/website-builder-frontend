@@ -1,8 +1,8 @@
 "use client";
 import { useMemo, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAllSchemas, getAllUsers, downloadSchema } from "@/services/userService";
-import { Download } from "lucide-react";
+import { getAllSchemas, getAllUsers, downloadSchemaZip } from "@/services/userService";
+import { DatabaseBackup } from "lucide-react";
 import Swal from "sweetalert2";
 import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
 import PaginatedDataTable from "@/components/PaginatedDataTablet";
@@ -40,23 +40,64 @@ const SchemaListPage = () => {
         fetchData()
     }, [page, limit]);
 
-    const handleDownload = async (Schema: string) => {
+    const handleDownloadZip = async (schemaName: string) => {
+        if (!schemaName) return;
+
         const result = await Swal.fire({
-            title: "Are you sure",
-            text: `You want to download .sql file`,
-            icon: "warning",
+            title: "Select export type",
+            html: `
+             <div id="exportOptions">
+                <label><input type="checkbox" class="export-opt" value="json" checked> JSON</label><br>
+                <label><input type="checkbox" class="export-opt" value="excel" checked> Excel</label><br>
+                <label><input type="checkbox" class="export-opt" value="sql" checked> SQL</label>
+             </div>
+             `,
             showCancelButton: true,
-            confirmButtonText: "Yes, download it!",
+            confirmButtonText: "Download",
+            didOpen: () => {
+                const checkboxes = document.querySelectorAll(".export-opt");
+
+                checkboxes.forEach((box) => {
+                    box.addEventListener("change", () => {
+                        const checkedCount = [...checkboxes].filter((cb: any) => cb.checked).length;
+
+                        // Prevent unchecking last remaining checkbox
+                        if (checkedCount === 0) {
+                            (box as HTMLInputElement).checked = true;
+                        }
+                    });
+                });
+            },
+            preConfirm: () => {
+                const selected = [...document.querySelectorAll(".export-opt")]
+                    .filter((cb: any) => cb.checked)
+                    .map((cb: any) => cb.value);
+
+                return selected;
+            },
         });
 
-        if (result.isConfirmed) {
-            try {
-                await downloadSchema(Schema);
-                Swal.fire("Updated!", "File downloaded successfully.", "success");
-                fetchData();
-            } catch {
-                Swal.fire("Error", "Failed to download file.", "error");
-            }
+        if (!result.isConfirmed) return;
+
+        const chosenFormats = result.value.length ? result.value : ["json", "excel", "sql"];
+
+        try {
+            await downloadSchemaZip(schemaName, chosenFormats);
+
+            Swal.fire({
+                icon: "success",
+                title: "Download Started",
+                text: `Exporting: ${chosenFormats.join(", ")}`,
+                timer: 2000,
+                showConfirmButton: false,
+            });
+
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Download Failed",
+                text: "Something went wrong while generating the backup.",
+            });
         }
     };
 
@@ -120,20 +161,20 @@ const SchemaListPage = () => {
                 width: "15%",
                 sortable: true,
             },
-            // {
-            //     name: "Actions",
-            //     width: "8%",
-            //     cell: (row) => {
-            //         return (<div className="flex gap-2">
-            //             <button
-            //                 title="View Invoice"
-            //                 onClick={() => handleDownload(row?.schemaName)}
-            //             >
-            //                 <Download size={18} className="text-red-600 hover:text-red-800" />
-            //             </button>
-            //         </div>)
-            //     }
-            // }
+            {
+                name: "Actions",
+                width: "8%",
+                cell: (row) => {
+                    return (<div className="flex gap-2">
+                        <button
+                            title="Download DB ZIP (JSON / Excel / SQL)"
+                            onClick={() => handleDownloadZip(row?.schemaName || "")}
+                        >
+                            <DatabaseBackup size={18} className="text-green-600 hover:text-green-800" />
+                        </button>
+                    </div>)
+                }
+            }
         ],
         [page, limit]
     );

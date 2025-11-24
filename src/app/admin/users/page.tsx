@@ -4,13 +4,13 @@ import React, { useMemo, useCallback, useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation";
 import {
     Trash2, ToggleRight, ToggleLeft, Edit, CornerRightDown, EyeIcon, History,
-    Plus, CircleAlert, CircleCheckBig, ExternalLink, Link as LinkIcon
+    Plus, CircleAlert, CircleCheckBig, ExternalLink, Link as LinkIcon, Download, FileArchive
 } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { formatDate } from "@/lib/date";
 import Swal from "sweetalert2";
-import { getAllUsers, deleteUser, updateUserStatus, searchUsers, approveUser } from "@/services/userService";
+import { getAllUsers, deleteUser, updateUserStatus, searchUsers, approveUser, downloadSchemaZip } from "@/services/userService";
 import { updateSubscriptionStatus } from "@/services/subscription.service";
 import PaginatedDataTable from "@/components/PaginatedDataTablet";
 import { User } from "@/types/user";
@@ -235,6 +235,67 @@ const UsersListPage = () => {
         }
     };
 
+    const handleDownloadZip = async (schemaName: string) => {
+        if (!schemaName) return;
+
+        const result = await Swal.fire({
+            title: "Select export type",
+            html: `
+      <div id="exportOptions">
+        <label><input type="checkbox" class="export-opt" value="json" checked> JSON</label><br>
+        <label><input type="checkbox" class="export-opt" value="excel" checked> Excel</label><br>
+        <label><input type="checkbox" class="export-opt" value="sql" checked> SQL</label>
+      </div>
+    `,
+            showCancelButton: true,
+            confirmButtonText: "Download",
+            didOpen: () => {
+                const checkboxes = document.querySelectorAll(".export-opt");
+
+                checkboxes.forEach((box) => {
+                    box.addEventListener("change", () => {
+                        const checkedCount = [...checkboxes].filter((cb: any) => cb.checked).length;
+
+                        // Prevent unchecking last remaining checkbox
+                        if (checkedCount === 0) {
+                            (box as HTMLInputElement).checked = true;
+                        }
+                    });
+                });
+            },
+            preConfirm: () => {
+                const selected = [...document.querySelectorAll(".export-opt")]
+                    .filter((cb: any) => cb.checked)
+                    .map((cb: any) => cb.value);
+
+                return selected;
+            },
+        });
+
+        if (!result.isConfirmed) return;
+
+        const chosenFormats = result.value.length ? result.value : ["json", "excel", "sql"];
+
+        try {
+            await downloadSchemaZip(schemaName, chosenFormats);
+
+            Swal.fire({
+                icon: "success",
+                title: "Download Started",
+                text: `Exporting: ${chosenFormats.join(", ")}`,
+                timer: 2000,
+                showConfirmButton: false,
+            });
+
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Download Failed",
+                text: "Something went wrong while generating the backup.",
+            });
+        }
+    };
+
     const columns = useMemo(
         () => [
             {
@@ -260,28 +321,38 @@ const UsersListPage = () => {
                     const [imgSrc, setImgSrc] = React.useState(validLogo);
 
                     return (
-                        <button
-                            title="View Company Details"
-                            onClick={() => router.push(`/admin/users/view/${row.id}`)}
-                            className="flex items-center gap-2 text-blue-600 hover:underline max-w-full truncate"
-                        >
-                            {/* Logo */}
-                            <div className="flex-shrink-0 w-8 h-8 md:w-9 md:h-9 overflow-hidden flex items-center justify-center bg-gray-100 border border-gray-200 rounded-full">
-                                <Image
-                                    src={imgSrc}
-                                    alt={`${row.company_name || "Company"} Logo`}
-                                    width={36}
-                                    height={36}
-                                    className="object-cover"
-                                    onError={() => setImgSrc("/assest/image/defaultUser.webp")}
-                                />
-                            </div>
+                        <div className="flex flex-row gap-2">
+                            <button
+                                title="View Company Details"
+                                onClick={() => router.push(`/admin/users/view/${row.id}`)}
+                                className="flex items-center gap-2 text-blue-600 transition-transform duration-200 hover:scale-105 truncate"
+                            >
+                                {/* Logo */}
+                                <div className="flex-shrink-0 w-8 h-8 md:w-9 md:h-9 overflow-hidden flex items-center justify-center bg-gray-100 border border-gray-200 rounded-full">
+                                    <Image
+                                        src={imgSrc}
+                                        alt={`${row.company_name || "Company"} Logo`}
+                                        width={36}
+                                        height={36}
+                                        className="object-cover"
+                                        onError={() => setImgSrc("/assest/image/defaultUser.webp")}
+                                    />
+                                </div>
 
-                            {/* Company Name */}
-                            <span className="font-medium text-gray-800 truncate max-w-[100px] sm:max-w-[160px] md:max-w-[200px]">
-                                {row.company_name || "N/A"}
-                            </span>
-                        </button>
+                                {/* Company Name */}
+                                <span className="font-medium text-gray-800 truncate max-w-[100px] sm:max-w-[160px] md:max-w-[200px]">
+                                    {row.company_name || "N/A"}
+                                </span>
+
+                            </button>
+                            {/* DB Download */}
+                            <button
+                                title="Download DB ZIP (JSON / Excel / SQL)"
+                                onClick={() => handleDownloadZip(row?.schema_name || "")}
+                            >
+                                <FileArchive size={18} className="text-green-600 hover:text-green-800" />
+                            </button>
+                        </div>
                     );
                 },
             },
