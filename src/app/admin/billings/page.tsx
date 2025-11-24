@@ -275,9 +275,9 @@ export default function BillingListPage() {
 
         if (result.isConfirmed) {
             try {
-                const emailData = await sendEmail(id);
-                if (emailData?.result == 'true') {
-                    Swal.fire("Updated!", "Email have been send successfully.", "success");
+                const emailData: any = await sendEmail(id);
+                if (emailData?.result === true || emailData?.status === true) {
+                    Swal.fire("Sent!", "Email have been send successfully.", "success");
                     fetchData();
                 } else {
                     Swal.fire("Error", "Failed to send email.", "error");
