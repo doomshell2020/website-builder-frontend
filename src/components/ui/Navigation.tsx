@@ -39,6 +39,7 @@ const Navigation = () => {
         if (path.includes("/theme")) return "theme";
         if (path.includes("/plan")) return "plan";
         if (path.includes("/billings")) return "billings";
+        if (path.includes("/subscription")) return "billings";
         return null;
       case "2": // User
         if (path.includes("/enquiry")) return "enquiry";

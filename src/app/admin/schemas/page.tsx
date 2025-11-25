@@ -81,6 +81,13 @@ const SchemaListPage = () => {
 
         const chosenFormats = result.value.length ? result.value : ["json", "excel", "sql"];
 
+        Swal.fire({
+            title: "Preparing download...",
+            text: "Please wait while we generate your export.",
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading(),
+        });
+
         try {
             await downloadSchemaZip(schemaName, chosenFormats);
 

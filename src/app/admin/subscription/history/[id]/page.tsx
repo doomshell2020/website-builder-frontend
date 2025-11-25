@@ -716,7 +716,15 @@ export default function BillingListPage() {
                                 </div>
 
                                 <div className="flex justify-end relative">
-                                    <div className="ml-2">
+                                    <div className="flex flex-row gap-2 ml-2">
+                                        <Button
+                                            type="button"
+                                            title="Click to go back"
+                                            className="px-6 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-[5px]"
+                                            onClick={handleBack}
+                                        >
+                                            Back
+                                        </Button>
                                         <Button
                                             title="Add Subscription"
                                             onClick={handleClick}

@@ -62,3 +62,17 @@ export const InactivateExpiredSubs = async (): Promise<SubscriptionAttribute> =>
     const response = await API.get(`/subscription/check-expired-subs`);
     return response.data;
 };
+
+
+//----------  User View Invoices and their active subscription ------------//
+
+
+export const getUserSubscriptionByInvoiceId = async (id: string | number): Promise<SubscriptionAttribute[]> => {
+    const response = await API.get(`/user/subscription/plan/${id}`);
+    return response.data;
+};
+
+export const getUserSubscriptionsById = async (id: string | number, page = 1, limit = 10,): Promise<SubscriptionAttribute[]> => {
+    const response = await API.get(`/user/subscription/plan/user-wise/${id}`, { params: { page, limit }, });
+    return response.data;
+};

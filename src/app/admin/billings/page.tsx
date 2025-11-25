@@ -267,7 +267,7 @@ export default function BillingListPage() {
     const handleSendEmail = async (id: number) => {
         const result = await Swal.fire({
             title: "Are you sure",
-            text: `You want to send email?`,
+            text: `You want to send invoice?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Send",
@@ -277,13 +277,13 @@ export default function BillingListPage() {
             try {
                 const emailData: any = await sendEmail(id);
                 if (emailData?.result === true || emailData?.status === true) {
-                    Swal.fire("Sent!", "Email have been send successfully.", "success");
+                    Swal.fire("Sent!", "Invoice have been send successfully.", "success");
                     fetchData();
                 } else {
-                    Swal.fire("Error", "Failed to send email.", "error");
+                    Swal.fire("Error", "Failed to send invoice.", "error");
                 }
             } catch (error: any) {
-                Swal.fire("Error", error?.message ?? "Failed to send email.", "error");
+                Swal.fire("Error", error?.message ?? "Failed to send invoice.", "error");
             }
         }
     };
@@ -305,19 +305,6 @@ export default function BillingListPage() {
                     onError={() => setImgSrc("/assest/image/defaultUser.webp")}
                 />
             </div>
-        );
-    };
-
-    const StatusPill = ({ type }) => {
-        const styles = {
-            Y: "bg-green-100 text-green-700",
-            N: "bg-red-100 text-red-700",
-            default: "bg-gray-200 text-gray-600"
-        };
-        return (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${styles[type] || styles.default}`}>
-                {type === "Y" ? "Active" : type === "N" ? "Inactive" : "N/A"}
-            </span>
         );
     };
 
@@ -561,7 +548,7 @@ export default function BillingListPage() {
                         </button>
 
                         <button
-                            title="Send Email"
+                            title="Send Invoice"
                             disabled={row.status === "N" || isExpired}
                             onClick={() => handleSendEmail(row.Customer.id)}
                         >

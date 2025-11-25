@@ -19,15 +19,17 @@ const Header = () => {
     typeof window !== "undefined" ? localStorage.getItem("name") : name
   );
 
-  const [initialRole] = useState(() =>
-    typeof window !== "undefined" ? localStorage.getItem("role") : getRole?.()
-  );
+  const [role, setRole] = useState<string | null>(getRole?.() ?? null);
 
   const profileRef = useRef<HTMLDivElement>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   // Close on outside click
   useEffect(() => {
+
+    const storedRole = localStorage.getItem("role");
+    if (storedRole) setRole(storedRole);
+
     const handleClickOutside = (event: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false);
@@ -48,7 +50,6 @@ const Header = () => {
     );
     setIsProfileOpen(false);
   };
-
 
   const handleLogout = async () => {
     const result = await Swal.fire({
@@ -95,15 +96,25 @@ const Header = () => {
                 <div className="py-2">
                   <Link
                     href="#myaccount"
-                    className="block px-4 py-2 text-sm hover:bg-blue-500 text-gray-900 transition-colors"
+                    className="block px-4 py-2 text-sm hover:bg-blue-500 hover:text-white text-gray-900 transition-colors"
                     onClick={handleAccountClick}
                   >
                     My Account
                   </Link>
 
+                  {role === "2" && (
+                    <Link
+                      href={`/user/subscription`}
+                      onClick={() => setIsProfileOpen(false)}
+                      className="block px-4 py-2 text-sm hover:bg-blue-500 hover:text-white text-gray-900 transition-colors"
+                    >
+                      Subscription
+                    </Link>
+                  )}
+
                   <Link
                     href="#logout"
-                    className="block px-4 py-2 text-sm hover:bg-blue-500 text-gray-900"
+                    className="block px-4 py-2 text-sm hover:bg-blue-500 hover:text-white  text-gray-900"
                     onClick={handleLogout}
                   >
                     Logout

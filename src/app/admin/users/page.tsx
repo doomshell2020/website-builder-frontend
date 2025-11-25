@@ -274,9 +274,13 @@ const UsersListPage = () => {
 
         if (!result.isConfirmed) return;
         const chosenFormats = result.value.length ? result.value : ["json", "excel", "sql"];
+        Swal.fire({
+            title: "Preparing download...", text: "Please wait while we generate your export.",
+            allowOutsideClick: false, didOpen: () => Swal.showLoading(),
+        });
+
         try {
             await downloadSchemaZip(schemaName, chosenFormats);
-
             Swal.fire({
                 icon: "success",
                 title: "Download Started",
@@ -424,16 +428,16 @@ const UsersListPage = () => {
                                 </div>
                             </div>
                         ) : (
-                            <Button
+                            <button
                                 onClick={() => {
                                     setSelectedUserId(row.id);
                                     setOpenCustomDomainSetup(true);
                                 }}
-                                className="inline-flex items-center justify-center gap-1 rounded-md bg-gradient-to-r from-blue-600 to-blue-500 text-white text-xs md:text-sm font-medium px-2 md:px-2 shadow hover:from-blue-700 hover:to-blue-600 transition-all duration-200 w-full sm:w-auto truncate rounded-[5px]"
+                                className="inline-flex items-center justify-center gap-1 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-xs md:text-sm font-medium px-2 md:px-2 shadow hover:from-blue-700 hover:to-blue-600 transition-all duration-200 w-full sm:w-auto truncate rounded-[5px] px-1 py-1 md:py-2"
                             >
                                 <span className="text-base font-bold leading-none">+</span>
-                                <span className="hidden sm:inline">Custom Domain</span>
-                            </Button>
+                                <span className="hidden text-xs sm:inline">Custom Domain</span>
+                            </button>
                         )}
                     </div>
                 ),
@@ -570,14 +574,13 @@ const UsersListPage = () => {
                                             }
                                         }}
                                     >
-                                        {row.approval === "Y" ? (
-                                            <CircleCheckBig size={18} className="text-green-500" />
-                                        ) : (
+                                        {row.approval !== "Y" && (
                                             <CircleAlert size={18} className="text-red-500" />
                                         )}
                                     </div>
                                 )}
                             </div>
+
                             <div
                                 className="cursor-pointer"
                                 title={`Click to mark as ${row.status == "Y" ? "Inactive" : "Active"}`}
@@ -605,18 +608,14 @@ const UsersListPage = () => {
                                     <ToggleLeft size={20} className="text-red-500" />
                                 )}
                             </div>
-                            {/* <button
-                            title="View"
-                            onClick={() => router.push(`/users/view/${row.id}`)}
-                        >
-                            <Info size={18} color="blue" />
-                        </button> */}
+
                             <button
                                 title="Edit"
                                 onClick={() => router.push(`/admin/users/update/${row.id}`)}
                             >
                                 <Edit size={18} color="green" />
                             </button>
+
                             <button title="Delete" onClick={() => handleDelete(row.id!, row?.subscriptionData?.[0]?.status)}>
                                 <Trash2 size={16} color="red" />
                             </button>
