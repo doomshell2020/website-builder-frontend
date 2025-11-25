@@ -241,12 +241,12 @@ const UsersListPage = () => {
         const result = await Swal.fire({
             title: "Select export type",
             html: `
-      <div id="exportOptions">
-        <label><input type="checkbox" class="export-opt" value="json" checked> JSON</label><br>
-        <label><input type="checkbox" class="export-opt" value="excel" checked> Excel</label><br>
-        <label><input type="checkbox" class="export-opt" value="sql" checked> SQL</label>
-      </div>
-    `,
+                <div id="exportOptions">
+                    <label><input type="checkbox" class="export-opt" value="json" checked> JSON</label><br>
+                    <label><input type="checkbox" class="export-opt" value="excel" checked> Excel</label><br>
+                    <label><input type="checkbox" class="export-opt" value="sql" checked> SQL</label>
+                </div>
+                 `,
             showCancelButton: true,
             confirmButtonText: "Download",
             didOpen: () => {
@@ -273,9 +273,7 @@ const UsersListPage = () => {
         });
 
         if (!result.isConfirmed) return;
-
         const chosenFormats = result.value.length ? result.value : ["json", "excel", "sql"];
-
         try {
             await downloadSchemaZip(schemaName, chosenFormats);
 
