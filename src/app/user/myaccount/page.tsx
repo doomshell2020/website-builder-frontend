@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/Button";
-import { updateUser } from "@/services/userService";
+import { updateProfile } from "@/services/userService";
 import { AdminProfile } from "@/services/admin.service";
 import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
 import { userSchema } from "@/schemas/userSchema";
@@ -22,8 +22,8 @@ type FormData = z.infer<typeof userSchema>;
 
 export default function EditUser() {
     const router = useRouter();
-    const params = useParams();
-    const id = String(params.id);
+    // const params = useParams();
+    // const id = String(params.id);
     const [loading, setLoading] = useState(false);
     const [imageFolder, setImageFolder] = useState<string | null>(null);
 
@@ -43,21 +43,18 @@ export default function EditUser() {
     });
     const [selectedCompanyLogo, setSelectedCompanyLogo] = useState<File | null>(null);
     const [previewCompanyLogo, setPreviewCompanyLogo] = useState<string | null>(null);
+    const [userId, setUserId] = useState<string | number>("");
 
-    const handleBack = () => {
-        router.back();
-    };
+    const handleBack = () => { router.back(); };
 
     useEffect(() => {
         setLoading(true);
         const fetchData = async () => {
-            if (!id) {
-                logout();
-                SwalError({ title: "Error", message: "OOPS Session expired. Login again." });
-            };
             try {
                 const res = await AdminProfile();
                 const data: User = res.result;
+                const fetchedId = data?.id;
+                setUserId(fetchedId);
                 reset({
                     name: data.name || "",
                     email: data.email || "",
@@ -74,7 +71,6 @@ export default function EditUser() {
                     address2: data.address2 || "",
                     gstin: data.gstin || "",
                 });
-
                 setImageFolder(data?.imageFolder);
 
                 if (data?.company_logo) {
@@ -90,7 +86,7 @@ export default function EditUser() {
         };
 
         fetchData();
-    }, [id, reset]);
+    }, []);
 
     const onSubmit = async (data: any) => {
         try {
@@ -115,7 +111,7 @@ export default function EditUser() {
             if (selectedCompanyLogo instanceof File && selectedCompanyLogo.size > 0) {
                 formData.append("company_logo", selectedCompanyLogo);
             }
-            const response = await updateUser(id, formData);
+            const response = await updateProfile(userId, formData);
             if (response?.status === true) {
                 SwalSuccess("Profile has been updated successfully.");
                 handleBack(); // If you want to go back
@@ -574,4 +570,4 @@ export default function EditUser() {
             </main>
         </div>
     );
-}
+};

@@ -45,8 +45,8 @@ const Header = () => {
     if (!role) return;
     router.push(
       role === "1"
-        ? `/admin/myaccount/edit/${id}`
-        : `/user/myaccount/edit/${id}`
+        ? `/admin/myaccount`
+        : `/user/myaccount`
     );
     setIsProfileOpen(false);
   };

@@ -57,7 +57,7 @@ export const createUser = async (data: FormData): Promise<any> => {
   return response.data;
 };
 
-export const updateUser = async (id: string, data: any): Promise<{ status: boolean; message?: string }> => {
+export const updateUser = async (id: string | number, data: any): Promise<{ status: boolean; message?: string }> => {
   const response = await API.put(`/users/update/${id}`, data, {
     headers: { 'Content-Type': 'multipart/form-data', },
   });
@@ -65,7 +65,7 @@ export const updateUser = async (id: string, data: any): Promise<{ status: boole
 };
 
 // separate for users profile update
-export const updateProfile = async (id: string, data: any): Promise<{ status: boolean; message?: string }> => {
+export const updateProfile = async (id: string | number, data: any): Promise<{ status: boolean; message?: string }> => {
   const response = await API.put(`/update-profile/self/${id}`, data, {
     headers: { 'Content-Type': 'multipart/form-data', },
   });
