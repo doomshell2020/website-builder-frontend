@@ -77,7 +77,7 @@ export default function HeroSlider({ company, slug }: DefaultProps): JSX.Element
                 <h5 className="text-lg md:text-lg font-bold mb-3 uppercase">
                     {`WELCOME TO ${company || "JAIPUR FOOD CATERERS"}`}
                 </h5>
-                <h2 className="text-2xl md:text-2xl mb-6">
+                <h2 className="text-5xl leading-[3rem] mb-6">
                     Creating Unforgettable Dining Experiences for Your Guests
                 </h2>
                 <Button

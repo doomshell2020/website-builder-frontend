@@ -113,7 +113,7 @@ export default function Gallery({ project }: DefaultProps) {
             {/* Gallery Section */}
             {loading ? (<div className="min-h-[420px] flex items-center justify-center"><Loader /></div>) : (
                 <section className="flex flex-col items-center justify-center gap-8 bg-gray-200 px-6 py-[60px] w-full">
-                    <motion.header
+                    {/* <motion.header
                         initial={{ opacity: 0, y: -20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
@@ -126,7 +126,7 @@ export default function Gallery({ project }: DefaultProps) {
                         <h2 className="font-normal text-black text-xl sm:text-2xl font-[Manrope]">
                             Explore Our Work
                         </h2>
-                    </motion.header>
+                    </motion.header> */}
 
                     {/* Gallery Grid */}
                     <motion.div

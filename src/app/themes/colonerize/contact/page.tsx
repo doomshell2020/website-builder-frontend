@@ -441,7 +441,7 @@ export default function Contact({ project }: DefaultProps) {
                                     {isSubmitting ? (
                                         <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                                     ) : (
-                                        "Send Message"
+                                        "Submit"
                                     )}
                                 </Button>
                             </CardContent>

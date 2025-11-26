@@ -427,8 +427,8 @@ export default function BillingListPage() {
             sortFunction: (a, b) => Number(a.plantotalprice) - Number(b.plantotalprice)
         },
         {
-            name: "Actions",
-            width: "8%",
+            name: "Action",
+            width: "6%",
             cell: (row) => {
 
                 const expiryDate = row?.expiry_date ? new Date(row.expiry_date) : null;
@@ -440,7 +440,7 @@ export default function BillingListPage() {
                 return (
                     <div className="flex gap-2">
                         <button
-                            title="View Invoice"
+                            title="Download Invoice"
                             onClick={() => handleExportPDF(row)}>
                             <FileText size={18} className="text-red-600 hover:text-red-800" />
                         </button>

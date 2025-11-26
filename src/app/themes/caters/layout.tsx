@@ -15,6 +15,32 @@ export default function Layout({ children, project, }: { children: React.ReactNo
   );
 };
 
+
+// For Testimonials conditional rendering
+// "use client";
+// import "./caters.css";
+// import Header from "./components/header/page";
+// import Footer from "./components/footer/page";
+// import Testimonials from "./testimonials/page";
+// import { usePathname } from "next/navigation";
+
+// export default function Layout({ children, project }: { children: React.ReactNode; project: any }) {
+//   const pathname = usePathname();
+
+//   const showTestimonialsOn = ["/", "/home", "/about", "/contact", "/services", "/products"];
+//   const shouldShowTestimonials = showTestimonialsOn.some(route => pathname.startsWith(route));
+
+//   return (
+//     <div className="min-h-screen flex flex-col" id="caters-theme">
+//       <Header project={project} />
+//       <main className="flex-1">{children}</main>
+//       {shouldShowTestimonials && <Testimonials project={project} />}
+//       <Footer project={project} />
+//     </div>
+//   );
+// }
+
+
 // // app/themes/caters/layout.tsx
 // import "./caters.css";
 // import Header from "./components/header/page";

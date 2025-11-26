@@ -420,7 +420,7 @@ export default function Home({ project }: DefaultHomeProps) {
                             // onClick={() => router.push("/gallery")}
                             onClick={() => router.push("#")}
                         >
-                            Explore More
+                            View More
                         </Button>
                     </motion.div>
                 </section>

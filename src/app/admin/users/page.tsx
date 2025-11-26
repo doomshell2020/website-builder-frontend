@@ -198,30 +198,71 @@ const UsersListPage = () => {
         exportToExcel(exportData, "user_report");
     };
 
+    const formatStatus = (val: any) => {
+        if (val == null) return "Inactive";
+        const s = String(val).trim().toUpperCase();
+        return ["Y", "YES", "1", "TRUE"].includes(s) ? "Active" : "Inactive";
+    };
+
     const handleExportPDF = () => {
         if (filteredData.length === 0) {
             Swal.fire("Error!", "No user data available to Generate PDF.", "error",);
             return;
         }
+
+        const pdfRows = filteredData.map((row, index) => ({
+            sno: index + 1,
+            company: row.company_name ?? "N/A",
+            customer: `${row.name ?? ""}\n${row.email ?? ""}\n${row.mobile_no ?? ""}`,
+            subdomain: row.subdomain ?? "N/A",
+            customDomain: row.custom_domain ?? "",
+            subscription: row?.subscriptionData?.[0]
+                ? `${formatDate(row.subscriptionData[0].created)} – ${formatDate(row.subscriptionData[0].expiry_date)}\n${formatStatus(row.subscriptionData[0].status)}`
+                : "— —",
+        }));
+
         exportToPdf({
-            data: filteredData,
+            data: pdfRows,   // 👈 Send formatted rows
             filename: "user_report",
             heading: "User Report",
-            showSerialNo: true,
+            showSerialNo: false,
             columns: [
-                { key: "company_name", label: "Company Name" },
-                // { key: "name", label: "User Name" },
-                { key: "email", label: "Email" },
-                // { key: "mobile_no", label: "Mobile No" },
+                { key: "sno", label: "S.No" },
+                { key: "company", label: "Company Detail" },
+                { key: "customer", label: "Customer Detail" },
                 { key: "subdomain", label: "Subdomain" },
-                { key: "custom_domain", label: "Custom Domain" },
-                { key: "approval", label: "Approval Status" },
-                { key: "createdAt", label: "Created" },
+                { key: "customDomain", label: "Custom Domain" },
+                { key: "subscription", label: "Subscription Details" },
             ],
         });
 
     };
 
+    // const handleExportPDF = () => {
+    //     if (filteredData.length === 0) {
+    //         Swal.fire("Error!", "No user data available to Generate PDF.", "error",);
+    //         return;
+    //     }
+    //     exportToPdf({
+    //         data: filteredData,
+    //         filename: "user_report",
+    //         heading: "User Report",
+    //         showSerialNo: true,
+    //         columns: [
+    //             { key: "company_name", label: "Company Name" },
+    //             // { key: "name", label: "User Name" },
+    //             { key: "email", label: "Email" },
+    //             // { key: "mobile_no", label: "Mobile No" },
+    //             { key: "subdomain", label: "Subdomain" },
+    //             { key: "custom_domain", label: "Custom Domain" },
+    //             { key: "status", label: "Approval Status" },
+    //             { key: "createdAt", label: "Created" },
+    //         ],
+    //     });
+
+    // };
+
+    
     const handleSubsStatusChange = async (id: number, currentStatus: string) => {
         const newStatus = currentStatus === "Y" ? "N" : "Y";
         const result = await Swal.fire({

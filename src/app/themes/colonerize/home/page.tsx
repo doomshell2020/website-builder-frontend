@@ -147,7 +147,6 @@ export default function Home({ project }: DefaultHomeProps) {
         fetchGalleryImages();
     }, [project]);
 
-
     const containerVariants: Variants = {
         hidden: { opacity: 0, y: 50 },
         visible: {
@@ -833,7 +832,7 @@ export default function Home({ project }: DefaultHomeProps) {
                                     {isSubmitting ? (
                                         <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                                     ) : (
-                                        "Send Message"
+                                        "Submit"
                                     )}
                                 </Button>
                             </CardContent>

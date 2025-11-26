@@ -215,8 +215,8 @@ const LoginScreen = () => {
 
               <div className="mt-6 text-center">
                 <Link
-                  // href="/administrator/forgot-password"
-                  href="#"
+                  href="/administrator/forgot-password"
+                  // href="#"
                   className="text-sm text-red-500 hover:text-red-700 font-medium transition-colors"
                 >
                   Forgot password?

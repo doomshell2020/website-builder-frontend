@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { User } from "@/types/user";
 import { Label } from "@/components/ui/Label";
 import { Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
-interface DefaultProps {  project?: User;};
+interface DefaultProps { project?: User; };
 
 const navigationItems = [
   { label: "About", to: "/about" },
@@ -82,7 +82,8 @@ export default function Footer({ project }: DefaultProps) {
       </div> */}
       <div className="w-full bg-[#000214] flex flex-col md:flex-row items-center justify-between px-6 sm:px-10 lg:px-20 py-4">
         <p className="text-white text-sm text-center md:text-left">
-          Copyright © {new Date().getFullYear()} {project?.company_name}: All Rights Reserved.
+          Copyright © {new Date().getFullYear()} Navlok: All Rights Reserved.
+          {/* {project?.company_name} */}
         </p>
         <p className="text-white text-sm md:mt-0 text-center md:text-right">
           Designed by {" "}
