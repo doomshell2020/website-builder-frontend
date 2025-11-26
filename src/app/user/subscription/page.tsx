@@ -6,7 +6,7 @@ import { FileText } from "lucide-react";
 import { logout } from "@/lib/auth";
 import { AdminProfile } from "@/services/admin.service";
 import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
-import { getUserSubscriptionsById } from "@/services/subscription.service";
+import { getUserSubscriptionsById, getUserSubscriptionByInvoiceId } from "@/services/subscription.service";
 import { formatDate } from "@/lib/date";
 import { formatPrice } from "@/lib/price";
 import PaginatedDataTable from "@/components/PaginatedDataTablet";
@@ -28,6 +28,7 @@ export default function BillingListPage() {
     const [totalRows, setTotalRows] = useState(0);
     const [searchText, setSearchText] = useState("");
     const [userId, setUserId] = useState<string | number>("");
+    const [subscription, setSubscription] = useState<SubscriptionAttribute | null>(null);
     const handleBack = () => { router.back(); };
 
     useEffect(() => {
@@ -49,22 +50,30 @@ export default function BillingListPage() {
         fetchUser();
     }, []);
 
-    const fetchData = useCallback(
+    const fetchAllData = useCallback(
         async (currentPage = page, currentLimit = limit) => {
-            if (!userId) return; // wait until userId is fetched
+            if (!userId) return;
+
             try {
                 setLoading(true);
-                const res: any = await getUserSubscriptionsById(userId, currentPage, currentLimit);
-                const result = res?.result;
-                const data: SubscriptionAttribute[] = Array.isArray(result?.data)
-                    ? result.data
-                    : [];
+
+                const [subsListRes, activeSubRes]: any = await Promise.all([
+                    getUserSubscriptionsById(userId, currentPage, currentLimit),
+                    getUserSubscriptionByInvoiceId(userId)
+                ]);
+
+                // List data
+                const result = subsListRes?.result;
+                const data: SubscriptionAttribute[] = Array.isArray(result?.data) ? result.data : [];
                 setData(data);
                 setFilteredData(data);
                 setTotalRows(result?.total || 0);
 
+                // Active subscription
+                setSubscription(activeSubRes?.result || null);
+
             } catch (error) {
-                console.error("Failed to fetch invoices:", error);
+                console.error("Failed to fetch subscription data:", error);
             } finally {
                 setLoading(false);
             }
@@ -73,8 +82,8 @@ export default function BillingListPage() {
     );
 
     useEffect(() => {
-        fetchData(page, limit);
-    }, [fetchData, page, limit]);
+        fetchAllData(page, limit);
+    }, [fetchAllData]);
 
     const normalize = (str: string) => str.toLowerCase().trim().replace(/[\s₹,.-]/g, "");
     const normalizeNumber = (num: any) => String(num || "").toLowerCase().replace(/[^0-9]/g, "");
@@ -255,7 +264,7 @@ export default function BillingListPage() {
             }
         },
         {
-            name: "Company Detail",
+            name: "Customer Details",
             selector: (row) => row?.Customer?.name || row?.Customer?.email || "",
             sortable: true,
             cell: (row) => {
@@ -417,54 +426,153 @@ export default function BillingListPage() {
             ),
             sortFunction: (a, b) => Number(a.plantotalprice) - Number(b.plantotalprice)
         },
-        // {
-        //     name: "Actions",
-        //     width: "8%",
-        //     cell: (row) => {
+        {
+            name: "Actions",
+            width: "8%",
+            cell: (row) => {
 
-        //         const expiryDate = row?.expiry_date ? new Date(row.expiry_date) : null;
-        //         const today = new Date();
-        //         today.setHours(0, 0, 0, 0);
-        //         if (expiryDate) { expiryDate.setHours(0, 0, 0, 0); }
-        //         const isExpired = expiryDate ? expiryDate < today : false;
+                const expiryDate = row?.expiry_date ? new Date(row.expiry_date) : null;
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                if (expiryDate) { expiryDate.setHours(0, 0, 0, 0); }
+                const isExpired = expiryDate ? expiryDate < today : false;
 
-        //         return (
-        //             <div className="flex gap-2">
-        //                 <button
-        //                     title="View Invoice"
-        //                     onClick={() => handleExportPDF(row)}>
-        //                     <FileText size={18} className="text-red-600 hover:text-red-800" />
-        //                 </button>
-
-        //                 <button
-        //                     title="Update Subscription"
-        //                     disabled={isExpired}
-        //                     onClick={() => router.push(`/admin/subscription/update/${row.id}`)}
-        //                 >
-        //                     <Edit size={18} color={isExpired ? "gray" : "green"} />
-        //                 </button>
-
-        //                 <button
-        //                     title="Send Email"
-        //                     disabled={row.status === "N" || isExpired}
-        //                     onClick={() => handleSendEmail(row.Customer.id)}
-        //                 >
-        //                     <Mail
-        //                         size={18}
-        //                         className={row.status === "N"
-        //                             ? "text-gray-400 cursor-not-allowed"
-        //                             : "text-purple-600 hover:text-purple-800"}
-        //                     />
-        //                 </button>
-        //             </div>)
-        //     }
-        // }
+                return (
+                    <div className="flex gap-2">
+                        <button
+                            title="View Invoice"
+                            onClick={() => handleExportPDF(row)}>
+                            <FileText size={18} className="text-red-600 hover:text-red-800" />
+                        </button>
+                    </div>)
+            }
+        }
     ], [page, limit]);
 
     const handleClick = () => { setIsLoading(true); router.push(`/user/subscription/active`); };
 
     return (
         <div className="min-h-screen">
+            <main className="max-w-10xl py-2">
+                <div className="border shadow-xl p-2">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl font-medium text-gray-800">
+                            Active Subscription
+                        </h2>
+                        {/* <Button
+                            title="Click to back"
+                            onClick={handleBack}
+                            className="min-w-[80px] p-2 rounded-[5px] bg-yellow-600 text-white hover:bg-yellow-700"
+                        >
+                            {isLoading ? (
+                                <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                            ) : (
+                                <> Back to Invoices </>
+                            )}
+                        </Button> */}
+                    </div>
+
+                    {loading
+                        ? (
+                            // 1️⃣ LOADING STATE
+                            <div className="flex justify-center items-center h-64">
+                                <Loader />
+                            </div>
+                        )
+                        : !subscription
+                            ? (
+                                // 2️⃣ EMPTY RESULT STATE
+                                <div className="bg-white border border-gray-200 rounded-xl shadow-md p-10 text-center">
+                                    <p className="text-lg font-semibold text-gray-700">
+                                        No subscription purchased yet
+                                    </p>
+                                    <p className="text-gray-500 mt-1 text-sm">
+                                        Once you purchase a plan, details will appear here.
+                                    </p>
+                                </div>
+                            )
+                            : (
+                                <div className="relative bg-white border border-gray-200 rounded-xl shadow-md p-5">
+                                    {subscription?.status === 'N' && (
+                                        <div className="mb-4 p-2">
+                                            <span className="text-2xl font-bold text-red-600"> You currently don’t have an active plan. If you believe this is a mistake, please review your last purchase or contact support.</span>
+                                        </div>
+                                    )}
+                                    <div className="border p-5 rounded-xl shadow-sm bg-white">
+                                        <div className="flex justify-between items-center">
+                                            <h2 className="text-lg font-semibold text-gray-900">{subscription?.Plan?.name} Plan</h2>
+                                            <span className={`px-3 py-1 text-sm rounded 
+                                            ${subscription?.status === 'Y' ? 'bg-green-100 text-green-700'
+                                                    : 'bg-red-100 text-red-700'}`}>
+                                                {subscription?.status === 'Y' ? 'Active' : 'Inactive'}
+                                            </span>
+
+                                        </div>
+
+                                        <div className="grid grid-cols-1 gap-4 mt-4 text-sm text-gray-600">
+                                            <p><strong>Price:</strong> ₹{subscription?.Plan?.price || "price"}</p>
+                                            <p><strong>Yearly Plan</strong></p>
+                                            <p><strong>Start Date:</strong> {formatDate(subscription?.created)}</p>
+                                            <p><strong>Expiry Date:</strong> {formatDate(subscription?.expiry_date)}</p>
+                                        </div>
+
+                                        {/* <div className="mt-3 text-blue-600 font-medium">
+                                            {"daysLeft"} days remaining
+                                        </div> */}
+                                    </div>
+                                    <div className="mt-6">
+                                        <h3 className="font-medium text-gray-800 mb-2">Billing & Invoices</h3>
+                                        <table className="w-full text-sm border-collapse">
+                                            <thead>
+                                                <tr className="bg-gray-100 text-gray-600 uppercase text-xs">
+                                                    <th className="p-2 text-left">Invoice</th>
+                                                    <th className="p-2 text-left">Date</th>
+                                                    <th className="p-2 text-left">Amount</th>
+                                                    <th className="p-2 text-left">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr className="border-b">
+                                                    <td className="p-2">{String(subscription?.id ?? 0).padStart(6, "0")}</td>
+                                                    <td className="p-2">{formatDate(subscription?.created)}</td>
+                                                    <td className="p-2 font-medium">
+                                                        ₹{formatPrice(Math.round(Number(subscription?.plantotalprice ?? "0")))}
+                                                    </td>
+
+                                                    <td className="p-2">
+                                                        <button className="text-blue-600 hover:underline"
+                                                            onClick={() => handleExportPDF(subscription)}>Download PDF</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div className="mt-6 bg-blue-50 p-4 rounded-lg">
+                                        <h3 className="font-medium text-gray-800">Renewal Settings</h3>
+                                        <p className="text-sm text-gray-600 mt-3">
+                                            All renewals and plan changes are managed by our admin team.
+                                            If you need help updating your plan, billing details, or if there’s any issue,
+                                            please contact our support:
+                                        </p>
+
+                                        <div className="mt-2 text-sm text-gray-700">
+                                            📧 <strong>contact@doomshell.com</strong><br />
+                                            📞 <strong>+91 8005523567</strong>
+                                        </div>
+                                    </div>
+                                    {/* <div className="fixed bottom-8 right-4 flex gap-3">
+                                        <Button
+                                            onClick={() => handleExportPDF(subscription)}
+                                            className="px-4 py-2 bg-green-600 text-white rounded-[6px] hover:bg-green-700">
+
+                                            Download Invoice
+                                        </Button>
+                                    </div> */}
+                                </div>
+                            )}
+                </div>
+            </main >
+
             <main className="max-w-10xl py-2">
                 <div className="border shadow-xl p-2">
                     <div className="flex justify-between items-center mb-6">
@@ -491,7 +599,7 @@ export default function BillingListPage() {
 
                                 <div className="flex justify-end relative">
                                     <div className="ml-2">
-                                        <Button
+                                        {/* <Button
                                             title="Click to view active subscription details"
                                             onClick={handleClick}
                                             className="min-w-[80px] p-2 rounded-[5px] bg-blue-600 text-white hover:bg-blue-700"
@@ -504,29 +612,26 @@ export default function BillingListPage() {
                                                     View Active Subscription
                                                 </>
                                             )}
-                                        </Button>
-
+                                        </Button> */}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </header>
                     <div className="relative">
-                        {loading ? (<Loader />) : (
-                            <PaginatedDataTable
-                                title="Subscription"
-                                columns={columns}
-                                data={filteredData}
-                                page={page}
-                                itemsPerPage={limit}
-                                totalCount={totalRows}
-                                onPageChange={setPage}
-                                onPerPageChange={(newLimit) => {
-                                    setLimit(newLimit);
-                                    setPage(1);
-                                }}
-                            />
-                        )}
+                        <PaginatedDataTable
+                            title="Subscription"
+                            columns={columns}
+                            data={filteredData}
+                            page={page}
+                            itemsPerPage={limit}
+                            totalCount={totalRows}
+                            onPageChange={setPage}
+                            onPerPageChange={(newLimit) => {
+                                setLimit(newLimit);
+                                setPage(1);
+                            }}
+                        />
                     </div>
                 </div>
             </main >

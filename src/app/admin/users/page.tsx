@@ -170,21 +170,29 @@ const UsersListPage = () => {
             Swal.fire("Error!", "No user data available to export.", "error");
             return;
         }
-        const exportData = filteredData.map((row) => ({
+
+        const exportData = filteredData.map((row: any) => ({
             "Company Name": row.company_name || "N/A",
             "User Name": row.name || "N/A",
             "Email": row.email || "N/A",
             "Mobile No": row.mobile_no || "N/A",
             "Subdomain": row.subdomain || "N/A",
             "Custom Domain": row.custom_domain || "N/A",
-            "Approval": row.approval || "N/A",
+            "User Status": row.status || "N/A",
+
+            "Active Plan": row?.subscriptionData?.[0]?.Plan?.name || "N/A",
+            // "Plan Price": row?.subscriptionData?.[0]?.Plan?.price || "N/A",
+            "Subscription Status": row?.subscriptionData?.[0]?.status || "N/A",
+            "Subscription Start Date": row?.subscriptionData?.[0]?.created || "N/A",
+            "Subscription Expiry Date": row?.subscriptionData?.[0]?.expiry_date || "N/A",
+            "Total Amount": Math.round(row?.subscriptionData?.[0]?.plantotalprice) || "N/A",
+
             "Facebook": row.fburl || "N/A",
             "Twitter": row.xurl || "N/A",
             "Instagram": row.instaurl || "N/A",
             "LinkedIn": row.linkedinurl || "N/A",
             "Youtube": row.yturl || "N/A",
             "Address": row.address1 || "N/A",
-            // "Status": row.status || "N/A",
             "Created": row.createdAt || "N/A",
         }));
         exportToExcel(exportData, "user_report");

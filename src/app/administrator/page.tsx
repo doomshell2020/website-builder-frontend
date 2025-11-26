@@ -12,9 +12,10 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AdminLogin } from '@/services/admin.service';
-import { setToken, setLogo, setSchema, getToken,setFolder, setRole } from '@/lib/auth';
+import { setToken, setLogo, setSchema, getToken, setFolder, setRole } from '@/lib/auth';
 import { SwalError } from "@/components/ui/SwalAlert";
 import ReCAPTCHA from "react-google-recaptcha";
+import Link from "next/link";
 type LoginFormData = z.infer<typeof schema>;
 const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY_V3 as string; // use env var
 
@@ -213,12 +214,13 @@ const LoginScreen = () => {
               </form>
 
               <div className="mt-6 text-center">
-                <a
+                <Link
+                  // href="/administrator/forgot-password"
                   href="#"
                   className="text-sm text-red-500 hover:text-red-700 font-medium transition-colors"
                 >
-                  Forgot your password?
-                </a>
+                  Forgot password?
+                </Link>
               </div>
             </CardContent>
           </Card>

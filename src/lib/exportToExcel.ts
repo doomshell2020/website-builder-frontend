@@ -56,25 +56,75 @@ export const exportToExcel = async (data: any[], filename: string) => {
     return ["Y", "YES", "1", "TRUE"].includes(s) ? "Active" : "Inactive";
   };
 
+  const formatPrice = (val: any) => {
+    if (!val || isNaN(val)) return "N/A";
+    return `₹ ${Number(val).toLocaleString("en-IN")}`;
+  };
+
   // 3️⃣ Add data rows
   data.forEach((item, index) => {
     const row = [
       index + 1,
       ...Object.keys(data[0]).map((key) => {
-        // If the key is "createdAt", format it to readable AM/PM format
-        if (key.toLowerCase() === "created") {
+        const lower = key.toLowerCase();
+
+        // ⏳ Date / Time fields
+        if (
+          lower.includes("date") ||
+          lower.includes("created") ||
+          lower.includes("expiry") ||
+          lower.includes("start")
+        ) {
           return formatDateTime(item[key]);
         }
-        if (key.toLowerCase() === "approval") {
+
+        // 🔘 Status fields
+        if (
+          lower.includes("status") ||
+          lower.includes("approval")
+        ) {
           return formatStatus(item[key]);
         }
-        if (key.toLowerCase() === "status") {
-          return formatStatus(item[key]);
+
+        // 💰 Price / Money fields
+        if (
+          lower.includes("price") ||
+          lower.includes("amount") ||
+          lower.includes("total") ||
+          lower.includes("tax") ||
+          lower.includes("paid")
+        ) {
+          return formatPrice(item[key]);
         }
+
         return item[key];
       }),
     ];
+
     worksheet.addRow(row);
+  });
+
+  // 🔍 Detect price columns
+  const priceColumnIndexes: number[] = [];
+  worksheet.getRow(1).eachCell((cell, colNumber) => {
+    const text = String(cell.value).toLowerCase();
+    if (
+      text.includes("price") ||
+      text.includes("amount") ||
+      text.includes("total") ||
+      text.includes("tax") ||
+      text.includes("paid")
+    ) {
+      priceColumnIndexes.push(colNumber);
+    }
+  });
+
+  // 🎯 Apply right alignment to price cells
+  worksheet.eachRow((row, rowIndex) => {
+    if (rowIndex === 1) return; // skip header
+    priceColumnIndexes.forEach((col) => {
+      row.getCell(col).alignment = { horizontal: "right" };
+    });
   });
 
   // 4️⃣ Auto-fit column widths
