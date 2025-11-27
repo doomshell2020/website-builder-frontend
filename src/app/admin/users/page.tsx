@@ -427,14 +427,14 @@ const UsersListPage = () => {
                     row?.subdomain ? (
                         <div className="flex items-center gap-2">
                             {/* <Link
-                                href={`https://${row.subdomain}.baaraat.com`}
+                                href={`https://${row.subdomain}.xpertart.com`}
                                 target="_blank"
                                 className="text-blue-600 hover:underline"
                             >
                             </Link> */}
                             {/* {`${row.subdomain}`} */}
                             <Link
-                                href={`https://${row.subdomain}.baaraat.com`}
+                                href={`https://${row.subdomain}.xpertart.com`}
                                 target="_blank"
                                 className="text-black font-medium hover:text-blue-700" >
                                 {/* <ExternalLink className="w-4 h-4" /> */}

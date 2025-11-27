@@ -161,6 +161,11 @@ export const addUserSchema = z.object({
     }).refine((file) => file instanceof File, {
         message: "Please upload a valid company logo",
     }),
+    favicon: z.custom<File>((file) => file instanceof File && file.size > 0, {
+        message: "Favicon is required",
+    }).refine((file) => file instanceof File, {
+        message: "Please upload a valid favicon logo",
+    }),
     fburl: z.string().url("Invalid facebook url").nullable().optional().or(z.literal("")),
     xurl: z.string().url("Invalid twitter url").nullable().optional().or(z.literal("")),
     linkedinurl: z.string().url("Invalid linkedIn url").nullable().optional().or(z.literal("")),
@@ -186,6 +191,15 @@ export const updateUserSchema = addUserSchema.partial().extend({
                 !file ||
                 (file instanceof File && file.size > 0),
             { message: "Please upload a valid company logo" }
+        ),
+    favicon: z
+        .any()
+        .optional()
+        .refine(
+            (file) =>
+                !file ||
+                (file instanceof File && file.size > 0),
+            { message: "Please upload a valid favicon logo" }
         ),
     subdomain: z.string().optional(),
 });

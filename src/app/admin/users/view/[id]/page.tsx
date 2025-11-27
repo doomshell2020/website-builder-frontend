@@ -112,68 +112,83 @@ const UsersViewPage = () => {
                             </section>
 
                             {/* Subscription Information */}
-                            <section>
-                                <h2 className="text-lg font-semibold text-gray-900 border-b pb-2 mb-4">
-                                    Subscription Information
-                                </h2>
-                                <div className="space-y-4">
+                            {data?.subscriptionData?.[0]
+                                ? (
+                                    <section>
+                                        <h2 className="text-lg font-semibold text-gray-900 border-b pb-2 mb-4">
+                                            Subscription Information
+                                        </h2>
+                                        <div className="space-y-4">
 
-                                    <div className="flex flex-row justify-between items-center">
-                                        <div className="flex flex-col">
-                                            <p className="text-base font-semibold text-gray-800">{data?.subscriptionData?.[0]?.Plan?.name + ' Plan' || "N/A"}</p>
-                                            <p className="text-sm text-gray-700 font-medium">
-                                                Plan Price:&nbsp;
-                                                {data?.subscriptionData?.[0]?.Plan?.price ? (
-                                                    <span className="text-gray-900 font-semibold">
-                                                        {formatPrice(data.subscriptionData[0].Plan.price)} / year
+                                            <div className="flex flex-row justify-between items-center">
+                                                <div className="flex flex-col">
+                                                    <p className="text-base font-semibold text-gray-800">{data?.subscriptionData?.[0]?.Plan?.name + ' Plan' || "N/A"}</p>
+                                                    <p className="text-sm text-gray-700 font-medium">
+                                                        Plan Price:&nbsp;
+                                                        {data?.subscriptionData?.[0]?.Plan?.price ? (
+                                                            <span className="text-gray-900 font-semibold">
+                                                                {formatPrice(data.subscriptionData[0].Plan.price)} / year
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-gray-500">N/A</span>
+                                                        )}
+                                                    </p>
+
+                                                </div>
+                                                <p className="text-base text-gray-800">
+                                                    <span
+                                                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold border ${data?.subscriptionData?.[0]?.status === "Y"
+                                                            ? "bg-green-100 text-green-700 border-green-300"
+                                                            : data?.subscriptionData?.[0]?.status === "N"
+                                                                ? "bg-red-100 text-red-700 border-red-300"
+                                                                : "bg-gray-100 text-gray-600 border-gray-300"
+                                                            }`
+                                                        }>
+                                                        <span
+                                                            className={`h-2 w-2 rounded-full ${data?.subscriptionData?.[0]?.status === "Y"
+                                                                ? "bg-green-500"
+                                                                : data?.subscriptionData?.[0]?.status === "N"
+                                                                    ? "bg-red-500"
+                                                                    : "bg-gray-500"
+                                                                } `}
+                                                        />
+                                                        {data?.subscriptionData?.[0]?.status === "Y" ? "Active" : data?.subscriptionData?.[0]?.status === "N" ? "Inactive" : "N/A"}
                                                     </span>
-                                                ) : (
-                                                    <span className="text-gray-500">N/A</span>
-                                                )}
-                                            </p>
+                                                </p>
+                                            </div>
 
-                                        </div>
-                                        <p className="text-base text-gray-800">
-                                            <span
-                                                className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold border ${data?.subscriptionData?.[0]?.status === "Y"
-                                                    ? "bg-green-100 text-green-700 border-green-300"
-                                                    : data?.subscriptionData?.[0]?.status === "N"
-                                                        ? "bg-red-100 text-red-700 border-red-300"
-                                                        : "bg-gray-100 text-gray-600 border-gray-300"
-                                                    }`
-                                                }>
-                                                <span
-                                                    className={`h-2 w-2 rounded-full ${data?.subscriptionData?.[0]?.status === "Y"
-                                                        ? "bg-green-500"
-                                                        : data?.subscriptionData?.[0]?.status === "N"
-                                                            ? "bg-red-500"
-                                                            : "bg-gray-500"
-                                                        } `}
-                                                />
-                                                {data?.subscriptionData?.[0]?.status === "Y" ? "Active" : data?.subscriptionData?.[0]?.status === "N" ? "Inactive" : "N/A"}
-                                            </span>
-                                        </p>
-                                    </div>
+                                            <div>
+                                                <p className="text-sm text-gray-600 font-medium mb-1">
+                                                    Subscription Duration
+                                                </p>
+                                                <div className="flex flex-wrap items-center gap-2 text-sm text-gray-800">
+                                                    <span>{formatDate(data?.subscriptionData?.[0]?.created) ?? "N/A"}</span>
+                                                    <span className="text-gray-500">—</span>
+                                                    <span className={isExpired ? "text-red-600 font-semibold" : "text-gray-800"}>
+                                                        {formatDate(data?.subscriptionData?.[0]?.expiry_date) ?? "N/A"}
+                                                    </span>
+                                                </div>
+                                            </div>
 
-                                    <div>
-                                        <p className="text-sm text-gray-600 font-medium mb-1">
-                                            Subscription Duration
-                                        </p>
-                                        <div className="flex flex-wrap items-center gap-2 text-sm text-gray-800">
-                                            <span>{formatDate(data?.subscriptionData?.[0]?.created) ?? "N/A"}</span>
-                                            <span className="text-gray-500">—</span>
-                                            <span className={isExpired ? "text-red-600 font-semibold" : "text-gray-800"}>
-                                                {formatDate(data?.subscriptionData?.[0]?.expiry_date) ?? "N/A"}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* <div>
+                                            {/* <div>
                                         <p className="text-sm text-gray-600 font-medium">Paid Amount</p>
                                         <p className="text-base text-gray-800">{"₹ " + formatPrice(Math.round(data?.subscriptionData?.[0]?.plantotalprice)) || "N/A"}</p>
                                     </div> */}
-                                </div>
-                            </section>
+                                        </div>
+                                    </section>
+                                )
+                                : (<section>
+                                    <h2 className="text-lg font-semibold text-gray-900 border-b pb-2 mb-4">
+                                        Subscription Information
+                                    </h2>
+
+                                    <div className="space-y-4">
+                                        <div className="flex flex-row justify-between items-center text-red-600 font-medium">
+                                            Subscription has not been purchased yet.
+                                        </div>
+                                    </div>
+                                </section>
+                                )}
 
                             {/* Address Information */}
                             <section>

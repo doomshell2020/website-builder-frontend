@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter, useParams } from "next/navigation";
 import CompanyLogoUpload from "@/components/CompanyLogoUpload";
+import FaviconUpload from "@/components/FaviconUploader";
 import { ChevronDown, HelpCircle } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent, } from "@/components/ui/popover";
 import { Label } from "@/components/ui/Label";
@@ -46,6 +47,8 @@ export default function UpdateUser() {
 
     const [selectedCompanyLogo, setSelectedCompanyLogo] = useState<File | null>(null);
     const [previewCompanyLogo, setPreviewCompanyLogo] = useState<string | null>(null);
+    const [selectedFavicon, setSelectedFavicon] = useState<File | null>(null);
+    const [previewFavicon, setPreviewFavicon] = useState<string | null>(null);
     const [websiteTypes, setWebsiteTypes] = useState<ThemeAttribute[]>([]);
 
     const handleBack = () => { router.back(); };
@@ -96,6 +99,9 @@ export default function UpdateUser() {
                     if (data?.company_logo) {
                         setPreviewCompanyLogo(`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.company_logo}`);
                     }
+                    if (data?.favicon) {
+                        setPreviewFavicon(`${process.env.NEXT_PUBLIC_IMAGE_URL}${data.favicon}`);
+                    }
                 }
             } catch (error) {
                 SwalError({
@@ -144,6 +150,9 @@ export default function UpdateUser() {
             appendIfValid("website_type", data.website_type);
             if (selectedCompanyLogo instanceof File && selectedCompanyLogo.size > 0) {
                 formData.append("company_logo", selectedCompanyLogo);
+            }
+            if (selectedFavicon instanceof File && selectedFavicon.size > 0) {
+                formData.append("favicon", selectedFavicon);
             }
             // ✅ Call API
             const response = await updateUser(id, formData);
@@ -449,7 +458,6 @@ export default function UpdateUser() {
                                                             field.onChange(file);
                                                             setSelectedCompanyLogo(file);
                                                         }}
-                                                        // defaultImage={null}
                                                         defaultImage={previewCompanyLogo ?? null}
                                                     />
                                                 )}
@@ -463,55 +471,88 @@ export default function UpdateUser() {
                                     </div>
                                 </div>
 
-                                {/* Company GST No. */}
-                                <div className="flex flex-col col-span-1 md:col-span-1">
-                                    <Label htmlFor="gstin" className="mb-1 font-medium">
-                                        Company GST No. (If you have)
-                                    </Label>
-                                    <Input
-                                        id="gstin"
-                                        type="text"
-                                        placeholder="eg. 22AAAAA0000A1Z5"
-                                        {...register("gstin")}
-                                        className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        maxLength={15}
-                                    />
-                                    {errors?.gstin?.message && (
-                                        <p className="text-red-500 text-sm mt-1">{errors.gstin.message}</p>
-                                    )}
-                                </div>
-
-                                {/* GST type */}
-                                <div className="flex flex-col gap-2">
-                                    <Label className="mb-1 font-medium">
-                                        GST Type <span className="text-red-600">*</span>
-                                    </Label>
-
-                                    <div className="flex gap-6">
-                                        <label className="flex items-center gap-2 cursor-pointer font-medium">
-                                            <input
-                                                type="radio"
-                                                value="CGST_SGST"
-                                                {...register("gst_type")}
-                                                className="cursor-pointer"
+                                {/* Favicon -- GST */}
+                                <div className="flex flex-col col-span-1 md:col-span-2">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black">
+                                        {/** Favicon */}
+                                        <div className="flex flex-col col-span-1">
+                                            <Label className="mb-1 font-medium">
+                                                Favicon <span className="text-red-600">*</span>
+                                            </Label>
+                                            <Controller
+                                                name="favicon"
+                                                control={control}
+                                                rules={{ required: "Favicon is required" }}
+                                                render={({ field }) => (
+                                                    <FaviconUpload
+                                                        onFileSelect={(file) => {
+                                                            field.onChange(file);
+                                                            setSelectedFavicon(file);
+                                                        }}
+                                                        defaultFavicon={previewFavicon ?? null}
+                                                    />
+                                                )}
                                             />
-                                            CGST + SGST
-                                        </label>
+                                            {typeof errors?.favicon?.message === "string" && (
+                                                <p className="text-red-500 text-sm">{errors.favicon.message}</p>
+                                            )}
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-1 gap-4 col-span-1">
 
-                                        <label className="flex items-center gap-2 cursor-pointer font-medium">
-                                            <input
-                                                type="radio"
-                                                value="IGST"
-                                                {...register("gst_type")}
-                                                className="cursor-pointer"
-                                            />
-                                            IGST
-                                        </label>
+                                            {/* GST type */}
+                                            <div className="flex flex-col gap-2">
+                                                <Label className="mb-1 font-medium">
+                                                    GST Type <span className="text-red-600">*</span>
+                                                </Label>
+
+                                                <div className="flex gap-6">
+                                                    <label className="flex items-center gap-2 cursor-pointer font-medium">
+                                                        <input
+                                                            type="radio"
+                                                            value="CGST_SGST"
+                                                            {...register("gst_type")}
+                                                            className="cursor-pointer"
+                                                        />
+                                                        CGST + SGST
+                                                    </label>
+
+                                                    <label className="flex items-center gap-2 cursor-pointer font-medium">
+                                                        <input
+                                                            type="radio"
+                                                            value="IGST"
+                                                            {...register("gst_type")}
+                                                            className="cursor-pointer"
+                                                        />
+                                                        IGST
+                                                    </label>
+                                                </div>
+
+                                                {errors.gst_type && (
+                                                    <p className="text-red-500 text-sm">{errors.gst_type.message}</p>
+                                                )}
+                                            </div>
+
+                                            {/* Company GST No. */}
+                                            <div className="flex flex-col col-span-1 md:col-span-1">
+                                                <Label htmlFor="gstin" className="mb-1 font-medium">
+                                                    Company GST No. (If you have)
+                                                </Label>
+                                                <Input
+                                                    id="gstin"
+                                                    type="text"
+                                                    placeholder="eg. 22AAAAA0000A1Z5"
+                                                    {...register("gstin")}
+                                                    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    maxLength={15}
+                                                />
+                                                {errors?.gstin?.message && (
+                                                    <p className="text-red-500 text-sm mt-1">{errors.gstin.message}</p>
+                                                )}
+                                            </div>
+
+                                        </div>
+
                                     </div>
-
-                                    {errors.gst_type && (
-                                        <p className="text-red-500 text-sm">{errors.gst_type.message}</p>
-                                    )}
                                 </div>
 
                             </div>

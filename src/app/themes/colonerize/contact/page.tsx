@@ -148,7 +148,7 @@ export default function Contact({ project }: DefaultProps) {
                 .replaceAll('{SUBJECT}', data?.subject)
                 .replaceAll('{COMPANY_PHONE}', project?.mobile_no)
                 .replaceAll('{COMPANY_NAME}', project?.company_name)
-                .replaceAll('{SITE_URL}', `https://${project?.subdomain}.baaraat.com`)
+                .replaceAll('{SITE_URL}', `https://${project?.subdomain}.xpertart.com`)
                 .replaceAll('{DATE}', `${new Date().getFullYear()}`)
                 .replaceAll('{LOGO_URL}', `https://navlokcolonizers.com/wp-content/uploads/2025/08/logo-300x141.png`);
 

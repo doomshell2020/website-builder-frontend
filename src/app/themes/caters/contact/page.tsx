@@ -146,7 +146,7 @@ export default function Contact({ project }: DefaultProps) {
                 .replaceAll('{SUBJECT}', data?.subject)
                 .replaceAll('{COMPANY_PHONE}', project?.mobile_no)
                 .replaceAll('{COMPANY_NAME}', project?.company_name)
-                .replaceAll('{SITE_URL}', `https://${project?.subdomain}.baaraat.com`)
+                .replaceAll('{SITE_URL}', `https://${project?.subdomain}.xpertart.com`)
                 .replaceAll('{DATE}', `${new Date().getFullYear()}`)
                 .replaceAll("{HEADER_BG_IMAGE}", "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=1200&q=80")
                 .replaceAll('{LOGO_URL}', `https://jaipurfoodcaterers.com/wp-content/themes/twentytwenty-child/assets/images/logo.png`);

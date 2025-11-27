@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
     host.includes("webbuilder.local");
 
   // ------------------ Domain setup ------------------
-  const MAIN_DOMAIN = "baaraat.com";
+  const MAIN_DOMAIN = "xpertart.com";
   const LOCAL_DEV_DOMAIN = "webbuilder.local";
   const VERCEL_DOMAIN = "website-builder-frontend-three.vercel.app";
   const LOCAL_DOMAINS = ["localhost:3000", "webbuilder.local:3000"];
@@ -64,7 +64,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // ------------------ Subdomains for projects ------------------
-  // Example: jaipurfoodcaterers.webbuilder.local / navlok.baaraat.com
+  // Example: jaipurfoodcaterers.webbuilder.local / navlok.xpertart.com
 if (
   [MAIN_DOMAIN, LOCAL_DEV_DOMAIN].includes(baseDomain?.toLowerCase().replace(/\.$/, "")) &&
   subdomain &&
@@ -83,7 +83,7 @@ if (
 
 
   // ------------------ Custom external domains ------------------
-  // Example: jaipurfoodcaterers.com → acts like jaipurfoodcaterers.baaraat.com
+  // Example: jaipurfoodcaterers.com → acts like jaipurfoodcaterers.xpertart.com
   if (
     !baseDomain &&
     !cleanHost.endsWith(MAIN_DOMAIN) &&

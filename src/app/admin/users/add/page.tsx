@@ -8,6 +8,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Eye, EyeOff, Lock, ChevronDown, HelpCircle } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent, } from "@/components/ui/popover";
 import CompanyLogoUpload from "@/components/CompanyLogoUpload";
+import FaviconUpload from "@/components/FaviconUploader";
 import { Label } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,6 +42,7 @@ export default function AddUser() {
     // console.log("errors: ", errors);
     const [showPassword, setShowPassword] = useState(false);
     const [selectedCompanyLogo, setSelectedCompanyLogo] = useState<File | null>(null);
+    const [selectedFavicon, setSelectedFavicon] = useState<File | null>(null);
     const [websiteTypes, setWebsiteTypes] = useState<ThemeAttribute[]>([]);
 
     const handleBack = () => { router.back(); };
@@ -94,6 +96,9 @@ export default function AddUser() {
             formData.append("gst_type", data.gst_type);
             if (selectedCompanyLogo) {
                 formData.append("company_logo", data.company_logo);
+            }
+            if (selectedFavicon) {
+                formData.append("favicon", data.favicon);
             }
             const response = await createUser(formData);
             if (response?.status === true) {
@@ -333,7 +338,7 @@ export default function AddUser() {
                                                         </p>
                                                         <p className="mb-2">
                                                             Example: if you enter <code>mycompany</code>, your site will be available at{" "}
-                                                            <strong>mycompany.baaraat.com</strong>.
+                                                            <strong>mycompany.xpertart.com</strong>.
                                                         </p>
                                                         <p>
                                                             You can link a custom domain (like <strong>mycompany.com</strong>) anytime later.
@@ -417,39 +422,6 @@ export default function AddUser() {
                                     </div>
 
                                 </div>
-                            </div>
-
-                            {/* GST type */}
-                            <div className="flex flex-col gap-2">
-                                <Label className="mb-1 font-medium">
-                                    GST Type <span className="text-red-600">*</span>
-                                </Label>
-
-                                <div className="flex gap-6">
-                                    <label className="flex items-center gap-2 cursor-pointer font-medium">
-                                        <input
-                                            type="radio"
-                                            value="CGST_SGST"
-                                            {...register("gst_type")}
-                                            className="cursor-pointer"
-                                        />
-                                        CGST + SGST
-                                    </label>
-
-                                    <label className="flex items-center gap-2 cursor-pointer font-medium">
-                                        <input
-                                            type="radio"
-                                            value="IGST"
-                                            {...register("gst_type")}
-                                            className="cursor-pointer"
-                                        />
-                                        IGST
-                                    </label>
-                                </div>
-
-                                {errors.gst_type && (
-                                    <p className="text-red-500 text-sm">{errors.gst_type.message}</p>
-                                )}
                             </div>
 
                             {/* Company Phone No. */}
@@ -550,6 +522,63 @@ export default function AddUser() {
                                 />
                                 {errors.fax_no && (
                                     <p className="text-red-500 text-sm mt-1">{errors.fax_no.message}</p>
+                                )}
+                            </div>
+
+                            {/** Favicon */}
+                            <div className="flex flex-col col-span-1">
+                                <Label className="mb-1 font-medium">
+                                    Favicon <span className="text-red-600">*</span>
+                                </Label>
+                                <Controller
+                                    name="favicon"
+                                    control={control}
+                                    rules={{ required: "Favicon is required" }}
+                                    render={({ field }) => (
+                                        <FaviconUpload
+                                            onFileSelect={(file) => {
+                                                field.onChange(file);
+                                                setSelectedFavicon(file);
+                                            }}
+                                            defaultFavicon={null}
+                                        />
+                                    )}
+                                />
+                                {errors?.favicon && (
+                                    <p className="text-red-500 text-sm">{errors?.favicon?.message}</p>
+                                )}
+                            </div>
+
+                            {/* GST type */}
+                            <div className="flex flex-col gap-2">
+                                <Label className="mb-1 font-medium">
+                                    GST Type <span className="text-red-600">*</span>
+                                </Label>
+
+                                <div className="flex gap-6">
+                                    <label className="flex items-center gap-2 cursor-pointer font-medium">
+                                        <input
+                                            type="radio"
+                                            value="CGST_SGST"
+                                            {...register("gst_type")}
+                                            className="cursor-pointer"
+                                        />
+                                        CGST + SGST
+                                    </label>
+
+                                    <label className="flex items-center gap-2 cursor-pointer font-medium">
+                                        <input
+                                            type="radio"
+                                            value="IGST"
+                                            {...register("gst_type")}
+                                            className="cursor-pointer"
+                                        />
+                                        IGST
+                                    </label>
+                                </div>
+
+                                {errors.gst_type && (
+                                    <p className="text-red-500 text-sm">{errors.gst_type.message}</p>
                                 )}
                             </div>
 

@@ -23,6 +23,7 @@ export interface User {
   custom_domain?: string | null;
   schema_name?: string | null;
   company_logo?: string | null;
+  favicon?: string | null;
   gstin?: string | null;
   image?: string | null;
   subscriptionData?: any;
