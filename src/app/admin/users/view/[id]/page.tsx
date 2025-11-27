@@ -255,7 +255,7 @@ const UsersViewPage = () => {
                                     </div>
 
                                     <div>
-                                        <p className="text-sm text-gray-600 font-medium">GSTIN</p>
+                                        <p className="text-sm text-gray-600 font-medium">GST No.</p>
                                         <p className="text-base text-gray-800">
                                             {data.gstin || "N/A"}
                                         </p>

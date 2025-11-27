@@ -29,7 +29,7 @@ export default function Footer({ project }: DefaultProps) {
                 ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${project?.company_logo}`
                 : "https://c.animaapp.com/mghk811dbdG4xS/img/image-30-5.png"}
               alt="Navvistar Logo"
-              className="w-28 h-auto mb-4"
+              className="w-full max-w-[180px] h-auto mb-4"
             />
             <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
               Founded on July 28, 2025, NAVVISTAR INFRA PVT. LTD. is a visionary new
@@ -63,7 +63,7 @@ export default function Footer({ project }: DefaultProps) {
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-xl font-medium mb-5 text-white">Contacts</h3>
+            <h3 className="text-xl font-medium mb-5 text-white">Contact Info</h3>
             <ul className="space-y-4 text-base">
               <li className="flex items-center gap-3">
                 <img
@@ -117,7 +117,7 @@ export default function Footer({ project }: DefaultProps) {
       {/* Bottom Section */}
       <div className="w-full bg-[#191919] flex flex-col md:flex-row items-center justify-between px-6 sm:px-10 lg:px-20 py-4 border-t border-gray-700">
         <p className="text-gray-400 text-sm text-center md:text-left">
-          Copyright © {new Date().getFullYear()} <span className="text-white font-semibold">{project?.company_name}</span> : All Rights Reserved.
+          Copyright © {new Date().getFullYear()} <span className="text-white font-semibold">Navvistar infra</span> : All Rights Reserved.
         </p>
         <p className="text-gray-400 text-sm mt-2 md:mt-0 text-center md:text-right">
           Designed by {" "}

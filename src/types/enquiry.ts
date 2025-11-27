@@ -1,6 +1,7 @@
 export interface EnquiryAttributes {
     id?: number;
     name: string;
+    name2?: string;
     email: string;
     mobile?: string;
     subject?: string;

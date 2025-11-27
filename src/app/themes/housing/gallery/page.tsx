@@ -106,7 +106,7 @@ export default function HousingGallery({ project }: DefaultProps) {
                         "linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('/assest/image/gallerybanner-1.jpg')",
                 }}
             >
-                <h1 className="text-white text-4xl md:text-5xl font-bold font-poppins">
+                <h1 className="text-white text-4xl md:text-5xl font-poppins">
                     Gallery
                 </h1>
             </div>

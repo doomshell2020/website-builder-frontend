@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { User } from "@/types/user";
-interface DefaultProps { project?: User;}
+interface DefaultProps { project?: User; }
 
 export default function Header({ project }: DefaultProps) {
   const pathname = usePathname();
@@ -21,18 +21,18 @@ export default function Header({ project }: DefaultProps) {
   return (
     <header>
       <nav>
-        <div className="max-w-[1440px] mx-auto flex items-center justify-between px-6 py-3">
+        <div className="max-w-[1188px] mx-auto flex items-center justify-between px-6 py-[10px]">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <img
               src={`${process.env.NEXT_PUBLIC_IMAGE_URL || "http://localhost:5000/uploads/"}${project?.company_logo}`}
               alt={project?.company_name || "logo"}
-              className="max-h-14 w-auto object-contain"
+              className="max-h-[61px] w-auto object-contain"
             />
           </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-[18px]">
             {navLinks.map((item, index) => {
               const isActive =
                 item.to === "/"
@@ -43,13 +43,13 @@ export default function Header({ project }: DefaultProps) {
                   key={index}
                   href={item.to}
                   className={`relative font-medium text-lg transition-all duration-300 ${isActive
-                    ? "text-blue-600 after:w-full"
-                    : "text-black hover:text-blue-600"
+                    ? "text-[#1199d4] after:w-full"
+                    : "text-black hover:text-[#1199d4]"
                     } group`}
                 >
                   {item.label}
                   <span
-                    className={`absolute left-0 -bottom-1 h-[2px] bg-blue-600 transition-all duration-300 ${isActive ? "w-full" : "w-0 group-hover:w-full"
+                    className={`absolute left-0 -bottom-1 h-[2px] bg-[#1199d4] transition-all duration-300 ${isActive ? "w-full" : "w-0 group-hover:w-full"
                       }`}
                   ></span>
                 </Link>

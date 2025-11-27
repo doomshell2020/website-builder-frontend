@@ -20,7 +20,6 @@ import { User } from "@/types/user";
 interface DefaultHomeProps { project?: User };
 type FormData = z.infer<typeof enquirySchema>;
 
-
 export default function HousingHome({ project }: DefaultHomeProps) {
     const router = useRouter();
 
@@ -28,14 +27,14 @@ export default function HousingHome({ project }: DefaultHomeProps) {
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
     const fallbackImages = [
-        "/assest/image/gallery-1.jpg",
-        "/assest/image/gallery-2.jpg",
-        "/assest/image/gallery-3.jpg",
-        "/assest/image/gallery-4.jpg",
-        "/assest/image/gallery-5.jpg",
-        "/assest/image/gallery-6.jpg",
         "/assest/image/gallery-7.jpg",
+        "/assest/image/gallery-6.jpg",
         "/assest/image/gallery-8.jpg",
+        "/assest/image/gallery-1.jpg",
+        "/assest/image/gallery-3.jpg",
+        "/assest/image/gallery-2.jpg",
+        "/assest/image/gallery-5.jpg",
+        "/assest/image/gallery-4.jpg",
     ];
 
     useEffect(() => {
@@ -112,7 +111,7 @@ export default function HousingHome({ project }: DefaultHomeProps) {
     } = useForm<FormData>({
         resolver: zodResolver(enquirySchema) as any,
     });
-    
+
     const containerVariants: Variants = {
         hidden: { opacity: 0, y: 50 },
         visible: {
@@ -259,7 +258,7 @@ export default function HousingHome({ project }: DefaultHomeProps) {
                 .replaceAll('{LOGO_URL}', `https://navvistarinfra.com/wp-content/uploads/2025/08/logo-1.png`);
 
             const payload: EnquiryAttributes = {
-                name: data.name,
+                name: `${data.name} ${data.name2}`.trim(),
                 email: data.email,
                 mobile: data.mobile,
                 subject: data.subject,
@@ -373,7 +372,7 @@ export default function HousingHome({ project }: DefaultHomeProps) {
                                 className="relative mt-4 max-w-[180px] w-full inline-flex items-center justify-center bg-[#141414] text-white text-lg font-medium px-4 py-2 rounded-md overflow-hidden transition-all duration-300 group"
                             >
                                 <span className="relative z-10">Explore More</span>
-                                <span className="absolute left-0 top-0 h-full w-0 bg-blue-500 transition-all duration-500 ease-in-out group-hover:w-full"></span>
+                                <span className="absolute left-0 top-0 h-full w-0 bg-[#1199d4] transition-all duration-500 ease-in-out group-hover:w-full"></span>
                             </Link>
                         </motion.div>
                     </motion.div>
@@ -394,7 +393,7 @@ export default function HousingHome({ project }: DefaultHomeProps) {
                         className="relative text-center w-full"
                         variants={itemVariants}
                     >
-                        <h1 className="absolute inset-0 flex items-center justify-center text-6xl -top-12 text-[#E2F4FB] uppercase pointer-events-none select-none">
+                        <h1 className="absolute inset-0 flex items-center justify-center text-6xl -top-12 text-[#00a4e520] uppercase pointer-events-none select-none">
                             OUR GALLERY
                         </h1>
                         <h2 className="relative text-2xl sm:text-3xl md:text-4xl font-bold text-black font-poppins">
@@ -431,7 +430,7 @@ export default function HousingHome({ project }: DefaultHomeProps) {
                             className="relative mt-4 max-w-[180px] w-full inline-flex items-center justify-center bg-[#141414] text-white text-lg font-medium px-4 py-2 rounded-md overflow-hidden transition-all duration-300 group"
                         >
                             <span className="relative z-10">Explore More</span>
-                            <span className="absolute left-0 top-0 h-full w-0 bg-blue-500 transition-all duration-500 ease-in-out group-hover:w-full"></span>
+                            <span className="absolute left-0 top-0 h-full w-0 bg-[#1199d4] transition-all duration-500 ease-in-out group-hover:w-full"></span>
                         </motion.button>
                     </Link>
                 </motion.div>
@@ -440,16 +439,6 @@ export default function HousingHome({ project }: DefaultHomeProps) {
             {/** Contact Section */}
             <section>
                 <div className="flex flex-col items-center justify-center relative self-stretch w-full flex-[0_0_auto]">
-                    <div
-                        className="flex h-[450px] items-center justify-center w-full bg-cover bg-center bg-no-repeat relative"
-                        style={{
-                            backgroundImage: "linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('https://c.animaapp.com/mghk811dbdG4xS/img/hero.png')",
-                        }}
-                    >
-                        <h1 className="text-white text-4xl md:text-5xl font-bold font-poppins">
-                            Contact
-                        </h1>
-                    </div>
                     <div className="flex flex-col items-center justify-center gap-6 p-20 relative self-stretch w-full flex-[0_0_auto] -mt-10 bg-white rounded-[40px_40px_0px_0px]">
                         <div className="flex flex-wrap items-center justify-center gap-[40px_40px] relative self-stretch w-full flex-[0_0_auto] mt-[-1.00px] mb-[-1.00px] ml-[-1.00px] mr-[-1.00px] border border-solid border-[#d5d0d0]">
                             <motion.div
@@ -469,22 +458,22 @@ export default function HousingHome({ project }: DefaultHomeProps) {
                                 className="flex flex-col w-full lg:w-1/2 p-8 md:p-12 gap-6"
                             >
                                 {/* Heading */}
-                                <div className="space-y-2 text-center lg:text-left">
-                                    <h2 className="text-4xl font-bold text-gray-900 font-poppins">
-                                        Let’s Start a Conversation
+                                <div className="space-y-1 text-center lg:text-left">
+                                    <h2 className="text-[28px] text-gray-900 font-poppins">
+                                        Let’s Talk
                                     </h2>
-                                    <p className="text-base md:text-lg text-gray-700 font-medium">
+                                    <p className="text-base md:text-[16px] text-gray-800 font-semibold">
                                         Our support team is here to guide you—no matter how big or small your concern.
                                     </p>
                                 </div>
 
                                 {/* Form */}
-                                <form className="flex flex-col gap-4 mt-4" onSubmit={handleSubmit(onSubmit)}>
+                                <form className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" onSubmit={handleSubmit(onSubmit)}>
                                     {/* Row 1 */}
                                     <Input
                                         name="name"
                                         className="bg-white-500"
-                                        placeholder="Name"
+                                        placeholder="First Name"
                                         {...register("name")}
                                     />
                                     {errors.name && (
@@ -492,6 +481,14 @@ export default function HousingHome({ project }: DefaultHomeProps) {
                                     )}
 
                                     {/* Row 2 */}
+                                    <Input
+                                        name="name2"
+                                        className="bg-white-500"
+                                        placeholder="Last Name"
+                                        {...register("name2")}
+                                    />
+
+                                    {/* Row 3 */}
                                     <Input
                                         name="email"
                                         className="bg-white-500"
@@ -501,6 +498,8 @@ export default function HousingHome({ project }: DefaultHomeProps) {
                                     {errors.email && (
                                         <p className="text-sm text-red-500">{errors.email.message}</p>
                                     )}
+
+                                    {/* Row 4 */}
                                     <Input
                                         name="phone"
                                         type="text"
@@ -577,34 +576,39 @@ export default function HousingHome({ project }: DefaultHomeProps) {
                                         <p className="text-sm text-red-500">{errors.mobile.message}</p>
                                     )}
 
-                                    {/* Message */}
-                                    <Textarea
-                                        name="message"
-                                        placeholder="Message"
-                                        {...register("subject")}
-                                        className="resize-none"
-                                    />
-                                    {errors.subject && (
-                                        <p className="text-sm text-red-500">{errors.subject.message}</p>
-                                    )}
-
-                                    {/* Submit Button */}
-                                    <motion.button
-                                        type="submit"
-                                        disabled={isSubmitting}
-                                        variants={itemVariants}
-                                        className="relative mt-4 max-w-[120px] w-full inline-flex items-center justify-center bg-[#141414] text-white text-lg font-medium px-6 py-2 rounded-md overflow-hidden transition-all duration-300 group disabled:opacity-60"
-                                    >
-                                        {/* Button text or spinner */}
-                                        {isSubmitting ? (
-                                            <span className="relative z-10 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                                        ) : (
-                                            <span className="relative z-10">Submit</span>
+                                    {/* Row 5 */}
+                                    <div className="md:col-span-2">
+                                        <Textarea
+                                            name="message"
+                                            placeholder="Message"
+                                            {...register("subject")}
+                                            className="resize-none"
+                                        />
+                                        {errors.subject && (
+                                            <p className="text-sm text-red-500">{errors.subject.message}</p>
                                         )}
 
-                                        {/* Hover background animation */}
-                                        <span className="absolute left-0 top-0 h-full w-0 bg-blue-500 transition-all duration-500 ease-in-out group-hover:w-full"></span>
-                                    </motion.button>
+                                    </div>
+
+                                    {/* Submit Button */}
+                                    <div className="md:col-span-2">
+                                        <motion.button
+                                            type="submit"
+                                            disabled={isSubmitting}
+                                            variants={itemVariants}
+                                            className="relative mt-4 w-full inline-flex items-center justify-center bg-[#141414] text-white text-lg font-medium px-6 py-2 rounded-md overflow-hidden transition-all duration-300 group disabled:opacity-60"
+                                        >
+                                            {/* Button text or spinner */}
+                                            {isSubmitting ? (
+                                                <span className="relative z-10 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                                            ) : (
+                                                <span className="relative z-10">Submit</span>
+                                            )}
+
+                                            {/* Hover background animation */}
+                                            <span className="absolute left-0 top-0 h-full w-0 bg-blue-500 transition-all duration-500 ease-in-out group-hover:w-full"></span>
+                                        </motion.button>
+                                    </div>
 
                                 </form>
                             </motion.div>

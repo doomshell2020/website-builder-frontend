@@ -33,7 +33,7 @@ export default function HousingLeadership({ project }: DefaultHomeProps) {
                         "linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('https://c.animaapp.com/mghk811dbdG4xS/img/hero-3.png')",
                 }}
             >
-                <h1 className="text-white text-3xl sm:text-4xl lg:text-5xl font-bold font-poppins text-center">
+                <h1 className="text-white text-3xl sm:text-4xl lg:text-5xl font-poppins text-center">
                     Our Leadership
                 </h1>
             </div>

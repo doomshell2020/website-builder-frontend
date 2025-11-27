@@ -97,10 +97,10 @@ export const HeroSlider = ({ company, slug }: DefaultProps): JSX.Element => {
             <style>{slideInAnimationStyle}</style>
 
             <div className="relative flex h-[90vh] w-full items-start justify-center overflow-hidden">
-                {/* 🌄 Image Slider */}
+
+                {/* Slider Images — only this should move */}
                 <div
-                    className={`flex h-full w-full ${isTransitioning ? "transition-transform duration-1000 ease-in-out" : ""
-                        }`}
+                    className={`flex h-full w-full ${isTransitioning ? "transition-transform duration-1000 ease-in-out" : ""}`}
                     style={{
                         transform: `translateX(-${currentIndex * 100}%)`,
                     }}
@@ -116,20 +116,20 @@ export const HeroSlider = ({ company, slug }: DefaultProps): JSX.Element => {
                     ))}
                 </div>
 
-                {/* 📝 Overlay Text */}
-                <div className="absolute inset-0 flex flex-col items-start justify-center gap-2.5 px-[54px]">
-                    <div key={currentIndex} className="animate-slideIn">
-                        <h1 className="font-poppins font-bold text-white text-[32px] md:text-[48px] leading-normal">
+                {/* Static Text Always On Same Position */}
+                <div className="absolute inset-0 flex flex-col items-start justify-center gap-0.5 px-[52px]">
+                    <div className="animate-slideIn">
+                        <h1 className="font-[Merriweather] font-normal text-white text-[55px] leading-[60px]">
                             Smart Design, Strong <br /> Foundations
                         </h1>
-                        <p className="mt-3 font-inter font-medium text-white text-xl md:text-2xl leading-normal">
+                        <p className="font-inter text-[18px] font-medium text-white leading-[28px]">
                             Blending innovation with quality to build a better tomorrow.
                         </p>
                     </div>
                 </div>
 
                 {/* ⚪ Dots Navigation */}
-                <div className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 transform gap-3">
+                {/* <div className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 transform gap-3">
                     {sliderImages.slice(0, -1).map((_, index) => (
                         <button
                             key={index}
@@ -143,7 +143,7 @@ export const HeroSlider = ({ company, slug }: DefaultProps): JSX.Element => {
                                 }`}
                         />
                     ))}
-                </div>
+                </div> */}
             </div>
         </>
     );
