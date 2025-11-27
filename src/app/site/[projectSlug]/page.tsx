@@ -1,17 +1,23 @@
 // site/[projectSlug]/page.tsx
 import NotFoundPage from "@/app/not-found";
-import { fetchProject } from "@/services/userService";
 import type { Metadata } from "next";
+import { cache } from "react";
+import { fetchProject } from "@/services/userService";
+
+
+// 1️⃣ Cached fetch — runs only once per request
+const getCachedProject = cache(async (projectSlug: string) => {
+  return await fetchProject(projectSlug);
+});
 
 
 // ---------------------- 🔥 Dynamic Metadata & Favicon ----------------------
 export async function generateMetadata(
   { params }: { params: { projectSlug: string } }
 ): Promise<Metadata> {
-  const { projectSlug } = await params; // ⬅ FIXED
+  const { projectSlug } = await params;
 
-  const project = await fetchProject(projectSlug);
-
+  const project = await getCachedProject(projectSlug); // <— no 2nd API call
   if (!project?.status) return { title: "Not Found" };
 
   const p = project.result;
@@ -20,16 +26,19 @@ export async function generateMetadata(
     title: p?.company_name || "Project",
     description: p?.seo_description || p?.company_name,
     icons: {
-      icon: p?.favicon ? [{ url: `${process.env.NEXT_PUBLIC_IMAGE_URL}${p?.favicon}` }] : [{ url: "/favicon.ico" }],
-      apple: p?.favicon ? [{ url: `${process.env.NEXT_PUBLIC_IMAGE_URL}${p?.favicon}` }] : undefined,
+      icon: p?.favicon
+        ? [{ url: `${process.env.NEXT_PUBLIC_IMAGE_URL}${p.favicon}` }]
+        : [{ url: "/favicon.ico" }],
+      apple: p?.favicon
+        ? [{ url: `${process.env.NEXT_PUBLIC_IMAGE_URL}${p.favicon}` }]
+        : undefined,
     },
     openGraph: {
       title: p?.company_name,
       description: p?.seo_description,
       siteName: p?.company_name,
       type: "website",
-      url: p?.domain || "",
-      images: p?.og_image ? [p?.og_image] : [],
+      images: p?.og_image ? [p.og_image] : [],
     },
     twitter: {
       card: "summary_large_image",
@@ -47,18 +56,19 @@ export default async function ProjectEntry({
 }: {
   params: { projectSlug: string };
 }) {
-  const { projectSlug } = await params; // ⬅ FIXED
+  const { projectSlug } = await params;
 
-  const project = await fetchProject(projectSlug);
+  const project = await getCachedProject(projectSlug); // ❗ reuses cached request
   if (!project?.status) return <NotFoundPage />;
+
   const ProjectDetail = project.result;
 
   const themeName =
     ProjectDetail?.Theme?.slug?.trim()
       ? ProjectDetail.Theme.slug.trim()
-        .toLowerCase()
-        .replace(/\s+/g, "-")
-        .replace(/[^a-z0-9-]/g, "")
+          .toLowerCase()
+          .replace(/\s+/g, "-")
+          .replace(/[^a-z0-9-]/g, "")
       : "default";
 
   let ThemeLayout, ThemeHome;
@@ -82,6 +92,7 @@ export default async function ProjectEntry({
     </ThemeLayout>
   );
 }
+
 
 
 // Without metadata and with old param handling
