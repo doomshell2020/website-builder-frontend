@@ -26,6 +26,7 @@ export interface User {
   gstin?: string | null;
   image?: string | null;
   subscriptionData?: any;
+  Plan?: any;
   status?: 'Y' | 'N';
   gst_type?: 'IGST' | 'CGST_SGST';
   approval?: 'Y' | 'N';

@@ -1,13 +1,14 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Image from "next/image";
 import { MoveLeft, Facebook, Twitter, Instagram, Linkedin, Youtube } from "lucide-react";
-import { Button } from "@/components/ui/Button";
 import { getUserById } from "@/services/userService";
-import { User } from "@/types/user";
+import { Button } from "@/components/ui/Button";
 import Loader from "@/components/ui/loader";
+import { formatPrice } from "@/lib/price";
 import { formatDate } from "@/lib/date";
+import { User } from "@/types/user";
+import Image from "next/image";
 import Link from "next/link";
 
 const UsersViewPage = () => {
@@ -15,7 +16,6 @@ const UsersViewPage = () => {
     const { id } = useParams();
     const [data, setData] = useState<User | null>(null);
     const [loading, setLoading] = useState(false);
-
     const handleBack = () => router.back();
 
     const fetchData = useCallback(async () => {
@@ -40,6 +40,11 @@ const UsersViewPage = () => {
     const companyLogo = data.company_logo
         ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${data.company_logo}`
         : "/assest/image/defaultCompanyLogo.png";
+
+    const sub = data?.subscriptionData?.[0];
+    const expiryDate = sub?.expiry_date ? new Date(sub.expiry_date) : null;
+    const today = new Date();
+    const isExpired = expiryDate ? expiryDate < today : false;
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -67,6 +72,7 @@ const UsersViewPage = () => {
 
                         {/* LEFT SIDE */}
                         <div className="space-y-10">
+
                             {/* Personal Information */}
                             <section>
                                 <h2 className="text-lg font-semibold text-gray-900 border-b pb-2 mb-4">
@@ -79,14 +85,16 @@ const UsersViewPage = () => {
                                             {data.name || "N/A"}
                                         </p>
                                         <span
-                                            className={`px-2 py-0.5 text-xs font-medium rounded-full ${data.status === "Y"
-                                                ? "bg-green-100 text-green-700 border border-green-300"
-                                                : "bg-red-100 text-red-700 border border-red-300"
+                                            className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full border ${data.status === "Y"
+                                                ? "bg-green-50 text-green-700 border-green-300"
+                                                : "bg-red-50 text-red-700 border-red-300"
                                                 }`}
                                         >
+                                            <span
+                                                className={`h-2.5 w-2.5 rounded-full ${data.status === "Y" ? "bg-green-500" : "bg-red-500"} `}
+                                            ></span>
                                             {data.status === "Y" ? "Active" : "Inactive"}
                                         </span>
-
                                     </div>
 
                                     <div>
@@ -100,6 +108,70 @@ const UsersViewPage = () => {
                                         <p className="text-sm text-gray-600 font-medium">Email</p>
                                         <p className="text-base text-gray-800">{data.email || "N/A"}</p>
                                     </div>
+                                </div>
+                            </section>
+
+                            {/* Subscription Information */}
+                            <section>
+                                <h2 className="text-lg font-semibold text-gray-900 border-b pb-2 mb-4">
+                                    Subscription Information
+                                </h2>
+                                <div className="space-y-4">
+
+                                    <div className="flex flex-row justify-between items-center">
+                                        <div className="flex flex-col">
+                                            <p className="text-base font-semibold text-gray-800">{data?.subscriptionData?.[0]?.Plan?.name + ' Plan' || "N/A"}</p>
+                                            <p className="text-sm text-gray-700 font-medium">
+                                                Plan Price:&nbsp;
+                                                {data?.subscriptionData?.[0]?.Plan?.price ? (
+                                                    <span className="text-gray-900 font-semibold">
+                                                        {formatPrice(data.subscriptionData[0].Plan.price)} / year
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-gray-500">N/A</span>
+                                                )}
+                                            </p>
+
+                                        </div>
+                                        <p className="text-base text-gray-800">
+                                            <span
+                                                className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold border ${data?.subscriptionData?.[0]?.status === "Y"
+                                                    ? "bg-green-100 text-green-700 border-green-300"
+                                                    : data?.subscriptionData?.[0]?.status === "N"
+                                                        ? "bg-red-100 text-red-700 border-red-300"
+                                                        : "bg-gray-100 text-gray-600 border-gray-300"
+                                                    }`
+                                                }>
+                                                <span
+                                                    className={`h-2 w-2 rounded-full ${data?.subscriptionData?.[0]?.status === "Y"
+                                                        ? "bg-green-500"
+                                                        : data?.subscriptionData?.[0]?.status === "N"
+                                                            ? "bg-red-500"
+                                                            : "bg-gray-500"
+                                                        } `}
+                                                />
+                                                {data?.subscriptionData?.[0]?.status === "Y" ? "Active" : data?.subscriptionData?.[0]?.status === "N" ? "Inactive" : "N/A"}
+                                            </span>
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <p className="text-sm text-gray-600 font-medium mb-1">
+                                            Subscription Duration
+                                        </p>
+                                        <div className="flex flex-wrap items-center gap-2 text-sm text-gray-800">
+                                            <span>{formatDate(data?.subscriptionData?.[0]?.created) ?? "N/A"}</span>
+                                            <span className="text-gray-500">—</span>
+                                            <span className={isExpired ? "text-red-600 font-semibold" : "text-gray-800"}>
+                                                {formatDate(data?.subscriptionData?.[0]?.expiry_date) ?? "N/A"}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* <div>
+                                        <p className="text-sm text-gray-600 font-medium">Paid Amount</p>
+                                        <p className="text-base text-gray-800">{"₹ " + formatPrice(Math.round(data?.subscriptionData?.[0]?.plantotalprice)) || "N/A"}</p>
+                                    </div> */}
                                 </div>
                             </section>
 
@@ -124,6 +196,7 @@ const UsersViewPage = () => {
 
                         {/* RIGHT SIDE */}
                         <div className="space-y-10">
+
                             {/* Company Details */}
                             <section>
                                 <h2 className="text-lg font-semibold text-gray-900 border-b pb-2 mb-4">
@@ -131,8 +204,6 @@ const UsersViewPage = () => {
                                 </h2>
 
                                 <div className="space-y-4">
-
-
                                     <div className="flex items-center justify-between gap-4 mb-6">
                                         {/* Left Side: Company Info */}
                                         <div className="flex flex-col space-y-2">
@@ -270,6 +341,7 @@ const UsersViewPage = () => {
                                 </div>
 
                             </section>
+
                         </div>
                     </div>
 
