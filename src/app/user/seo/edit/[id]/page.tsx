@@ -148,6 +148,8 @@ export default function EditSeoForm() {
                 )}
               </div>
 
+              <div></div>
+
               {/* keyword */}
               <div>
                 <Label htmlFor="keyword">
@@ -161,6 +163,7 @@ export default function EditSeoForm() {
                 />
                 {errors.keyword && (<p className="text-red-600 text-sm mt-1">{errors.keyword.message}</p>)}
               </div>
+
               {/* description */}
               <div>
                 <Label htmlFor="description">
