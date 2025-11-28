@@ -241,111 +241,119 @@ export default function Contact({ project }: DefaultProps) {
                             {/* Form */}
                             <form className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2" onSubmit={handleSubmit(onSubmit)}>
                                 {/* Row 1 */}
-                                <Input
-                                    name="name"
-                                    className="bg-white-500"
-                                    placeholder="First Name"
-                                    {...register("name")}
-                                />
-                                {errors.name && (
-                                    <p className="text-sm text-red-500">{errors.name.message}</p>
-                                )}
+                                <div>
+                                    <Input
+                                        name="name"
+                                        className="bg-white-500"
+                                        placeholder="First Name"
+                                        {...register("name")}
+                                    />
+                                    {errors.name && (
+                                        <p className="text-sm text-red-500">{errors.name.message}</p>
+                                    )}
+                                </div>
 
                                 {/* Row 2 */}
-                                <Input
-                                    name="name2"
-                                    className="bg-white-500"
-                                    placeholder="Last Name"
-                                    {...register("name2")}
-                                />
+                                <div>
+                                    <Input
+                                        name="name2"
+                                        className="bg-white-500"
+                                        placeholder="Last Name"
+                                        {...register("name2")}
+                                    />
+                                </div>
 
                                 {/* Row 3 */}
-                                <Input
-                                    name="email"
-                                    className="bg-white-500"
-                                    placeholder="Email"
-                                    {...register("email")}
-                                />
-                                {errors.email && (
-                                    <p className="text-sm text-red-500">{errors.email.message}</p>
-                                )}
+                                <div>
+                                    <Input
+                                        name="email"
+                                        className="bg-white-500"
+                                        placeholder="Email"
+                                        {...register("email")}
+                                    />
+                                    {errors.email && (
+                                        <p className="text-sm text-red-500">{errors.email.message}</p>
+                                    )}
+                                </div>
 
                                 {/* Row 4 */}
-                                <Input
-                                    name="phone"
-                                    type="text"
-                                    placeholder="Phone"
-                                    className="bg-white-500"
-                                    {...register("mobile")}
-                                    maxLength={13}
-                                    {...register("mobile")}
-                                    onInput={(e) => {
-                                        let val = e.currentTarget.value;
+                                <div>
+                                    <Input
+                                        name="phone"
+                                        type="text"
+                                        placeholder="Phone"
+                                        className="bg-white-500"
+                                        {...register("mobile")}
+                                        maxLength={13}
+                                        {...register("mobile")}
+                                        onInput={(e) => {
+                                            let val = e.currentTarget.value;
 
-                                        if (val.startsWith("+")) {
-                                            val = "+" + val.slice(1).replace(/\D/g, "");
-                                        } else {
-                                            val = val.replace(/\D/g, "");
-                                        }
-                                        if (val.startsWith("+91")) {
-                                            val = "+91" + val.slice(3, 13);
-                                        }
-                                        else if (val.startsWith("91")) {
-                                            val = "91" + val.slice(2, 12);
-                                        }
-                                        else if (val.startsWith("0")) {
-                                            val = val.replace(/^0+/, "0"); // collapse multiple 0s
-                                            val = val.slice(0, 11); // 0 + 10 digits
-                                            // must not start with 0 followed by 1–5
-                                            if (/^0[1-5]/.test(val)) {
-                                                val = "0"; // reset to just "0" (invalid input beyond that)
+                                            if (val.startsWith("+")) {
+                                                val = "+" + val.slice(1).replace(/\D/g, "");
+                                            } else {
+                                                val = val.replace(/\D/g, "");
                                             }
-                                        }
-                                        else if (/^[6-9]/.test(val)) {
-                                            val = val.slice(0, 10);
-                                        }
-                                        else if (/^[1-5]/.test(val)) {
-                                            val = "";
-                                        }
-                                        else {
-                                            val = val.slice(0, 10);
-                                        }
+                                            if (val.startsWith("+91")) {
+                                                val = "+91" + val.slice(3, 13);
+                                            }
+                                            else if (val.startsWith("91")) {
+                                                val = "91" + val.slice(2, 12);
+                                            }
+                                            else if (val.startsWith("0")) {
+                                                val = val.replace(/^0+/, "0"); // collapse multiple 0s
+                                                val = val.slice(0, 11); // 0 + 10 digits
+                                                // must not start with 0 followed by 1–5
+                                                if (/^0[1-5]/.test(val)) {
+                                                    val = "0"; // reset to just "0" (invalid input beyond that)
+                                                }
+                                            }
+                                            else if (/^[6-9]/.test(val)) {
+                                                val = val.slice(0, 10);
+                                            }
+                                            else if (/^[1-5]/.test(val)) {
+                                                val = "";
+                                            }
+                                            else {
+                                                val = val.slice(0, 10);
+                                            }
 
-                                        e.currentTarget.value = val;
-                                    }}
-                                    onPaste={(e) => {
-                                        e.preventDefault();
-                                        let val = e.clipboardData.getData("text");
-                                        if (val.startsWith("+")) {
-                                            val = "+" + val.slice(1).replace(/\D/g, "");
-                                        } else {
-                                            val = val.replace(/\D/g, "");
-                                        }
+                                            e.currentTarget.value = val;
+                                        }}
+                                        onPaste={(e) => {
+                                            e.preventDefault();
+                                            let val = e.clipboardData.getData("text");
+                                            if (val.startsWith("+")) {
+                                                val = "+" + val.slice(1).replace(/\D/g, "");
+                                            } else {
+                                                val = val.replace(/\D/g, "");
+                                            }
 
-                                        if (val.startsWith("+91")) {
-                                            val = "+91" + val.slice(3, 13);
-                                            if (/^\+91[0-5]/.test(val)) val = "+91";
-                                        } else if (val.startsWith("91")) {
-                                            val = "91" + val.slice(2, 12);
-                                            if (/^91[0-5]/.test(val)) val = "91";
-                                        } else if (val.startsWith("0")) {
-                                            val = val.replace(/^0+/, "0");
-                                            val = val.slice(0, 11);
-                                            if (/^0[1-5]/.test(val)) val = "0";
-                                        } else if (/^[6-9]/.test(val)) {
-                                            val = val.slice(0, 10);
-                                        } else if (/^[1-5]/.test(val)) {
-                                            val = "";
-                                        } else {
-                                            val = val.slice(0, 10);
-                                        }
+                                            if (val.startsWith("+91")) {
+                                                val = "+91" + val.slice(3, 13);
+                                                if (/^\+91[0-5]/.test(val)) val = "+91";
+                                            } else if (val.startsWith("91")) {
+                                                val = "91" + val.slice(2, 12);
+                                                if (/^91[0-5]/.test(val)) val = "91";
+                                            } else if (val.startsWith("0")) {
+                                                val = val.replace(/^0+/, "0");
+                                                val = val.slice(0, 11);
+                                                if (/^0[1-5]/.test(val)) val = "0";
+                                            } else if (/^[6-9]/.test(val)) {
+                                                val = val.slice(0, 10);
+                                            } else if (/^[1-5]/.test(val)) {
+                                                val = "";
+                                            } else {
+                                                val = val.slice(0, 10);
+                                            }
 
-                                        e.currentTarget.value = val;
-                                    }}
-                                />
-                                {errors.mobile && (
-                                    <p className="text-sm text-red-500">{errors.mobile.message}</p>
-                                )}
+                                            e.currentTarget.value = val;
+                                        }}
+                                    />
+                                    {errors.mobile && (
+                                        <p className="text-sm text-red-500">{errors.mobile.message}</p>
+                                    )}
+                                </div>
 
                                 {/* Row 5 */}
                                 <div className="md:col-span-2">
