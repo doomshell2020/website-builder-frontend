@@ -140,7 +140,7 @@ export default function EnquiryListPage() {
             {
                 name: "Email",
                 selector: (row: EnquiryAttributes) => row.email || "N/A",
-                width: "18%",
+                width: "20%",
             },
             {
                 name: "Mobile",
@@ -150,6 +150,7 @@ export default function EnquiryListPage() {
             {
                 name: "Enquiry",
                 selector: (row: EnquiryAttributes) => row.subject || "N/A",
+                width: "30%",
             },
             {
                 name: "Created",
@@ -230,4 +231,3 @@ export default function EnquiryListPage() {
         </div>
     );
 };
-
