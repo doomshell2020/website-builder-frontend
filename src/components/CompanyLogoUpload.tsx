@@ -27,16 +27,13 @@ export default function CompanyImageUpload({
       "image/jpeg",
       "image/jpg",
       "image/png",
-      "image/gif",
-      "image/tiff",
-      "image/webp",
     ];
     const maxSize = 1 * 1024 * 1024; // 1MB
 
     if (!validTypes.includes(file.type)) {
       SwalError({
         title: "Invalid File Type",
-        message: "Only JPG, JPEG, PNG, GIF, TIFF, or WEBP images are allowed.",
+        message: "Only JPG, JPEG or PNG images are allowed.",
       });
       return false;
     }
@@ -98,10 +95,9 @@ export default function CompanyImageUpload({
         className={`relative w-full h-32 border-[1px] rounded-lg overflow-hidden 
           flex flex-col items-center justify-center cursor-pointer 
           shadow-sm transition-all 
-          ${
-            isDragging
-              ? "border-blue-400 bg-blue-50"
-              : "border-gray-300 bg-gray-50 hover:border-blue-400"
+          ${isDragging
+            ? "border-blue-400 bg-blue-50"
+            : "border-gray-300 bg-gray-50 hover:border-blue-400"
           }`}
         onClick={() => fileInputRef.current?.click()}
         onDragOver={(e) => {
@@ -127,7 +123,7 @@ export default function CompanyImageUpload({
             <Upload className="w-8 h-8 mb-2 text-gray-400" />
             <p className="text-sm font-medium">
               Drag & drop or click to upload <br />
-              <span className="text-gray-400 text-xs">(PNG / JPG / WEBP, max 1 MB)</span>
+              <span className="text-gray-400 text-xs">(PNG / JPG / JPEG, max 1 MB)</span>
             </p>
           </div>
         )}
@@ -136,7 +132,7 @@ export default function CompanyImageUpload({
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/jpeg,image/jpg,image/png,image/gif,image/tiff,image/webp"
+          accept="image/jpeg,image/jpg,image/png"
           onChange={handleFileChange}
           className="hidden"
         />
