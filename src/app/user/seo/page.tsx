@@ -154,12 +154,7 @@ export default function SeoListPage() {
           <button
             title="View Description"
             onClick={() => {
-              const stripHtml = (html: string) => html.replace(/<[^>]+>/g, "");
-              const text = row.description?.trim();
-              const isInvalid =
-                !text || ["null", "undefined"].includes(text.toLowerCase());
-
-              setSelectedDescription(isInvalid ? "N/A" : stripHtml(text));
+              setSelectedDescription(row.description);
               setIsDescriptionModalOpen(true);
             }}
             className="text-xs px-[8px] py-[4px] text-white list-[gurmukhi] rounded-[1rem] bg-[#66686b] font-bold no-underline"
@@ -176,12 +171,7 @@ export default function SeoListPage() {
           <button
             title="View Keyword"
             onClick={() => {
-              const stripHtml = (html: string) => html.replace(/<[^>]+>/g, "");
-              const text = row.keyword?.trim();
-              const isInvalid =
-                !text || ["null", "undefined"].includes(text.toLowerCase());
-
-              setSelectedKeyword(isInvalid ? "N/A" : stripHtml(text));
+              setSelectedKeyword(row.keyword);
               setIsKeywordModalOpen(true);
             }}
             className="text-xs px-[8px] py-[4px] text-white list-[gurmukhi] rounded-[1rem] bg-[#66686b] font-bold no-underline"
@@ -191,7 +181,6 @@ export default function SeoListPage() {
         ),
         width: "10%",
       },
-
       {
         name: "Actions",
         cell: (row: Seo) => (
@@ -355,4 +344,3 @@ export default function SeoListPage() {
     </div>
   );
 };
-

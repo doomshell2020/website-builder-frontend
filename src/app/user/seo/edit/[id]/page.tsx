@@ -3,49 +3,36 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft } from "lucide-react";
-import { useRouter, useParams } from "next/navigation";
 import Loader from '@/components/ui/loader'
 import { Label } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
+import { Textarea } from "@/components/ui/textarea";
 import { seoZodSchema } from "@/schemas/seo.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter, useParams } from "next/navigation";
 import { updateSeo, getSeoById } from "@/services/seo.service";
-import dynamic from "next/dynamic";
+import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
 
-const SummernoteEditor = dynamic(() => import("@/components/ui/SummernoteEditor"), {
-  ssr: false,
-});
 type FormData = z.infer<typeof seoZodSchema>;
 
 export default function EditSeoForm() {
   const router = useRouter();
   const params = useParams();
   const id = String(params.id);
-
-  const [description, setDescription] = useState<string | null>();
-  const [keyword, setKeyword] = useState<string | null>();
   const [loading, setLoading] = useState(true);
 
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
     formState: { errors, isSubmitting },
     reset,
   } = useForm<FormData>({
     resolver: zodResolver(seoZodSchema),
   });
 
-  const handleBack = () => {
-    router.push("/user/seo");
-  };
-
-  const descriptionValue = watch("description") ?? "N/A";
-  const keywordValue = watch("keyword") ?? "N/A";
+  const handleBack = () => { router.back(); };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -109,12 +96,6 @@ export default function EditSeoForm() {
       <header className="bg-white shadow-sm border-b">
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-12">
-            {/* <Button
-              onClick={handleBack}
-              className="flex items-center text-gray-600 hover:text-gray-900 mr-4"
-            >
-              <ArrowLeft className="h-5 w-5 mr-1" />
-            </Button> */}
             <h1 className="text-xl font-medium text-gray-800 ml-2">Edit SEO</h1>
           </div>
         </div>
@@ -122,11 +103,9 @@ export default function EditSeoForm() {
 
       <main className="mx-auto px-4 sm:px-6 lg:px-8 py-4">
         {loading ? (<Loader />) : (
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-6 p-6 bg-white rounded-lg shadow-md"
-          >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6 bg-white rounded-lg shadow-md">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black">
+
               {/* page */}
               <div>
                 <Label htmlFor="page">
@@ -137,6 +116,7 @@ export default function EditSeoForm() {
                   <p className="text-red-600 text-sm">{errors.page.message}</p>
                 )}
               </div>
+
               {/* location */}
               <div className="">
                 <Label htmlFor="location">
@@ -153,6 +133,7 @@ export default function EditSeoForm() {
                   </p>
                 )}
               </div>
+
               {/* title */}
               <div>
                 <Label htmlFor="title">
@@ -166,47 +147,35 @@ export default function EditSeoForm() {
                   </p>
                 )}
               </div>
-              <div></div>
+
               {/* keyword */}
-              <div className="">
+              <div>
                 <Label htmlFor="keyword">
                   Keyword <span className="text-red-600">*</span>
                 </Label>
-                <SummernoteEditor
-                  value={keywordValue}
-                  onChange={(html) => {
-                    setKeyword(html);
-                    setValue("keyword", html, { shouldValidate: true });
-                  }}
-                  placeholder="Enter Keyword here...."
+                <Textarea
+                  id="keyword"
+                  placeholder="Enter Keyword"
+                  {...register("keyword")}
+                  className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                {errors.keyword && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {errors.keyword.message}
-                  </p>
-                )}
+                {errors.keyword && (<p className="text-red-600 text-sm mt-1">{errors.keyword.message}</p>)}
               </div>
               {/* description */}
-              <div className="">
+              <div>
                 <Label htmlFor="description">
                   Description <span className="text-red-600">*</span>
                 </Label>
-                <SummernoteEditor
-                  value={descriptionValue}
-                  onChange={(html) => {
-                    setDescription(html);
-                    setValue("description", html, { shouldValidate: true });
-                  }}
-                  placeholder="Enter Description here...."
+                <Textarea
+                  id="description"
+                  placeholder="Enter Description"
+                  {...register("description")}
+                  className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                {errors.description && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {errors.description.message}
-                  </p>
-                )}
+                {errors.description && (<p className="text-red-600 text-sm mt-1">{errors.description.message}</p>)}
               </div>
-            </div>
 
+            </div>
             {/* Action Buttons */}
             <div className="pt-4 flex justify-between">
               <Button
@@ -228,9 +197,10 @@ export default function EditSeoForm() {
                 )}
               </Button>
             </div>
+
           </form>
         )}
       </main>
     </div>
   );
-}
+};

@@ -1,51 +1,41 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
-import { seoZodSchema } from "@/schemas/seo.schema";
 import { createSeo } from "@/services/seo.service";
-import dynamic from "next/dynamic";
+import { Textarea } from "@/components/ui/textarea";
+import { seoZodSchema } from "@/schemas/seo.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
 
-const SummernoteEditor = dynamic(() => import("@/components/ui/SummernoteEditor"), {
-  ssr: false,
-});
 type FormData = z.infer<typeof seoZodSchema>;
 export default function AddSeoForm() {
   const router = useRouter();
-  const [description, setDescription] = useState<string | null>();
-  const [keyword, setKeyword] = useState<string | null>();
 
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors, isSubmitting },
-    reset,
   } = useForm<FormData>({
     resolver: zodResolver(seoZodSchema),
   });
 
-  const handleBack = () => {
-    router.push("/user/seo");
-  };
+  const handleBack = () => { router.back(); };
 
   const onSubmit = async (data: FormData) => {
     try {
       const payload = {
+        orgid: data.orgid ?? 0,
         page: data.page,
         location: data.location,
         title: data.title,
         keyword: data.keyword,
         description: data.description,
-        orgid: data.orgid ?? 0,
         status: data.status || "Y",
       };
 
@@ -79,22 +69,13 @@ export default function AddSeoForm() {
       <header className="bg-white shadow-sm border-b">
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-12">
-            {/* <Button
-              onClick={handleBack}
-              className="flex items-center text-gray-600 hover:text-gray-900 mr-4"
-            >
-              <ArrowLeft className="h-5 w-5 mr-1" />
-            </Button> */}
             <h1 className="text-xl font-medium text-gray-800 ml-2">Add SEO</h1>
           </div>
         </div>
       </header>
 
       <main className="mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-6 p-6 bg-white rounded-lg shadow-md"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6 bg-white rounded-lg shadow-md">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black">
 
             {/* page */}
@@ -141,48 +122,34 @@ export default function AddSeoForm() {
               )}
             </div>
 
-            <div></div>
-
             {/* keyword */}
-            <div className="">
+            <div>
               <Label htmlFor="keyword">
                 Keyword <span className="text-red-600">*</span>
               </Label>
-              <SummernoteEditor
-                value={keyword}
-                onChange={(html) => {
-                  setKeyword(html);
-                  setValue("keyword", html, { shouldValidate: true });
-                }}
-                placeholder="Enter Keyword here...."
+              <Textarea
+                id="keyword"
+                placeholder="Enter Keyword"
+                {...register("keyword")}
+                className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.keyword && (
-                <p className="text-red-600 text-sm mt-1">
-                  {errors.keyword.message}
-                </p>
-              )}
+              {errors.keyword && (<p className="text-red-600 text-sm mt-1">{errors.keyword.message}</p>)}
             </div>
 
             {/* description */}
-            <div className="">
+            <div>
               <Label htmlFor="description">
                 Description <span className="text-red-600">*</span>
               </Label>
-              <SummernoteEditor
-                value={description}
-                onChange={(html) => {
-                  setDescription(html);
-                  setValue("description", html, { shouldValidate: true });
-                }}
-                placeholder="Enter Description here...."
+              <Textarea
+                id="description"
+                placeholder="Enter Description"
+                {...register("description")}
+                className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.description && (
-                <p className="text-red-600 text-sm mt-1">
-                  {errors.description.message}
-                </p>
-              )}
+              {errors.description && (<p className="text-red-600 text-sm mt-1">{errors.description.message}</p>)}
             </div>
-            
+
           </div>
 
           {/* Action Buttons */}
@@ -206,8 +173,9 @@ export default function AddSeoForm() {
               )}
             </Button>
           </div>
+
         </form>
       </main>
     </div>
   );
-}
+};

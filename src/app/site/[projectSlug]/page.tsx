@@ -38,7 +38,7 @@ export async function generateMetadata(
       description: p?.seo_description,
       siteName: p?.company_name,
       type: "website",
-      images: p?.og_image ? [p.og_image] : [],
+      images: p?.og_image ? [p.company_logo] : [],
     },
     twitter: {
       card: "summary_large_image",
@@ -66,9 +66,9 @@ export default async function ProjectEntry({
   const themeName =
     ProjectDetail?.Theme?.slug?.trim()
       ? ProjectDetail.Theme.slug.trim()
-          .toLowerCase()
-          .replace(/\s+/g, "-")
-          .replace(/[^a-z0-9-]/g, "")
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "")
       : "default";
 
   let ThemeLayout, ThemeHome;
