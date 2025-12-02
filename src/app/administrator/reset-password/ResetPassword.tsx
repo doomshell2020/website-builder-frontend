@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Eye, EyeOff, Lock } from 'lucide-react';
+import { Eye, EyeOff, Lock, LockKeyhole } from 'lucide-react';
 import { Label } from '@/components/ui/Label';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -27,10 +27,8 @@ type ResetForm = z.infer<typeof schema>;
 export default function ResetPassword() {
     const router = useRouter();
     const token = useSearchParams().get("token");
-
     const [showPass, setShowPass] = useState(false);
     const [loading, setLoading] = useState(false);
-
     const { register, handleSubmit, formState: { errors } } = useForm<ResetForm>({
         resolver: zodResolver(schema)
     });
@@ -41,7 +39,6 @@ export default function ResetPassword() {
 
     const onSubmit = async (data: ResetForm) => {
         setLoading(true);
-
         try {
             const res: any = await ResetPasswordByToken({
                 token,
@@ -75,7 +72,7 @@ export default function ResetPassword() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-400 via-blue-500 to-white flex">
+        <div className="min-h-screen bg-white flex">
 
             {/* Left Form */}
             <div className="flex-1 flex items-center justify-center px-6">
@@ -110,15 +107,18 @@ export default function ResetPassword() {
 
                                 <div>
                                     <Label>Confirm Password</Label>
-                                    <Input
-                                        {...register("confirmPassword")}
-                                        type="password"
-                                        placeholder="Confirm password"
-                                        className="pl-10 pr-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 transition-colors"
-                                        onKeyDown={(e) => {
-                                            if (e.key === " ") e.preventDefault();
-                                        }}
-                                    />
+                                    <div className="relative">
+                                        <LockKeyhole className="absolute left-3 top-3 text-gray-400" size={18} />
+                                        <Input
+                                            {...register("confirmPassword")}
+                                            type="password"
+                                            placeholder="Confirm password"
+                                            className="pl-10 pr-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500 transition-colors"
+                                            onKeyDown={(e) => {
+                                                if (e.key === " ") e.preventDefault();
+                                            }}
+                                        />
+                                    </div>
                                     <p className="text-red-500 text-sm">{errors.confirmPassword?.message}</p>
                                 </div>
 
@@ -142,7 +142,7 @@ export default function ResetPassword() {
             </div>
 
             {/* Right Branding */}
-            {/* <ResetBranding /> */}
+            <ResetBranding />
 
         </div>
     );
@@ -176,7 +176,6 @@ function ResetBranding() {
         </div>
     );
 }
-
 
 {/**
     if (
