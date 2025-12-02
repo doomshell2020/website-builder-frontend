@@ -35,51 +35,56 @@ export async function middleware(request: NextRequest) {
   }
 
   // ------------------ Allow main domains home & admin access ------------------
+  const PUBLIC_ROUTES = [
+    "/administrator",
+    "/forgot-password",
+    "/reset-password"
+  ];
+
   if (
     cleanHost === MAIN_DOMAIN ||
     cleanHost === `www.${MAIN_DOMAIN}` ||
     cleanHost === LOCAL_DEV_DOMAIN ||
     LOCAL_DOMAINS.includes(host)
   ) {
-    // ✅ Admin route auth check
+    // Protected route group logic
     if (
       pathname.startsWith("/admin") ||
       pathname.startsWith("/administrator") ||
       pathname.startsWith("/user")
     ) {
-      if (!token && pathname !== "/administrator") {
+      // ❌ If no token and route is NOT public → redirect to login
+      if (!token && !PUBLIC_ROUTES.some(route => pathname.startsWith(route))) {
         const loginUrl = new URL("/administrator", request.url);
         const res = NextResponse.redirect(loginUrl);
-
-        // clear all cookies if unauthenticated
+        // Clear cookies on redirect
         cookies.getAll().forEach((c) =>
           res.cookies.set(c.name, "", { path: "/", maxAge: 0 })
         );
         return res;
       }
     }
-
-    // ✅ Home route `/` or any public path — allow free access
+    // Allow normal access
     return NextResponse.next();
   }
 
   // ------------------ Subdomains for projects ------------------
   // Example: jaipurfoodcaterers.webbuilder.local / navlok.xpertart.com
-if (
-  [MAIN_DOMAIN, LOCAL_DEV_DOMAIN].includes(baseDomain?.toLowerCase().replace(/\.$/, "")) &&
-  subdomain &&
-  subdomain.toLowerCase() !== "www"
-) {
-  // console.log("🌀 Rewriting for subdomain:", subdomain);
-  const url = request.nextUrl.clone();
+  if (
+    [MAIN_DOMAIN, LOCAL_DEV_DOMAIN].includes(baseDomain?.toLowerCase().replace(/\.$/, "")) &&
+    subdomain &&
+    subdomain.toLowerCase() !== "www"
+  ) {
+    // console.log("🌀 Rewriting for subdomain:", subdomain);
+    const url = request.nextUrl.clone();
 
-  // ✅ Ensure clean path joining (avoid double slashes)
-  const cleanPath = pathname.startsWith("/") ? pathname : `/${pathname}`;
-  url.pathname = `/site/${subdomain}${cleanPath}`;
+    // ✅ Ensure clean path joining (avoid double slashes)
+    const cleanPath = pathname.startsWith("/") ? pathname : `/${pathname}`;
+    url.pathname = `/site/${subdomain}${cleanPath}`;
 
-  // console.log("➡️ Rewrite to:", url.pathname);
-  return NextResponse.rewrite(url);
-}
+    // console.log("➡️ Rewrite to:", url.pathname);
+    return NextResponse.rewrite(url);
+  }
 
 
   // ------------------ Custom external domains ------------------
