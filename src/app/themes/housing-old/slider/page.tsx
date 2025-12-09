@@ -117,9 +117,9 @@ export const HeroSlider = ({ company, slug }: DefaultProps): JSX.Element => {
                 </div>
 
                 {/* Static Text Always On Same Position */}
-                <div className="absolute inset-0 flex flex-col items-start justify-center gap-0.5 px-[60px]">
+                <div className="absolute inset-0 flex flex-col items-start justify-center gap-0.5 px-[52px]">
                     <div className="animate-slideIn">
-                        <h1 className="font-[Merriweather] font-normal text-white text-[69px] leading-[72px]">
+                        <h1 className="font-[Merriweather] font-normal text-white text-[55px] leading-[60px]">
                             Smart Design, Strong <br /> Foundations
                         </h1>
                         <p className="font-inter text-[18px] font-medium text-white leading-[28px]">

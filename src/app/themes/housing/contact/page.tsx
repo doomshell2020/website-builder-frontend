@@ -197,203 +197,92 @@ export default function Contact({ project }: DefaultProps) {
         }
     };
 
+    const formFields = {
+        row1: [
+            { placeholder: "First Name", name: "firstName" },
+            { placeholder: "Last Name", name: "lastName" },
+        ],
+        row2: [
+            { placeholder: "Email", name: "email" },
+            { placeholder: "Phone", name: "phone" },
+        ],
+    };
+
     return (
         <div>
-            <div className="flex flex-col items-center justify-center relative self-stretch w-full flex-[0_0_auto]">
-                <div
-                    className="flex h-[450px] items-center justify-center w-full bg-cover bg-center bg-no-repeat relative"
-                    style={{
-                        backgroundImage: "linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('https://c.animaapp.com/mghk811dbdG4xS/img/hero.png')",
-                    }}
-                >
-                    <h1 className="text-white text-4xl md:text-5xl font-poppins">
-                        Contact Us
-                    </h1>
+            <section className="flex flex-col items-center justify-center relative w-full">
+                <div className="flex h-[459px] items-center justify-center gap-2.5 relative w-full bg-[linear-gradient(0deg,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0.5)_100%),url(https://c.animaapp.com/miu4qofhUHi324/img/hero-gallery-1.png)] bg-cover bg-center bg-no-repeat translate-y-[-1rem] animate-fade-in opacity-0">
+                    <div className="inline-flex items-center justify-center gap-2.5 relative">
+                        <h1 className="relative w-fit mt-[-1.00px] font-poppinsregular-52 font-[number:var(--poppinsregular-52-font-weight)] text-white text-[length:var(--poppinsregular-52-font-size)] tracking-[var(--poppinsregular-52-letter-spacing)] leading-[var(--poppinsregular-52-line-height)] [font-style:var(--poppinsregular-52-font-style)]">
+                            Contact Us
+                        </h1>
+                    </div>
                 </div>
-                <div className="flex flex-col items-center justify-center gap-6 p-20 relative self-stretch w-full flex-[0_0_auto] -mt-10 bg-white rounded-[40px_40px_0px_0px]">
-                    <div className="flex flex-wrap items-center justify-center gap-[40px_40px] relative self-stretch w-full flex-[0_0_auto] mt-[-1.00px] mb-[-1.00px] ml-[-1.00px] mr-[-1.00px] border border-solid border-[#d5d0d0]">
-                        <motion.div
-                            variants={itemVariants}
-                            className="flex-shrink-0 w-full lg:w-1/3 h-full flex justify-center items-center bg-white"
-                        >
-                            <img
-                                className="w-full h-[500px] object-cover rounded-none lg:rounded-l-2xl"
-                                alt="Contact Us"
-                                src="https://c.animaapp.com/mghk811dbdG4xS/img/image-36-1.png"
-                            />
-                        </motion.div>
 
-                        {/* Right Content */}
-                        <motion.div
-                            variants={itemVariants}
-                            className="flex flex-col w-full lg:w-1/2 p-8 md:p-12 gap-6"
-                        >
-                            {/* Heading */}
-                            <div className="space-y-1 text-center lg:text-left">
-                                <h2 className="text-[28px] text-gray-900 font-poppins">
-                                    Let’s Start a Conversation
+                <div className="flex flex-col items-center justify-center gap-6 p-20 relative w-full -mt-10 bg-white rounded-[40px_40px_0px_0px] translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:200ms]">
+                    <div className="flex flex-wrap items-center justify-center gap-[34px] relative w-full bg-white shadow-[1px_-1px_6px_#00000059]">
+                        <div className="flex w-[393px] h-[611px] items-center justify-center gap-2.5 relative">
+                            <img
+                                className="flex-1 self-stretch grow relative object-cover"
+                                alt="Contact support"
+                                src="https://c.animaapp.com/miu4qofhUHi324/img/image-36-1.png"
+                            />
+                        </div>
+
+                        <div className="flex flex-col w-[853px] items-center justify-center gap-[22px] pl-0 pr-5 py-5 relative">
+                            <div className="flex items-center gap-2.5 relative w-full">
+                                <h2 className="relative w-fit mt-[-1.00px] font-manrope-34 font-[number:var(--manrope-34-font-weight)] text-[#141414] text-[length:var(--manrope-34-font-size)] text-justify tracking-[var(--manrope-34-letter-spacing)] leading-[var(--manrope-34-line-height)] [font-style:var(--manrope-34-font-style)]">
+                                    Let&apos;s Talk
                                 </h2>
-                                <p className="text-base md:text-[16px] text-gray-800 font-semibold">
-                                    Our support team is here to guide you—no matter how big or small your concern.
+                            </div>
+
+                            <div className="flex items-center gap-2.5 relative w-full">
+                                <p className="relative flex-1 mt-[-1.00px] font-poppinsregular-20 font-[number:var(--poppinsregular-20-font-weight)] text-[#141414] text-[length:var(--poppinsregular-20-font-size)] text-justify tracking-[var(--poppinsregular-20-letter-spacing)] leading-[var(--poppinsregular-20-line-height)] [font-style:var(--poppinsregular-20-font-style)]">
+                                    Our support team is here to guide you—no matter how big or small
+                                    your concern.
                                 </p>
                             </div>
 
-                            {/* Form */}
-                            <form className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2" onSubmit={handleSubmit(onSubmit)}>
-                                {/* Row 1 */}
-                                <div>
-                                    <Input
-                                        name="name"
-                                        className="bg-white-500"
-                                        placeholder="First Name"
-                                        {...register("name")}
-                                    />
-                                    {errors.name && (
-                                        <p className="text-sm text-red-500">{errors.name.message}</p>
-                                    )}
+                            <form className="flex flex-col items-end justify-end gap-7 relative w-full">
+                                <div className="flex items-center justify-center gap-8 relative w-full">
+                                    {formFields.row1.map((field, index) => (
+                                        <Input
+                                            key={field.name}
+                                            name={field.name}
+                                            placeholder={field.placeholder}
+                                            className="flex-1 h-auto px-3.5 py-4 rounded-sm border border-solid border-[#141414] font-interregular-20 font-[number:var(--interregular-20-font-weight)] text-[#9a9393] text-[length:var(--interregular-20-font-size)] text-justify tracking-[var(--interregular-20-letter-spacing)] leading-[var(--interregular-20-line-height)] [font-style:var(--interregular-20-font-style)] placeholder:text-[#9a9393]"
+                                        />
+                                    ))}
                                 </div>
 
-                                {/* Row 2 */}
-                                <div>
-                                    <Input
-                                        name="name2"
-                                        className="bg-white-500"
-                                        placeholder="Last Name"
-                                        {...register("name2")}
-                                    />
+                                <div className="flex items-center justify-center gap-8 relative w-full">
+                                    {formFields.row2.map((field, index) => (
+                                        <Input
+                                            key={field.name}
+                                            name={field.name}
+                                            placeholder={field.placeholder}
+                                            className="flex-1 h-auto px-3.5 py-4 rounded-sm border border-solid border-[#141414] font-interregular-20 font-[number:var(--interregular-20-font-weight)] text-[#9a9393] text-[length:var(--interregular-20-font-size)] text-justify tracking-[var(--interregular-20-letter-spacing)] leading-[var(--interregular-20-line-height)] [font-style:var(--interregular-20-font-style)] placeholder:text-[#9a9393]"
+                                        />
+                                    ))}
                                 </div>
 
-                                {/* Row 3 */}
-                                <div>
-                                    <Input
-                                        name="email"
-                                        className="bg-white-500"
-                                        placeholder="Email"
-                                        {...register("email")}
-                                    />
-                                    {errors.email && (
-                                        <p className="text-sm text-red-500">{errors.email.message}</p>
-                                    )}
-                                </div>
+                                <Textarea
+                                    name="message"
+                                    placeholder="Message"
+                                    className="h-[199px] w-full px-3.5 py-4 rounded-sm border border-solid border-[#141414] font-interregular-20 font-[number:var(--interregular-20-font-weight)] text-[#9a9393] text-[length:var(--interregular-20-font-size)] text-justify tracking-[var(--interregular-20-letter-spacing)] leading-[var(--interregular-20-line-height)] [font-style:var(--interregular-20-font-style)] placeholder:text-[#9a9393] resize-none"
+                                />
 
-                                {/* Row 4 */}
-                                <div>
-                                    <Input
-                                        name="phone"
-                                        type="text"
-                                        placeholder="Phone"
-                                        className="bg-white-500"
-                                        {...register("mobile")}
-                                        maxLength={13}
-                                        {...register("mobile")}
-                                        onInput={(e) => {
-                                            let val = e.currentTarget.value;
-
-                                            if (val.startsWith("+")) {
-                                                val = "+" + val.slice(1).replace(/\D/g, "");
-                                            } else {
-                                                val = val.replace(/\D/g, "");
-                                            }
-                                            if (val.startsWith("+91")) {
-                                                val = "+91" + val.slice(3, 13);
-                                            }
-                                            else if (val.startsWith("91")) {
-                                                val = "91" + val.slice(2, 12);
-                                            }
-                                            else if (val.startsWith("0")) {
-                                                val = val.replace(/^0+/, "0"); // collapse multiple 0s
-                                                val = val.slice(0, 11); // 0 + 10 digits
-                                                // must not start with 0 followed by 1–5
-                                                if (/^0[1-5]/.test(val)) {
-                                                    val = "0"; // reset to just "0" (invalid input beyond that)
-                                                }
-                                            }
-                                            else if (/^[6-9]/.test(val)) {
-                                                val = val.slice(0, 10);
-                                            }
-                                            else if (/^[1-5]/.test(val)) {
-                                                val = "";
-                                            }
-                                            else {
-                                                val = val.slice(0, 10);
-                                            }
-
-                                            e.currentTarget.value = val;
-                                        }}
-                                        onPaste={(e) => {
-                                            e.preventDefault();
-                                            let val = e.clipboardData.getData("text");
-                                            if (val.startsWith("+")) {
-                                                val = "+" + val.slice(1).replace(/\D/g, "");
-                                            } else {
-                                                val = val.replace(/\D/g, "");
-                                            }
-
-                                            if (val.startsWith("+91")) {
-                                                val = "+91" + val.slice(3, 13);
-                                                if (/^\+91[0-5]/.test(val)) val = "+91";
-                                            } else if (val.startsWith("91")) {
-                                                val = "91" + val.slice(2, 12);
-                                                if (/^91[0-5]/.test(val)) val = "91";
-                                            } else if (val.startsWith("0")) {
-                                                val = val.replace(/^0+/, "0");
-                                                val = val.slice(0, 11);
-                                                if (/^0[1-5]/.test(val)) val = "0";
-                                            } else if (/^[6-9]/.test(val)) {
-                                                val = val.slice(0, 10);
-                                            } else if (/^[1-5]/.test(val)) {
-                                                val = "";
-                                            } else {
-                                                val = val.slice(0, 10);
-                                            }
-
-                                            e.currentTarget.value = val;
-                                        }}
-                                    />
-                                    {errors.mobile && (
-                                        <p className="text-sm text-red-500">{errors.mobile.message}</p>
-                                    )}
-                                </div>
-
-                                {/* Row 5 */}
-                                <div className="md:col-span-2">
-                                    <Textarea
-                                        name="message"
-                                        placeholder="Message"
-                                        {...register("subject")}
-                                        className="resize-none"
-                                    />
-                                    {errors.subject && (
-                                        <p className="text-sm text-red-500">{errors.subject.message}</p>
-                                    )}
-
-                                </div>
-
-                                {/* Submit Button */}
-                                <div className="md:col-span-2">
-                                    <motion.button
-                                        type="submit"
-                                        disabled={isSubmitting}
-                                        variants={itemVariants}
-                                        className="relative mt-4 w-full inline-flex items-center justify-center bg-[#141414] text-white text-lg font-medium px-6 py-2 rounded-md overflow-hidden transition-all duration-300 group disabled:opacity-60"
-                                    >
-                                        {/* Button text or spinner */}
-                                        {isSubmitting ? (
-                                            <span className="relative z-10 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                                        ) : (
-                                            <span className="relative z-10">Submit</span>
-                                        )}
-
-                                        {/* Hover background animation */}
-                                        <span className="absolute left-0 top-0 h-full w-0 bg-blue-500 transition-all duration-500 ease-in-out group-hover:w-full"></span>
-                                    </motion.button>
-                                </div>
-
+                                <Button
+                                    type="submit"
+                                    className="h-auto w-full px-[26px] py-4 bg-[#201667] hover:bg-[#201667]/90 transition-colors font-poppinsmedium-20 font-[number:var(--poppinsmedium-20-font-weight)] text-white text-[length:var(--poppinsmedium-20-font-size)] text-justify tracking-[var(--poppinsmedium-20-letter-spacing)] leading-[var(--poppinsmedium-20-line-height)] [font-style:var(--poppinsmedium-20-font-style)]"
+                                >
+                                    Submit
+                                </Button>
                             </form>
-                        </motion.div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </div>
     );
 };

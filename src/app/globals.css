@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 @import 'summernote/dist/summernote-lite.css';
+@import "@/styles/themes/colonerize/colonerize.css";
+@import "@/styles/themes/housing/housing.css";
 
 .clip-path-polygon {
   clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%);

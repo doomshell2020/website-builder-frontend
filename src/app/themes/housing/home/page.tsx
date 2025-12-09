@@ -7,6 +7,8 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/textarea";
 import { findGalleryBySlug } from "@/services/gallery.service";
@@ -126,6 +128,41 @@ export default function HousingHome({ project }: DefaultHomeProps) {
         hidden: { opacity: 0, scale: 0.95 },
         visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
     };
+
+    const galleryImages = [
+        {
+            src: "https://c.animaapp.com/miu4qofhUHi324/img/image-3-11.png",
+            alt: "Architecture project 1",
+        },
+        {
+            src: "https://c.animaapp.com/miu4qofhUHi324/img/image-3-12.png",
+            alt: "Architecture project 2",
+        },
+        {
+            src: "https://c.animaapp.com/miu4qofhUHi324/img/image-3-13.png",
+            alt: "Architecture project 3",
+        },
+        {
+            src: "https://c.animaapp.com/miu4qofhUHi324/img/image-3-14.png",
+            alt: "Architecture project 4",
+        },
+        {
+            src: "https://c.animaapp.com/miu4qofhUHi324/img/image-3-15.png",
+            alt: "Architecture project 5",
+        },
+        {
+            src: "https://c.animaapp.com/miu4qofhUHi324/img/image-3-16.png",
+            alt: "Architecture project 6",
+        },
+        {
+            src: "https://c.animaapp.com/miu4qofhUHi324/img/image-3-17.png",
+            alt: "Architecture project 7",
+        },
+        {
+            src: "https://c.animaapp.com/miu4qofhUHi324/img/image-3-18.png",
+            alt: "Architecture project 8",
+        },
+    ];
 
     const onSubmit = async (data: FormData) => {
         try {
@@ -297,330 +334,186 @@ export default function HousingHome({ project }: DefaultHomeProps) {
             <HeroSlider company={project?.schema_name} slug={"home"} />
 
             {/** About Section */}
-            <section className="flex flex-col items-center relative justify-center px-6 md:px-12 lg:px-20 py-20 bg-white rounded-t-[40px] overflow-hidden">
-                {/* Decorative Dots */}
-                <div className="absolute top-5 left-1/2 -translate-x-1/2 md:left-[33%]">
+            <section className="flex flex-col items-center gap-2.5 p-20 w-full bg-white">
+                <div className="flex flex-wrap items-start justify-center gap-[78px] w-full">
                     <img
-                        className="w-28 md:w-40 lg:w-40 object-contain opacity-80"
-                        alt="Decorative Dots"
-                        src="https://c.animaapp.com/mghk811dbdG4xS/img/dots-1-1.png"
+                        className="w-[588.5px] mt-[-44px] mb-[-8px] ml-[-12.5px] translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:0ms]"
+                        alt="Img dot box"
+                        src="https://c.animaapp.com/miu4qofhUHi324/img/img-dot-box-1.svg"
                     />
-                </div>
 
-                {/* Main Content */}
-                <div className="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20 relative w-full max-w-[1200px]">
-                    {/* Left Image */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -80 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                        viewport={{ once: true, amount: 0.3 }}
-                        className="flex justify-center flex-shrink-0"
-                    >
-                        <img
-                            className="w-64 sm:w-80 md:w-[400px] lg:w-[400px] xl:w-[480px] object-cover rounded-xl"
-                            alt="About Us"
-                            src="https://c.animaapp.com/mghk811dbdG4xS/img/image-34-1.png"
-                        />
-                    </motion.div>
+                    <div className="flex flex-col w-[681px] items-start gap-[22px] pt-[18px] pb-0 px-0 relative">
+                        <div className="flex flex-col items-start w-full">
+                            <div className="flex flex-col items-start justify-center gap-4 w-full translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:200ms]">
+                                <div className="flex w-full items-center gap-2.5">
+                                    <h2 className="w-fit mt-[-1px] font-manrope-34 font-[number:var(--manrope-34-font-weight)] text-[#141414] text-[length:var(--manrope-34-font-size)] tracking-[var(--manrope-34-letter-spacing)] leading-[var(--manrope-34-line-height)] [font-style:var(--manrope-34-font-style)]">
+                                        Designing Spaces, Defining Futures
+                                    </h2>
+                                </div>
+                            </div>
 
-                    {/* Right Text Content */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 50 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.9, delay: 0.2, ease: "easeOut" }}
-                        viewport={{ once: true, amount: 0.3 }}
-                        className="relative flex flex-col gap-6 text-center lg:text-left max-w-2xl"
-                    >
-                        {/* Background "OUR STORY" text */}
-                        <h1 className="absolute -top-6 left-1/2 -translate-x-1/2 lg:left-0 lg:translate-x-0 text-6xl font-poppins font-bold text-[#E6F4FF] opacity-70 select-none pointer-events-none">
-                            OUR STORY
-                        </h1>
+                            <div className="inline-flex absolute top-[-15px] left-0 items-center gap-2.5 opacity-0 animate-fade-in [--animation-delay:0ms]">
+                                <div className="w-[647px] mt-[-1px] font-manrope-66 font-[number:var(--manrope-66-font-weight)] text-[#00a4e521] text-[length:var(--manrope-66-font-size)] tracking-[var(--manrope-66-letter-spacing)] leading-[var(--manrope-66-line-height)] [font-style:var(--manrope-66-font-style)]">
+                                    OUR STORY
+                                </div>
+                            </div>
+                        </div>
 
-                        {/* Foreground main heading */}
-                        <h2 className="relative font-poppins font-bold text-black text-2xl sm:text-3xl lg:text-3xl">
-                            Designing Spaces, Defining Futures
-                        </h2>
+                        <div className="flex items-center justify-center gap-2.5 pl-0 pr-2.5 py-0 w-full translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:400ms]">
+                            <p className="flex-1 font-poppinsregular-22 font-[number:var(--poppinsregular-22-font-weight)] text-[#141414] text-[length:var(--poppinsregular-22-font-size)] text-justify tracking-[var(--poppinsregular-22-letter-spacing)] leading-[var(--poppinsregular-22-line-height)] [font-style:var(--poppinsregular-22-font-style)]">
+                                Founded on July 28, 2025, NAVVISTAR INFRA PVT. LTD. is a visionary
+                                new construction company built on ambition, innovation, and a
+                                commitment to excellence. We are more than just builders — we are
+                                forward-thinkers with a clear mission to shape the future of
+                                construction through smart design, quality craftsmanship, and
+                                sustainable practices.
+                            </p>
+                        </div>
 
-                        <p className="text-black text-base sm:text-lg">
-                            Founded on <span className="font-semibold">July 28, 2025</span>,
-                            NAVVISTAR INFRA PVT. LTD. is a visionary construction company built
-                            on ambition, innovation, and a commitment to excellence. We are more
-                            than just builders — we are forward-thinkers with a clear mission to
-                            shape the future of construction through smart design, quality
-                            craftsmanship, and sustainable practices.
-                        </p>
+                        <div className="flex items-center justify-center gap-2.5 pl-0 pr-2.5 py-0 w-full translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:600ms]">
+                            <p className="flex-1 font-poppinsregular-22 font-[number:var(--poppinsregular-22-font-weight)] text-[#141414] text-[length:var(--poppinsregular-22-font-size)] text-justify tracking-[var(--poppinsregular-22-letter-spacing)] leading-[var(--poppinsregular-22-line-height)] [font-style:var(--poppinsregular-22-font-style)]">
+                                Driven by a high vision, we aim to set new standards in the
+                                industry by delivering modern, efficient, and long-lasting
+                                structures that meet the evolving needs of our clients and
+                                communities. Our team combines fresh ideas with technical
+                                expertise to bring bold concepts to life — safely, on time, and
+                                within budget.
+                            </p>
+                        </div>
 
-                        <p className="text-black text-base sm:text-lg">
-                            Driven by a high vision, we aim to set new standards in the industry
-                            by delivering modern, efficient, and long-lasting structures that
-                            meet the evolving needs of our clients and communities. Our team
-                            combines fresh ideas with technical expertise to bring bold concepts
-                            to life — safely, on time, and within budget.
-                        </p>
-
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.6, delay: 0.4 }}
-                            viewport={{ once: true }}
-                        >
-                            <Link
-                                href="/about"
-                                className="relative mt-4 max-w-[180px] w-full inline-flex items-center justify-center bg-[#141414] text-white text-lg font-medium px-4 py-2 rounded-md overflow-hidden transition-all duration-300 group"
-                            >
-                                <span className="relative z-10">Explore More</span>
-                                <span className="absolute left-0 top-0 h-full w-0 bg-[#1199d4] transition-all duration-500 ease-in-out group-hover:w-full"></span>
-                            </Link>
-                        </motion.div>
-                    </motion.div>
+                        <Button
+                            onClick={() => router.push("/about")}
+                            className="h-auto gap-2.5 px-6 py-3 bg-[#1b1b1b] hover:bg-[#1b1b1b]/90 transition-colors translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:800ms]">
+                            <span className="w-fit mt-[-1px] font-poppins-22 font-[number:var(--poppins-22-font-weight)] text-white text-[length:var(--poppins-22-font-size)] tracking-[var(--poppins-22-letter-spacing)] leading-[var(--poppins-22-line-height)] [font-style:var(--poppins-22-font-style)]">
+                                Explore More
+                            </span>
+                        </Button>
+                    </div>
                 </div>
             </section>
 
             {/** Gallery Section */}
-            <section>
-                <motion.div
-                    className="flex flex-col items-center justify-center gap-10 p-10 md:p-16 lg:p-20 bg-gray-100 w-full"
-                    variants={containerVariants}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, amount: 0.2 }} // triggers when 20% is visible
-                >
-                    {/* Section Title */}
-                    <motion.div
-                        className="relative text-center w-full"
-                        variants={itemVariants}
-                    >
-                        <h1 className="absolute inset-0 flex items-center justify-center text-6xl -top-12 text-[#00a4e520] uppercase pointer-events-none select-none">
-                            OUR GALLERY
-                        </h1>
-                        <h2 className="relative text-2xl sm:text-3xl md:text-4xl font-bold text-black font-poppins">
+            <section className="flex flex-col items-center justify-center gap-[38px] px-20 py-[54px] w-full bg-[#f0f0f0]">
+                <header className="flex flex-col items-center justify-center gap-6 w-full relative">
+                    <div className="flex justify-center w-full items-center relative z-10 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:200ms]">
+                        <h2 className="font-manrope-38 font-[number:var(--manrope-38-font-weight)] text-[#141414] text-[length:var(--manrope-38-font-size)] tracking-[var(--manrope-38-letter-spacing)] leading-[var(--manrope-38-line-height)] [font-style:var(--manrope-38-font-style)]">
                             Explore Our Work
                         </h2>
-                    </motion.div>
+                    </div>
 
-                    {/* Image Grid */}
-                    <motion.div
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-7xl"
-                        variants={containerVariants}
-                    >
-                        {imagePreviews.slice(0, 8).map((src, index) => (
-                            <motion.div
-                                key={index}
-                                className="overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300"
-                                variants={itemVariants}
-                            >
-                                <img
-                                    src={src}
-                                    alt={`Gallery ${index + 1}`}
-                                    className="w-full h-48 object-contain hover:scale-105 transition-transform duration-300 cursor-pointer"
-                                    loading="lazy"
-                                />
-                            </motion.div>
-                        ))}
+                    <div className="absolute top-[-60%] left-[37%] -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-0 animate-fade-in [--animation-delay:0ms]">
+                        <p className="font-manrope-66 font-[number:var(--manrope-66-font-weight)] text-[#00a4e521] text-[length:var(--manrope-66-font-size)] text-center tracking-[var(--manrope-66-letter-spacing)] leading-[var(--manrope-66-line-height)] [font-style:var(--manrope-66-font-style)] whitespace-nowrap">
+                            OUR GALLERY
+                        </p>
+                    </div>
+                </header>
 
-                    </motion.div>
-
-                    {/* Explore Button */}
-                    <Link href="/gallery">
-                        <motion.button
-                            variants={itemVariants}
-                            className="relative mt-4 max-w-[180px] w-full inline-flex items-center justify-center bg-[#141414] text-white text-lg font-medium px-4 py-2 rounded-md overflow-hidden transition-all duration-300 group"
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:400ms]">
+                    {galleryImages.map((image, index) => (
+                        <Card
+                            key={index}
+                            className="border-[#141414] bg-white transition-transform hover:scale-105 duration-300"
                         >
-                            <span className="relative z-10">Explore More</span>
-                            <span className="absolute left-0 top-0 h-full w-0 bg-[#1199d4] transition-all duration-500 ease-in-out group-hover:w-full"></span>
-                        </motion.button>
-                    </Link>
-                </motion.div>
+                            <CardContent className="p-1.5">
+                                <img
+                                    className="w-full h-[194.33px] object-cover"
+                                    alt={image.alt}
+                                    src={image.src}
+                                />
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+
+                <Button
+                    onClick={() => router.push("/gallery")}
+                    className="h-auto gap-2.5 px-6 py-3 bg-[#1b1b1b] hover:bg-[#1b1b1b]/90 transition-colors translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:800ms]">
+                    <span className="w-fit mt-[-1px] font-poppins-22 font-[number:var(--poppins-22-font-weight)] text-white text-[length:var(--poppins-22-font-size)] tracking-[var(--poppins-22-letter-spacing)] leading-[var(--poppins-22-line-height)] [font-style:var(--poppins-22-font-style)]">
+                        Explore More
+                    </span>
+                </Button>
             </section>
 
             {/** Contact Section */}
-            <section>
-                <div className="flex flex-col items-center justify-center relative self-stretch w-full flex-[0_0_auto]">
-                    <div className="flex flex-col items-center justify-center gap-6 p-20 relative self-stretch w-full flex-[0_0_auto] -mt-10 bg-white rounded-[40px_40px_0px_0px]">
-                        <div className="flex flex-wrap items-center justify-center gap-[40px_40px] relative self-stretch w-full flex-[0_0_auto] mt-[-1.00px] mb-[-1.00px] ml-[-1.00px] mr-[-1.00px] border border-solid border-[#d5d0d0]">
-                            <motion.div
-                                variants={itemVariants}
-                                className="flex-shrink-0 w-full lg:w-1/3 h-full flex justify-center items-center bg-white"
-                            >
-                                <img
-                                    className="w-full h-[500px] object-cover rounded-none lg:rounded-l-2xl"
-                                    alt="Contact Us"
-                                    src="https://c.animaapp.com/mghk811dbdG4xS/img/image-36-1.png"
-                                />
-                            </motion.div>
+            <section className="flex flex-col items-center gap-2.5 px-20 py-[62px] w-full bg-white">
+                <div className="flex flex-wrap items-center justify-center gap-[34px] w-full bg-white shadow-[1px_-1px_6px_#00000059]">
+                    <div className="flex w-[393px] h-[611px] items-center justify-center gap-2.5 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:200ms]">
+                        <img
+                            className="flex-1 self-stretch object-cover"
+                            alt="Contact support"
+                            src="https://c.animaapp.com/miu4qofhUHi324/img/image-36-1.png"
+                        />
+                    </div>
 
-                            {/* Right Content */}
-                            <motion.div
-                                variants={itemVariants}
-                                className="flex flex-col w-full lg:w-1/2 p-8 md:p-12 gap-6"
-                            >
-                                {/* Heading */}
-                                <div className="space-y-1 text-center lg:text-left">
-                                    <h2 className="text-[28px] text-gray-900 font-poppins">
-                                        Let’s Talk
-                                    </h2>
-                                    <p className="text-base md:text-[16px] text-gray-800 font-semibold">
-                                        Our support team is here to guide you—no matter how big or small your concern.
-                                    </p>
+                    <div className="flex flex-col w-[853px] items-center justify-center gap-[22px] pl-0 pr-5 py-5 bg-white translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:400ms]">
+                        <div className="flex items-center gap-2.5 self-stretch w-full">
+                            <h2 className="w-fit mt-[-1.00px] font-manrope-34 font-[number:var(--manrope-34-font-weight)] text-[#141414] text-[length:var(--manrope-34-font-size)] text-justify tracking-[var(--manrope-34-letter-spacing)] leading-[var(--manrope-34-line-height)] [font-style:var(--manrope-34-font-style)]">
+                                Let&apos;s Talk
+                            </h2>
+                        </div>
+
+                        <div className="flex items-center gap-2.5 self-stretch w-full">
+                            <p className="flex-1 mt-[-1.00px] font-poppinsregular-20 font-[number:var(--poppinsregular-20-font-weight)] text-[#141414] text-[length:var(--poppinsregular-20-font-size)] text-justify tracking-[var(--poppinsregular-20-letter-spacing)] leading-[var(--poppinsregular-20-line-height)] [font-style:var(--poppinsregular-20-font-style)]">
+                                Our support team is here to guide you—no matter how big or small
+                                your concern.
+                            </p>
+                        </div>
+
+                        <form className="flex flex-col items-end justify-end gap-7 self-stretch w-full">
+                            <div className="flex items-center justify-center gap-8 self-stretch w-full">
+                                <div className="flex-1">
+                                    <Input
+                                        type="text"
+                                        placeholder="First Name"
+                                        className="h-auto pl-3.5 pr-0 py-4 rounded-sm border border-solid border-[#141414] font-interregular-20 font-[number:var(--interregular-20-font-weight)] text-[#9a9393] text-[length:var(--interregular-20-font-size)] text-justify tracking-[var(--interregular-20-letter-spacing)] leading-[var(--interregular-20-line-height)] [font-style:var(--interregular-20-font-style)] placeholder:text-[#9a9393]"
+                                    />
                                 </div>
 
-                                {/* Form */}
-                                <form className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4" onSubmit={handleSubmit(onSubmit)}>
-                                    {/* Row 1 */}
-                                    <div>
-                                        <Input
-                                            name="name"
-                                            className="bg-white-500"
-                                            placeholder="First Name"
-                                            {...register("name")}
-                                        />
-                                        {errors.name && (
-                                            <p className="text-sm text-red-500">{errors.name.message}</p>
-                                        )}
-                                    </div>
+                                <div className="flex-1">
+                                    <Input
+                                        type="text"
+                                        placeholder="Last Name"
+                                        className="h-auto pl-3.5 pr-0 py-4 rounded-sm border border-solid border-[#141414] font-interregular-20 font-[number:var(--interregular-20-font-weight)] text-[#9a9393] text-[length:var(--interregular-20-font-size)] text-justify tracking-[var(--interregular-20-letter-spacing)] leading-[var(--interregular-20-line-height)] [font-style:var(--interregular-20-font-style)] placeholder:text-[#9a9393]"
+                                    />
+                                </div>
+                            </div>
 
-                                    {/* Row 2 */}
-                                    <div>
-                                        <Input
-                                            name="name2"
-                                            className="bg-white-500"
-                                            placeholder="Last Name"
-                                            {...register("name2")}
-                                        />
-                                    </div>
+                            <div className="flex items-center justify-center gap-8 self-stretch w-full">
+                                <div className="flex-1">
+                                    <Input
+                                        type="email"
+                                        placeholder="Email"
+                                        className="h-auto pl-3.5 pr-0 py-4 rounded-sm border border-solid border-[#141414] font-interregular-20 font-[number:var(--interregular-20-font-weight)] text-[#9a9393] text-[length:var(--interregular-20-font-size)] text-justify tracking-[var(--interregular-20-letter-spacing)] leading-[var(--interregular-20-line-height)] [font-style:var(--interregular-20-font-style)] placeholder:text-[#9a9393]"
+                                    />
+                                </div>
 
-                                    {/* Row 3 */}
-                                    <div>
-                                        <Input
-                                            name="email"
-                                            className="bg-white-500"
-                                            placeholder="Email"
-                                            {...register("email")}
-                                        />
-                                        {errors.email && (
-                                            <p className="text-sm text-red-500">{errors.email.message}</p>
-                                        )}
-                                    </div>
+                                <div className="flex-1">
+                                    <Input
+                                        type="tel"
+                                        placeholder="Phone"
+                                        className="h-auto pl-3.5 pr-0 py-4 rounded-sm border border-solid border-[#141414] font-interregular-20 font-[number:var(--interregular-20-font-weight)] text-[#9a9393] text-[length:var(--interregular-20-font-size)] text-justify tracking-[var(--interregular-20-letter-spacing)] leading-[var(--interregular-20-line-height)] [font-style:var(--interregular-20-font-style)] placeholder:text-[#9a9393]"
+                                    />
+                                </div>
+                            </div>
 
-                                    {/* Row 4 */}
-                                    <div>
-                                        <Input
-                                            name="phone"
-                                            type="text"
-                                            placeholder="Phone"
-                                            className="bg-white-500"
-                                            {...register("mobile")}
-                                            maxLength={13}
-                                            {...register("mobile")}
-                                            onInput={(e) => {
-                                                let val = e.currentTarget.value;
+                            <div className="self-stretch w-full">
+                                <Textarea
+                                    placeholder="Message"
+                                    className="h-[199px] pl-3.5 pr-0 py-4 rounded-sm border border-solid border-[#141414] font-interregular-20 font-[number:var(--interregular-20-font-weight)] text-[#9a9393] text-[length:var(--interregular-20-font-size)] text-justify tracking-[var(--interregular-20-letter-spacing)] leading-[var(--interregular-20-line-height)] [font-style:var(--interregular-20-font-style)] placeholder:text-[#9a9393] resize-none"
+                                />
+                            </div>
 
-                                                if (val.startsWith("+")) {
-                                                    val = "+" + val.slice(1).replace(/\D/g, "");
-                                                } else {
-                                                    val = val.replace(/\D/g, "");
-                                                }
-                                                if (val.startsWith("+91")) {
-                                                    val = "+91" + val.slice(3, 13);
-                                                }
-                                                else if (val.startsWith("91")) {
-                                                    val = "91" + val.slice(2, 12);
-                                                }
-                                                else if (val.startsWith("0")) {
-                                                    val = val.replace(/^0+/, "0"); // collapse multiple 0s
-                                                    val = val.slice(0, 11); // 0 + 10 digits
-                                                    // must not start with 0 followed by 1–5
-                                                    if (/^0[1-5]/.test(val)) {
-                                                        val = "0"; // reset to just "0" (invalid input beyond that)
-                                                    }
-                                                }
-                                                else if (/^[6-9]/.test(val)) {
-                                                    val = val.slice(0, 10);
-                                                }
-                                                else if (/^[1-5]/.test(val)) {
-                                                    val = "";
-                                                }
-                                                else {
-                                                    val = val.slice(0, 10);
-                                                }
-                                                e.currentTarget.value = val;
-                                            }}
-                                            onPaste={(e) => {
-                                                e.preventDefault();
-                                                let val = e.clipboardData.getData("text");
-                                                if (val.startsWith("+")) {
-                                                    val = "+" + val.slice(1).replace(/\D/g, "");
-                                                } else {
-                                                    val = val.replace(/\D/g, "");
-                                                }
-
-                                                if (val.startsWith("+91")) {
-                                                    val = "+91" + val.slice(3, 13);
-                                                    if (/^\+91[0-5]/.test(val)) val = "+91";
-                                                } else if (val.startsWith("91")) {
-                                                    val = "91" + val.slice(2, 12);
-                                                    if (/^91[0-5]/.test(val)) val = "91";
-                                                } else if (val.startsWith("0")) {
-                                                    val = val.replace(/^0+/, "0");
-                                                    val = val.slice(0, 11);
-                                                    if (/^0[1-5]/.test(val)) val = "0";
-                                                } else if (/^[6-9]/.test(val)) {
-                                                    val = val.slice(0, 10);
-                                                } else if (/^[1-5]/.test(val)) {
-                                                    val = "";
-                                                } else {
-                                                    val = val.slice(0, 10);
-                                                }
-
-                                                e.currentTarget.value = val;
-                                            }}
-                                        />
-                                        {errors.mobile && (
-                                            <p className="text-sm text-red-500">{errors.mobile.message}</p>
-                                        )}
-                                    </div>
-
-                                    {/* Row 5 */}
-                                    <div className="md:col-span-2">
-                                        <Textarea
-                                            name="message"
-                                            placeholder="Message"
-                                            {...register("subject")}
-                                            className="resize-none"
-                                        />
-                                        {errors.subject && (
-                                            <p className="text-sm text-red-500">{errors.subject.message}</p>
-                                        )}
-
-                                    </div>
-
-                                    {/* Submit Button */}
-                                    <div className="md:col-span-2">
-                                        <motion.button
-                                            type="submit"
-                                            disabled={isSubmitting}
-                                            variants={itemVariants}
-                                            className="relative mt-4 w-full inline-flex items-center justify-center bg-[#141414] text-white text-lg font-medium px-6 py-2 rounded-md overflow-hidden transition-all duration-300 group disabled:opacity-60"
-                                        >
-                                            {/* Button text or spinner */}
-                                            {isSubmitting ? (
-                                                <span className="relative z-10 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                                            ) : (
-                                                <span className="relative z-10">Submit</span>
-                                            )}
-
-                                            {/* Hover background animation */}
-                                            <span className="absolute left-0 top-0 h-full w-0 bg-blue-500 transition-all duration-500 ease-in-out group-hover:w-full"></span>
-                                        </motion.button>
-                                    </div>
-
-                                </form>
-                            </motion.div>
-                        </div>
+                            <Button
+                                type="submit"
+                                className="h-auto px-[26px] py-4 self-stretch w-full bg-[#201667] hover:bg-[#201667]/90 transition-colors font-poppinsmedium-20 font-[number:var(--poppinsmedium-20-font-weight)] text-white text-[length:var(--poppinsmedium-20-font-size)] text-justify tracking-[var(--poppinsmedium-20-letter-spacing)] leading-[var(--poppinsmedium-20-line-height)] [font-style:var(--poppinsmedium-20-font-style)]"
+                            >
+                                Submit
+                            </Button>
+                        </form>
                     </div>
                 </div>
             </section>
+
         </div>
     );
 };

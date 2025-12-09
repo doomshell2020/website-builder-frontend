@@ -5,129 +5,130 @@ import { useRouter } from "next/navigation";
 import { User } from "@/types/user";
 import { Label } from "@/components/ui/Label";
 import { Mail, MapPin, Phone } from 'lucide-react';
-
 interface DefaultProps { project?: User };
+import { MailIcon, MapPinIcon, PhoneIcon } from "lucide-react";
 
-const menuItems = [
-  { label: "About", href: "/about" },
-  { label: "Our Leadership", href: "/leadership" },
-  { label: "Gallery", href: "/gallery" },
-  { label: "Contact Us", href: "/contact" },
+const quickLinks = [
+  { label: "About", to: "/about" },
+  { label: "Our Leadership", to: "/leadership" },
+  { label: "Gallery", to: "/gallery" },
+  { label: "Contact Us", to: "/contact" },
+];
+
+const contactInfo = [
+  {
+    icon: PhoneIcon,
+    label: "Phone",
+    value: "7240230171",
+    type: "text",
+  }, {
+    icon: MailIcon,
+    label: "Email",
+    value: "contact@navvistarinfra.com",
+    type: "email",
+    href: "mailto:contact@navvistarinfra.com",
+  }, {
+    icon: MapPinIcon,
+    label: "Address",
+    value: "302, okey plus square, Patel marg , Mansarover , Jaipur 302020",
+    type: "text",
+  },
 ];
 
 export default function Footer({ project }: DefaultProps) {
   const router = useRouter();
   return (
-    <footer>
-      {/* Top Section */}
-      <div className="w-full bg-[#1b1b1b] text-white  px-12 py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-12 lg:gap-16 justify-center items-start ">
-          {/* Logo + Description */}
-          <div>
+    <footer className="flex flex-col w-full">
+      <div className="flex flex-wrap items-start gap-[50px] px-20 py-[52px] w-full bg-[#1b1b1b] justify-center">
+        <div className="w-full max-w-[585px] flex flex-col items-start gap-6 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:0ms]">
+          <Link
+            className="inline-flex flex-col items-start gap-2.5"
+            href="/navvstaru45homeu45page"
+          >
             <img
-              src={(project?.company_logo)
-                ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${project?.company_logo}`
-                : "https://c.animaapp.com/mghk811dbdG4xS/img/image-30-5.png"}
-              alt="Navvistar Logo"
-              className="w-full max-w-[180px] h-auto mb-4"
+              className="w-[177px] h-[146px] object-cover"
+              alt="Navvistar Infra Logo"
+              src="https://c.animaapp.com/miu4qofhUHi324/img/image-30-4.png"
             />
-            <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-              Founded on July 28, 2025, NAVVISTAR INFRA PVT. LTD. is a visionary new
-              construction company built on ambition, innovation, and a commitment to excellence.
-            </p>
-          </div>
+          </Link>
 
-          {/* Quick Links */}
+          <p className="w-full font-manropemedium-22 font-[number:var(--manropemedium-22-font-weight)] text-white text-[length:var(--manropemedium-22-font-size)] tracking-[var(--manropemedium-22-letter-spacing)] leading-[var(--manropemedium-22-line-height)] [font-style:var(--manropemedium-22-font-style)]">
+            Founded on July 28, 2025, NAVVISTAR INFRA PVT. LTD. is a visionary
+            new construction company built on ambition, innovation, and a
+            commitment to excellence.
+          </p>
+        </div>
 
-          <div >
-            <h3 className="text-xl font-medium mb-5 text-white">Quick Links</h3>
-            <ul className="space-y-3 text-base">
-              {menuItems.map((item, idx) => (
-                <li
-                  key={idx}
-                  className="relative w-fit cursor-pointer transition-colors duration-300 
-                     after:content-[''] after:absolute after:left-0 after:bottom-0 
-                     after:w-0 after:h-[2px] after:bg-blue-400 hover:after:w-full 
-                     after:transition-all after:duration-300"
-                >
-                  <Link
-                    href={item.href}
-                    className="block text-white hover:text-blue-500 transition-colors duration-300"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div className="flex flex-wrap w-full max-w-[645px] items-start gap-20">
+          <nav className="inline-flex flex-col items-start gap-[18px] translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:200ms]">
+            <h3 className="w-[158px] font-inter-24 font-[number:var(--inter-24-font-weight)] text-white text-[length:var(--inter-24-font-size)] tracking-[var(--inter-24-letter-spacing)] leading-[var(--inter-24-line-height)] [font-style:var(--inter-24-font-style)]">
+              Quick Links
+            </h3>
 
-          {/* Contact Info */}
-          <div>
-            <h3 className="text-xl font-medium mb-5 text-white">Contact Info</h3>
-            <ul className="space-y-4 text-base">
-              <li className="flex items-center gap-3">
-                <img
-                  src="https://c.animaapp.com/mghk811dbdG4xS/img/phone-fill.svg"
-                  alt="Phone"
-                  className="w-8 h-8 "
-                />
-                {/* <Phone size={28} strokeWidth={2.5} /> */}
-                <div className="flex flex-col gap-1">
-                  <Label htmlFor="" className="text-[16px] text-white">Phone</Label>
-                  <Link href={'#'} className="text-white">
-                    {project?.mobile_no || "9988998899"}
-                  </Link>
+            {quickLinks.map((link, index) => (
+              <Link
+                key={index}
+                className="w-[158px] font-manropemedium-22 font-[number:var(--manropemedium-22-font-weight)] text-white text-[length:var(--manropemedium-22-font-size)] tracking-[var(--manropemedium-22-letter-spacing)] leading-[var(--manropemedium-22-line-height)] [font-style:var(--manropemedium-22-font-style)] transition-opacity hover:opacity-80"
+                href={link.to}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="flex flex-col w-full max-w-[407px] items-start gap-[22px] translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:400ms]">
+            <h3 className="w-full font-inter-24 font-[number:var(--inter-24-font-weight)] text-white text-[length:var(--inter-24-font-size)] tracking-[var(--inter-24-letter-spacing)] leading-[var(--inter-24-line-height)] [font-style:var(--inter-24-font-style)]">
+              Contact Info
+            </h3>
+
+            {contactInfo.map((contact, index) => {
+              const IconComponent = contact.icon;
+              return (
+                <div key={index} className="flex w-full items-start gap-[22px]">
+                  <IconComponent className="w-6 h-6 text-white flex-shrink-0" />
+
+                  <div className="flex flex-col items-start flex-1">
+                    <span className="font-manropemedium-22 font-[number:var(--manropemedium-22-font-weight)] text-white text-[length:var(--manropemedium-22-font-size)] tracking-[var(--manropemedium-22-letter-spacing)] leading-[var(--manropemedium-22-line-height)] [font-style:var(--manropemedium-22-font-style)]">
+                      {contact.label}
+                    </span>
+
+                    {contact.type === "email" ? (
+                      <a
+                        href={contact.href}
+                        rel="noopener noreferrer"
+                        target="_blank"
+                        className="w-full font-manrope-20 font-[number:var(--manrope-20-font-weight)] text-white text-[length:var(--manrope-20-font-size)] tracking-[var(--manrope-20-letter-spacing)] leading-[var(--manrope-20-line-height)] [font-style:var(--manrope-20-font-style)] underline transition-opacity hover:opacity-80"
+                      >
+                        {contact.value}
+                      </a>
+                    ) : (
+                      <span className="w-full font-manrope-20 font-[number:var(--manrope-20-font-weight)] text-white text-[length:var(--manrope-20-font-size)] tracking-[var(--manrope-20-letter-spacing)] leading-[var(--manrope-20-line-height)] [font-style:var(--manrope-20-font-style)]">
+                        {contact.value}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </li>
-
-              <li className="flex items-center gap-3">
-                <img
-                  src="https://c.animaapp.com/mghk811dbdG4xS/img/chat-unread-fill.svg"
-                  alt="Email"
-                  className="w-8 h-8"
-                />
-                {/* <Mail size={28} strokeWidth={2.5} /> */}
-                <div className="flex flex-col gap-1">
-                  <Label htmlFor="" className="text-[16px] text-white">Email</Label>
-                  <Link href={'#'} className=" text-white ">
-                    {project?.email || "contact@company.com"}
-                  </Link>
-                </div>
-              </li>
-
-              <li className="flex items-start gap-3">
-                <img
-                  src="https://c.animaapp.com/mghk811dbdG4xS/img/map-pin-2-fill.svg"
-                  alt="Location"
-                  className="w-8 h-8 mt-1"
-                />
-                {/* <MapPin size={28} strokeWidth={2.5} /> */}
-                <div className="flex flex-col gap-1">
-                  <Label htmlFor="" className="text-[16px] text-white">Address</Label>
-                  <Link href={'#'} className=" text-white leading-snug">
-                    {project?.address1 || "Rajasthan"}
-                  </Link>
-                </div>
-              </li>
-            </ul>
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* Bottom Section */}
-      <div className="w-full bg-[#191919] flex flex-col md:flex-row items-center justify-between px-6 sm:px-10 lg:px-20 py-4 border-t border-gray-700">
-        <p className="text-gray-400 text-sm text-center md:text-left">
-          Copyright © {new Date().getFullYear()} <span className="text-white font-semibold">Navvistar infra</span> : All Rights Reserved.
+      <div className="flex flex-wrap items-center justify-between gap-[10px] px-[104px] py-4 w-full bg-[#161212]">
+        <p className="font-interregular-20 font-[number:var(--interregular-20-font-weight)] text-white text-[length:var(--interregular-20-font-size)] tracking-[var(--interregular-20-letter-spacing)] leading-[var(--interregular-20-line-height)] [font-style:var(--interregular-20-font-style)] whitespace-nowrap">
+          Copyright © 2025 Navvistar infra : All Rights Reserved.
         </p>
-        <p className="text-gray-400 text-sm mt-2 md:mt-0 text-center md:text-right">
-          Designed by {" "}
-          <Link
+
+        <p className="font-interregular-20 font-[number:var(--interregular-20-font-weight)] text-white text-[length:var(--interregular-20-font-size)] tracking-[var(--interregular-20-letter-spacing)] leading-[var(--interregular-20-line-height)] [font-style:var(--interregular-20-font-style)] whitespace-nowrap">
+          Designed By:{" "}
+          <a
             href="http://doomshell.com/"
+            rel="noopener noreferrer"
             target="_blank"
-            className="text-blue-500 hover:text-blue-300 underline font-noraml"
+            className="transition-opacity hover:opacity-80"
           >
             Doomshell.com
-          </Link>
+          </a>
         </p>
       </div>
     </footer>

@@ -1,8 +1,7 @@
+// layout.tsx
+import "./housing.css";
 import Header from "./components/header/page";
 import Footer from "./components/footer/page";
-// import "@/styles/themes/housing/housing.css";
-import "../../../styles/themes/housing/housing.css";
-// import "./housing.css";
 
 export default function HousingLayout({ children, project, }: { children: React.ReactNode; project: any; }) {
   return (

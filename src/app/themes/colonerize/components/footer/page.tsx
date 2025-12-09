@@ -7,94 +7,58 @@ import { Label } from "@/components/ui/Label";
 import { Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
 interface DefaultProps { project?: User; };
 
-const navigationItems = [
-  { label: "About", to: "/about" },
-  { label: "Our Leadership", to: "/leadership" },
-  { label: "Gallery", to: "/gallery" },
-  { label: "Contact Us", to: "/contact" },
+const navigationLinks = [
+  { label: "About", isBold: true },
+  { label: "Our Leadership", isBold: false },
+  { label: "Gallery", isBold: false },
+  { label: "Contact Us", isBold: false },
 ];
 
 export default function Footer({ project }: DefaultProps) {
   const router = useRouter();
   return (
-    <footer>
-      <div className="flex flex-col items-center justify-center bg-[#000216] text-white px-6 sm:px-10 lg:px-[120px] py-8 sm:py-16 gap-10 w-full">
-        {/* Logo */}
-        <div className="flex flex-col items-center gap-4">
+    <footer className="flex flex-col justify-center gap-20 pt-[84px] pb-[18px] px-[120px] bg-bgToken w-full">
+      <div className="flex items-center gap-6 w-full flex-col">
+        <div className="inline-flex items-start gap-2.5 flex-col opacity-0 translate-y-[-1rem] animate-fade-in [--animation-delay:0ms]">
           <img
-            className="w-[200px] sm:w-[250px] h-auto object-contain"
+            className="w-[250px] h-[118px] object-cover"
             alt="Navlok Logo"
-            src="https://c.animaapp.com/mhd81w7aWvI44g/img/image-6-4.png"
+            src="https://c.animaapp.com/mijuqzb08ywwmN/img/image-6.png"
           />
         </div>
 
-        {/* Navigation */}
-        <nav className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
-          {navigationItems.map((link, index) => (
+        <nav className="flex flex-wrap items-center justify-center gap-6 w-full opacity-0 translate-y-[-1rem] animate-fade-in [--animation-delay:200ms]">
+          {navigationLinks.map((link, index) => (
             <Link
               key={index}
-              href={link.to}
-              className="relative group text-white text-base sm:text-lg font-medium tracking-wide"
+              href="#"
+              className="inline-flex items-center justify-center gap-2.5 transition-opacity hover:opacity-80"
             >
-              {link.label}
-              <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+              <span
+                className={`text-primary-white text-[length:var(--text-lg-500-font-size)] tracking-[var(--text-lg-500-letter-spacing)] leading-[var(--text-lg-500-line-height)] [font-style:var(--text-lg-500-font-style)] ${link.isBold
+                  ? "font-text-semibold-lg font-[number:var(--text-semibold-lg-font-weight)]"
+                  : "font-text-lg-500 font-[number:var(--text-lg-500-font-weight)]"
+                  }`}
+              >
+                {link.label}
+              </span>
             </Link>
           ))}
         </nav>
-
       </div>
-      {/* Divider */}
-      {/* <div className="w-full h-px bg-white/10 mt-4 mb-2"></div> */}
 
-      {/* Bottom Section */}
-      {/* <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0 w-full text-sm sm:text-base">
-        <p className="text-gray-400 text-center sm:text-left">
-          Copyright © {new Date().getFullYear()} {project?.company_name}: All Rights Reserved.
-        </p>
+      <div className="flex flex-wrap justify-between gap-6 items-center w-full opacity-0 translate-y-[-1rem] animate-fade-in [--animation-delay:400ms]">
+        <div className="inline-flex items-center justify-center gap-2.5">
+          <p className="font-text-md-400 font-[number:var(--text-md-400-font-weight)] text-primary-white text-[length:var(--text-md-400-font-size)] tracking-[var(--text-md-400-letter-spacing)] leading-[var(--text-md-400-line-height)] whitespace-nowrap [font-style:var(--text-md-400-font-style)]">
+            Copyright © 2025 Navlok : All Rights Reserved.
+          </p>
+        </div>
 
-        // Social Links 
-        <div className="flex items-center gap-5">
-          <Link
-            href={project?.fburl ?? "#"}
-            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
-          >
-            <Facebook className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-          </Link>
-          <Link
-            href={project?.instaurl ?? "#"}
-            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
-          >
-            <Instagram className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-          </Link>
-          <Link
-            href={project?.xurl ?? "#"}
-            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
-          >
-            <Twitter className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-          </Link>
-          <Link
-            href={project?.linkedinurl ?? "#"}
-            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
-          >
-            <Linkedin className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-          </Link>
-        </div> 
-      </div> */}
-      <div className="w-full bg-[#000214] flex flex-col md:flex-row items-center justify-between px-6 sm:px-10 lg:px-20 py-4">
-        <p className="text-white text-sm text-center md:text-left">
-          Copyright © {new Date().getFullYear()} Navlok: All Rights Reserved.
-          {/* {project?.company_name} */}
-        </p>
-        <p className="text-white text-sm md:mt-0 text-center md:text-right">
-          Designed by {" "}
-          <Link
-            href="http://doomshell.com/"
-            target="_blank"
-            className="text-blue-500 hover:text-blue-300 underline font-noraml"
-          >
-            Doomshell.com
-          </Link>
-        </p>
+        <div className="inline-flex items-center justify-center gap-2.5">
+          <p className="font-text-md-400 font-[number:var(--text-md-400-font-weight)] text-primary-white text-[length:var(--text-md-400-font-size)] tracking-[var(--text-md-400-letter-spacing)] leading-[var(--text-md-400-line-height)] whitespace-nowrap [font-style:var(--text-md-400-font-style)]">
+            Designed by Doomshell.com
+          </p>
+        </div>
       </div>
     </footer>
   );

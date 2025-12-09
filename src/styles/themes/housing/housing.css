@@ -1,0 +1,300 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .all-\[unset\] {
+    all: unset;
+  }
+}
+
+.housing-theme {
+  --inter-24-font-family: "Inter", Helvetica;
+  --inter-24-font-size: 24px;
+  --inter-24-font-style: normal;
+  --inter-24-font-weight: 400;
+  --inter-24-letter-spacing: 0px;
+  --inter-24-line-height: normal;
+  --interregular-20-font-family: "Inter", Helvetica;
+  --interregular-20-font-size: 20px;
+  --interregular-20-font-style: normal;
+  --interregular-20-font-weight: 400;
+  --interregular-20-letter-spacing: 0px;
+  --interregular-20-line-height: normal;
+  --manrope-20-font-family: "Manrope", Helvetica;
+  --manrope-20-font-size: 20px;
+  --manrope-20-font-style: normal;
+  --manrope-20-font-weight: 500;
+  --manrope-20-letter-spacing: 0px;
+  --manrope-20-line-height: 166%;
+  --manrope-30-font-family: "Manrope", Helvetica;
+  --manrope-30-font-size: 30px;
+  --manrope-30-font-style: normal;
+  --manrope-30-font-weight: 500;
+  --manrope-30-letter-spacing: 0px;
+  --manrope-30-line-height: normal;
+  --manrope-34-font-family: "Manrope", Helvetica;
+  --manrope-34-font-size: 34px;
+  --manrope-34-font-style: normal;
+  --manrope-34-font-weight: 500;
+  --manrope-34-letter-spacing: 0px;
+  --manrope-34-line-height: normal;
+  --manrope-38-font-family: "Manrope", Helvetica;
+  --manrope-38-font-size: 38px;
+  --manrope-38-font-style: normal;
+  --manrope-38-font-weight: 500;
+  --manrope-38-letter-spacing: 0px;
+  --manrope-38-line-height: normal;
+  --manrope-66-font-family: "Manrope", Helvetica;
+  --manrope-66-font-size: 56px;
+  --manrope-66-font-style: normal;
+  --manrope-66-font-weight: 800;
+  --manrope-66-letter-spacing: 2px;
+  --manrope-66-line-height: normal;
+  --manropemedium-22-font-family: "Manrope", Helvetica;
+  --manropemedium-22-font-size: 22px;
+  --manropemedium-22-font-style: normal;
+  --manropemedium-22-font-weight: 500;
+  --manropemedium-22-letter-spacing: 0px;
+  --manropemedium-22-line-height: normal;
+  --merriweather-58-font-family: "Merriweather", Helvetica;
+  --merriweather-58-font-size: 58px;
+  --merriweather-58-font-style: normal;
+  --merriweather-58-font-weight: 400;
+  --merriweather-58-letter-spacing: -1px;
+  --merriweather-58-line-height: normal;
+  --poppins-16-font-family: "Poppins", Helvetica;
+  --poppins-16-font-size: 16px;
+  --poppins-16-font-style: normal;
+  --poppins-16-font-weight: 600;
+  --poppins-16-letter-spacing: 0px;
+  --poppins-16-line-height: normal;
+  --poppins-22-font-family: "Poppins", Helvetica;
+  --poppins-22-font-size: 22px;
+  --poppins-22-font-style: normal;
+  --poppins-22-font-weight: 500;
+  --poppins-22-letter-spacing: 0px;
+  --poppins-22-line-height: normal;
+  --poppins-34-font-family: "Poppins", Helvetica;
+  --poppins-34-font-size: 34px;
+  --poppins-34-font-style: normal;
+  --poppins-34-font-weight: 600;
+  --poppins-34-letter-spacing: 0px;
+  --poppins-34-line-height: normal;
+  --poppinsmedium-20-font-family: "Poppins", Helvetica;
+  --poppinsmedium-20-font-size: 20px;
+  --poppinsmedium-20-font-style: normal;
+  --poppinsmedium-20-font-weight: 500;
+  --poppinsmedium-20-letter-spacing: 0px;
+  --poppinsmedium-20-line-height: normal;
+  --poppinsregular-20-font-family: "Poppins", Helvetica;
+  --poppinsregular-20-font-size: 20px;
+  --poppinsregular-20-font-style: normal;
+  --poppinsregular-20-font-weight: 400;
+  --poppinsregular-20-letter-spacing: 0px;
+  --poppinsregular-20-line-height: normal;
+  --poppinsregular-22-font-family: "Poppins", Helvetica;
+  --poppinsregular-22-font-size: 22px;
+  --poppinsregular-22-font-style: normal;
+  --poppinsregular-22-font-weight: 400;
+  --poppinsregular-22-letter-spacing: 0px;
+  --poppinsregular-22-line-height: normal;
+  --poppinsregular-52-font-family: "Poppins", Helvetica;
+  --poppinsregular-52-font-size: 52px;
+  --poppinsregular-52-font-style: normal;
+  --poppinsregular-52-font-weight: 400;
+  --poppinsregular-52-letter-spacing: 0px;
+  --poppinsregular-52-line-height: normal;
+  --poppinssemibold-22-font-family: "Poppins", Helvetica;
+  --poppinssemibold-22-font-size: 22px;
+  --poppinssemibold-22-font-style: normal;
+  --poppinssemibold-22-font-weight: 600;
+  --poppinssemibold-22-letter-spacing: -1.0000000000000002px;
+  --poppinssemibold-22-line-height: normal;
+  --animate-spin: spin 1s linear infinite;
+}
+
+.housing-theme .animate-fade-in {
+  animation: fade-in 1s var(--animation-delay, 0s) ease forwards;
+}
+
+.housing-theme .animate-fade-up {
+  animation: fade-up 1s var(--animation-delay, 0s) ease forwards;
+}
+
+.housing-theme .animate-marquee {
+  animation: marquee var(--duration) infinite linear;
+}
+
+.housing-theme .animate-marquee-vertical {
+  animation: marquee-vertical var(--duration) linear infinite;
+}
+
+.housing-theme .animate-shimmer {
+  animation: shimmer 8s infinite;
+}
+
+.housing-theme .animate-spin {
+  animation: var(--animate-spin);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes image-glow {
+  0% {
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.74, 0.25, 0.76, 1);
+  }
+
+  10% {
+    opacity: 0.7;
+    animation-timing-function: cubic-bezier(0.12, 0.01, 0.08, 0.99);
+  }
+
+  to {
+    opacity: 0.4;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes shimmer {
+
+  0%,
+  90%,
+  to {
+    background-position: calc(-100% - var(--shimmer-width)) 0;
+  }
+
+  30%,
+  60% {
+    background-position: calc(100% + var(--shimmer-width)) 0;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translate(0);
+  }
+
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+
+@keyframes marquee-vertical {
+  0% {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+  }
+}
+
+@layer base {
+  .housing-theme :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+
+    --card: transparent;
+    --card-foreground: 222.2 47.4% 11.2%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+
+    --ring: 215 20.2% 65.1%;
+
+    --radius: 0.5rem;
+  }
+
+  .housing-theme .dark {
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
+
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20.2% 65.1%;
+
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+
+    --card: transparent;
+    --card-foreground: 213 31% 91%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 1.2%;
+
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --ring: 216 34% 17%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  .housing-theme * {
+    @apply border-border;
+  }
+
+  .housing-theme body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}

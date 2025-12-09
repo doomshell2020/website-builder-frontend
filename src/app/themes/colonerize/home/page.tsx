@@ -1,15 +1,13 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import HeroSlider from "../slider/page";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { User } from "@/types/user";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/textarea";
-import { motion, useMotionValue, useInView, animate, Variants } from "framer-motion";
+import { Variants } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,64 +18,26 @@ import { SwalSuccess, SwalError } from "@/components/ui/SwalAlert";
 import { findGalleryBySlug } from "@/services/gallery.service";
 type FormData = z.infer<typeof enquirySchema>;
 interface DefaultHomeProps { project?: User; };
+import useEmblaCarousel from "embla-carousel-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const statsData = [
+const heroSlides = [
     {
-        image: "https://c.animaapp.com/mhd81w7aWvI44g/img/image-4-4.png",
-        value: 1500,
-        suffix: "+",
-        label: "Plot Sold",
-        delay: 0,
+        image: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-5.png",
+        title: "Build Your Dream Home",
+        subtitle: "Premium Plots in Jaipur's Most Sought-After Locations",
     },
     {
-        image: "https://c.animaapp.com/mhd81w7aWvI44g/img/image-4-5.png",
-        value: 12,
-        suffix: "+",
-        label: "Developed Townships",
-        delay: 0.2,
+        image: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-5-1.png",
+        title: "Integrated Townships",
+        subtitle: "Modern Living with World-Class Amenities",
     },
     {
-        image: "https://c.animaapp.com/mhd81w7aWvI44g/img/image-4-6.png",
-        value: 1000,
-        suffix: "+",
-        label: "Happy Clients",
-        delay: 0.4,
-    },
-    {
-        image: "https://c.animaapp.com/mhd81w7aWvI44g/img/image-4-7.png",
-        value: 3,
-        suffix: "L",
-        label: "Total Area sq",
-        delay: 0.6,
+        image: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-5-2.png",
+        title: "Trusted Developer",
+        subtitle: "Over 1,500+ Plots Sold and 1,000+ Happy Families",
     },
 ];
-
-const AnimatedCounter = ({ target, suffix }: { target: number; suffix?: string }) => {
-    const ref = useRef<HTMLSpanElement>(null);
-    const count = useMotionValue(0);
-    const inView = useInView(ref, { once: true });
-    const [displayValue, setDisplayValue] = useState(0);
-
-    useEffect(() => {
-        if (inView) {
-            const controls = animate(count, target, {
-                duration: 2.5,
-                ease: "easeOut",
-                onUpdate: (latest) => {
-                    setDisplayValue(Math.floor(latest));
-                },
-            });
-            return () => controls.stop();
-        }
-    }, [inView, target, count]);
-
-    return (
-        <span ref={ref}>
-            {displayValue.toLocaleString()}
-            {suffix || ""}
-        </span>
-    );
-};
 
 export default function Home({ project }: DefaultHomeProps) {
     const router = useRouter();
@@ -147,19 +107,6 @@ export default function Home({ project }: DefaultHomeProps) {
         fetchGalleryImages();
     }, [project]);
 
-    const containerVariants: Variants = {
-        hidden: { opacity: 0, y: 50 },
-        visible: {
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.6, staggerChildren: 0.15, },
-        },
-    };
-
-    const itemVariants: Variants = {
-        hidden: { opacity: 0, scale: 0.95 },
-        visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
-    };
 
     const {
         register,
@@ -324,72 +271,233 @@ export default function Home({ project }: DefaultHomeProps) {
         }
     };
 
-    const fadeUp: Variants = {
-        hidden: { opacity: 0, y: 50 },
-        visible: (i: number) => ({
-            opacity: 1,
-            y: 0,
-            transition: { delay: i * 0.2, duration: 0.6, ease: "easeOut" },
-        }),
-    };
+    const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+    const [selectedIndex, setSelectedIndex] = useState(0);
+
+    const scrollPrev = useCallback(() => {
+        if (emblaApi) emblaApi.scrollPrev();
+    }, [emblaApi]);
+
+    const scrollNext = useCallback(() => {
+        if (emblaApi) emblaApi.scrollNext();
+    }, [emblaApi]);
+
+    const scrollTo = useCallback(
+        (index: number) => {
+            if (emblaApi) emblaApi.scrollTo(index);
+        },
+        [emblaApi]
+    );
+
+    const onSelect = useCallback(() => {
+        if (!emblaApi) return;
+        setSelectedIndex(emblaApi.selectedScrollSnap());
+    }, [emblaApi]);
+
+    useEffect(() => {
+        if (!emblaApi) return;
+        onSelect();
+        emblaApi.on("select", onSelect);
+        emblaApi.on("reInit", onSelect);
+
+        const autoplay = setInterval(() => {
+            emblaApi.scrollNext();
+        }, 5000);
+
+        return () => {
+            clearInterval(autoplay);
+            emblaApi.off("select", onSelect);
+            emblaApi.off("reInit", onSelect);
+        };
+    }, [emblaApi, onSelect]);
+
+    const galleryImages = [
+        {
+            src: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-5.png",
+            alt: "Gallery image 1",
+        },
+        {
+            src: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-5-1.png",
+            alt: "Gallery image 2",
+        },
+        {
+            src: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-5-2.png",
+            alt: "Gallery image 3",
+        },
+        {
+            src: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-5-3.png",
+            alt: "Gallery image 4",
+        },
+        {
+            src: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-5-4.png",
+            alt: "Gallery image 5",
+        },
+        {
+            src: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-5-5.png",
+            alt: "Gallery image 6",
+        },
+        {
+            src: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-5-6.png",
+            alt: "Gallery image 7",
+        },
+        {
+            src: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-5-7.png",
+            alt: "Gallery image 8",
+        },
+    ];
+
+    const contactInfoData = [
+        {
+            icon: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-7.png",
+            title: "Phone",
+            content: "9414520171",
+        },
+        {
+            icon: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-10.png",
+            title: "Email",
+            content: "contact@navlokcolonizers.com",
+        },
+        {
+            icon: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-11.png",
+            title: "Address",
+            content: "75,76,77 F Patarkar colony Mansarover, Jaipur 302017",
+        },
+    ];
+
+    const statisticsData = [
+        {
+            image: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-4.png",
+            number: "1,500+",
+            label: "Plot Sold",
+        },
+        {
+            image: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-4-1.png",
+            number: "12+",
+            label: "Developed Townships",
+        },
+        {
+            image: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-4-2.png",
+            number: "1,000+",
+            label: "Happy Clients",
+        },
+        {
+            image: "https://c.animaapp.com/mijuqzb08ywwmN/img/image-4-3.png",
+            number: "3+",
+            label: "Total Area sq",
+        },
+    ];
 
     return (
         <div>
-            {/** Hero Section */}
-            <HeroSlider company={project?.schema_name} slug={"home"} />
+
+            {/** Slider Section */}
+            <section className="relative w-full overflow-hidden bg-bgToken">
+                <div className="embla" ref={emblaRef}>
+                    <div className="embla__container flex">
+                        {heroSlides.map((slide, index) => (
+                            <div
+                                key={index}
+                                className="embla__slide relative min-w-0 flex-[0_0_100%]"
+                            >
+                                <div className="relative h-[500px] md:h-[600px] lg:h-[700px] w-full">
+                                    <img
+                                        src={slide.image}
+                                        alt={slide.title}
+                                        className="absolute inset-0 w-full h-full object-cover opacity-40"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-bgToken/80 to-transparent" />
+
+                                    <div className="relative h-full flex items-center px-4 sm:px-8 md:px-16 lg:px-[120px]">
+                                        <div className="max-w-3xl space-y-6 translate-y-[-1rem] animate-fade-in opacity-0">
+                                            <h1 className="font-heading-2xl font-[number:var(--heading-2xl-font-weight)] text-primary-white text-4xl md:text-5xl lg:text-6xl tracking-[var(--heading-2xl-letter-spacing)] leading-tight [font-style:var(--heading-2xl-font-style)]">
+                                                {slide.title}
+                                            </h1>
+                                            <p className="font-text-xl font-[number:var(--text-xl-font-weight)] text-primary-white text-lg md:text-xl lg:text-2xl tracking-[var(--text-xl-letter-spacing)] leading-relaxed [font-style:var(--text-xl-font-style)] opacity-0 animate-fade-in [--animation-delay:200ms]">
+                                                {slide.subtitle}
+                                            </p>
+                                            <div className="flex gap-4 opacity-0 animate-fade-in [--animation-delay:400ms]">
+                                                <Button className="h-auto gap-2.5 px-8 py-4 bg-blue-color rounded-[54px] hover:bg-blue-color/90 transition-colors">
+                                                    <span className="font-text-md font-[number:var(--text-md-font-weight)] text-primary-white text-[length:var(--text-md-font-size)] tracking-[var(--text-md-letter-spacing)] leading-[var(--text-md-line-height)] [font-style:var(--text-md-font-style)]">
+                                                        Explore Projects
+                                                    </span>
+                                                </Button>
+                                                <Button className="h-auto gap-2.5 px-8 py-4 bg-transparent border-2 border-primary-white rounded-[54px] hover:bg-primary-white/10 transition-colors">
+                                                    <span className="font-text-md font-[number:var(--text-md-font-weight)] text-primary-white text-[length:var(--text-md-font-size)] tracking-[var(--text-md-letter-spacing)] leading-[var(--text-md-line-height)] [font-style:var(--text-md-font-style)]">
+                                                        Contact Us
+                                                    </span>
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <button
+                    onClick={scrollPrev}
+                    className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-primary-white/20 backdrop-blur-sm hover:bg-primary-white/30 transition-colors flex items-center justify-center group"
+                    aria-label="Previous slide"
+                >
+                    <ChevronLeft className="w-6 h-6 text-primary-white group-hover:scale-110 transition-transform" />
+                </button>
+
+                <button
+                    onClick={scrollNext}
+                    className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-primary-white/20 backdrop-blur-sm hover:bg-primary-white/30 transition-colors flex items-center justify-center group"
+                    aria-label="Next slide"
+                >
+                    <ChevronRight className="w-6 h-6 text-primary-white group-hover:scale-110 transition-transform" />
+                </button>
+
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-3">
+                    {heroSlides.map((_, index) => (
+                        <button
+                            key={index}
+                            onClick={() => scrollTo(index)}
+                            className={`w-3 h-3 rounded-full transition-all ${index === selectedIndex
+                                ? "bg-blue-color w-8"
+                                : "bg-primary-white/50 hover:bg-primary-white/70"
+                                }`}
+                            aria-label={`Go to slide ${index + 1}`}
+                        />
+                    ))}
+                </div>
+            </section>
 
             {/** About Section */}
-            <motion.section
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, ease: "easeOut" }}
-                viewport={{ once: true, amount: 0.3 }}
-                className="flex flex-wrap items-center justify-center gap-10 pt-[50px] pb-[50px] w-full"
-            >
-                {/* Left Image */}
-                <motion.div
-                    initial={{ opacity: 0, x: -80 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 1, ease: "easeOut" }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    className="flex justify-center flex-shrink-0"
-                >
-                    <img
-                        className="w-[400px] object-cover rounded-xl"
-                        alt="About Us"
-                        src="https://c.animaapp.com/mhd81w7aWvI44g/img/frame-5-3.svg"
-                    />
-                </motion.div>
+            <section className="flex flex-wrap w-full items-start justify-center gap-[89px] pt-[50px] pb-[140px] px-[121px] relative">
+                <img
+                    className="relative w-full max-w-[503.5px] mb-[-95.10px] translate-y-[-1rem] animate-fade-in opacity-0"
+                    alt="About img"
+                    src="https://c.animaapp.com/mijuqzb08ywwmN/img/about-img.svg"
+                />
 
-                {/* Right Text Content */}
-                <motion.div
-                    initial={{ opacity: 0, x: 80 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    className="flex flex-col w-[609px] items-start justify-center gap-5 translate-y-[-1rem]"
-                >
-                    <div className="flex flex-col items-start gap-0.5 w-full">
-                        <div className="inline-flex items-center justify-center gap-2.5">
-                            <div className="font-medium text-[#00a4e5] w-fit mt-[-1.00px] [font-family:'Manrope',Helvetica] text-lg tracking-[0] leading-[normal]">
+                <div className="flex flex-col w-full max-w-[609px] items-start justify-center gap-4 relative translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:200ms]">
+                    <div className="flex items-start gap-0.5 self-stretch w-full flex-col relative">
+                        <div className="inline-flex items-center justify-center gap-2.5 relative">
+                            <p className="relative w-fit mt-[-1.00px] font-text-lg font-[number:var(--text-lg-font-weight)] text-blue-color text-[length:var(--text-lg-font-size)] tracking-[var(--text-lg-letter-spacing)] leading-[var(--text-lg-line-height)] [font-style:var(--text-lg-font-style)]">
                                 OUR STORY
-                            </div>
+                            </p>
                         </div>
 
-                        <div className="flex w-full items-center justify-center gap-2.5">
-                            <h2 className="flex-1 mt-[-1.00px] [font-family:'Manrope',Helvetica] font-normal text-black text-lg tracking-[0] leading-[normal] text-3xl font-bold">
+                        <div className="flex items-center justify-center gap-2.5 relative self-stretch w-full">
+                            <h2 className="relative flex-1 mt-[-1.00px] font-heading-2xl font-[number:var(--heading-2xl-font-weight)] text-primary-black text-[length:var(--heading-2xl-font-size)] tracking-[var(--heading-2xl-letter-spacing)] leading-[var(--heading-2xl-line-height)] [font-style:var(--heading-2xl-font-style)]">
                                 Rooted in Values. Rising with Vision.
                             </h2>
                         </div>
                     </div>
 
-                    <div className="flex w-full items-center justify-center gap-2.5">
-                        <p className="flex-1 mt-[-1.00px] [font-family:'Manrope',Helvetica] font-normal text-black text-lg text-justify tracking-[0] leading-[18px]">
-                            <span className="font-bold leading-[27.8px]">
+                    <div className="flex items-center justify-center gap-2.5 relative self-stretch w-full">
+                        <p className="relative flex-1 mt-[-1.00px] [font-family:'Manrope',Helvetica] font-normal text-primary-black text-xl text-justify tracking-[0] leading-5">
+                            <span className="font-bold text-black">
                                 Navlok Colonizers Group: Building Tomorrow and Today.
                             </span>
-                            <span className="font-light leading-[27.8px]">
-                                {" "}
+
+                            <span className="font-bold text-black">&nbsp;</span>
+
+                            <span className="font-[number:var(--text-lite-lg-font-weight)] text-black leading-[var(--text-lite-lg-line-height)] font-text-lite-lg [font-style:var(--text-lite-lg-font-style)] tracking-[var(--text-lite-lg-letter-spacing)] text-[length:var(--text-lite-lg-font-size)]">
                                 Navlok Colonizers Group stands as one of the most trusted and
                                 visionary real estate developers in Jaipur. Our mission is to
                                 redefine the way integrated townships are developed—by creating
@@ -399,447 +507,194 @@ export default function Home({ project }: DefaultHomeProps) {
                         </p>
                     </div>
 
-                    <div className="flex w-full items-center justify-center gap-2.5">
-                        <p className="flex-1 mt-[-1.00px] [font-family:'Manrope',Helvetica] font-normal text-black text-lg text-justify tracking-[0] leading-[18px]">
-                            <span className="font-light leading-[20.4px]">At </span>
-                            <span className="font-light leading-[27.8px]">
-                                NavlokColonizers
-                            </span>
-                            <span className="font-light leading-[20.4px]">
-                                , our work is driven by a deep commitment to enhancing the lives
-                                of families. We focus on delivering economically planned,
-                                high-quality real estate projects that not only meet the
-                                aspirations of our customers but also uphold the highest standards
-                                of environmental responsibility.
-                            </span>
+                    <div className="flex items-center justify-center gap-2.5 relative self-stretch w-full">
+                        <p className="relative flex-1 mt-[-1.00px] font-text-lite-lg font-[number:var(--text-lite-lg-font-weight)] text-primary-black text-[length:var(--text-lite-lg-font-size)] text-justify tracking-[var(--text-lite-lg-letter-spacing)] leading-[var(--text-lite-lg-line-height)] [font-style:var(--text-lite-lg-font-style)]">
+                            At NavlokColonizers, our work is driven by a deep commitment to
+                            enhancing the lives of families. We focus on delivering economically
+                            planned, high-quality real estate projects that not only meet the
+                            aspirations of our customers but also uphold the highest standards
+                            of environmental responsibility.
                         </p>
                     </div>
 
-                    <Button
-                        asChild
-                        className="h-auto inline-flex items-center justify-center gap-2.5 px-4 py-2 bg-[#000216] rounded-[74px] hover:bg-[#000216]/90 transition-colors"
-                    >
-                        <Link href="/about">
-                            <span className="w-fit mt-[-1.00px] [font-family:'Manrope',Helvetica] font-medium text-white text-base text-justify tracking-[0] leading-[24.7px] whitespace-nowrap">
-                                Read More
-                            </span>
-                        </Link>
+                    <Button className="h-auto gap-2.5 px-[30px] py-3.5 bg-gray-color rounded-[54px] hover:bg-gray-color/90 transition-colors">
+                        <span className="relative w-fit mt-[-1.00px] font-text-md font-[number:var(--text-md-font-weight)] text-primary-white text-[length:var(--text-md-font-size)] text-justify tracking-[var(--text-md-letter-spacing)] leading-[var(--text-md-line-height)] [font-style:var(--text-md-font-style)]">
+                            Read More
+                        </span>
                     </Button>
-                </motion.div>
-            </motion.section>
+                </div>
+            </section>
 
             {/** Dashboard Calculation */}
-            <section className="w-full bg-[#000216] py-[52px] px-6 sm:px-10 md:px-[60px] lg:px-[120px]">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-[31px] place-items-center">
-                    {statsData.map((stat, index) => (
-                        <motion.div
+            <section className="w-full bg-bgToken px-4 py-[52px] md:px-[120px]">
+                <div className="flex flex-wrap items-start justify-center gap-[30px]">
+                    {statisticsData.map((stat, index) => (
+                        <Card
                             key={index}
-                            initial={{ opacity: 0, y: 60 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, ease: "easeOut", delay: stat.delay }}
-                            viewport={{ once: true, amount: 0.2 }}
-                            className="w-full max-w-[276.75px]"
+                            className="w-full max-w-[277.5px] bg-white border-0 shadow-none translate-y-[-1rem] animate-fade-in opacity-0"
+                            style={
+                                { "--animation-delay": `${index * 200}ms` } as React.CSSProperties
+                            }
                         >
-                            <motion.div
-                                whileHover={{ scale: 1.05, y: -5 }}
-                                transition={{ type: "spring", stiffness: 200, damping: 10 }}
-                            >
-                                <Card className="bg-[#f9f9f9] border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl h-64 flex items-center justify-center">
-                                    <CardContent className="flex flex-col items-center gap-[18px] p-5 h-full">
-                                        <div className="inline-flex flex-col items-center justify-center gap-2.5 p-0.5">
-                                            <img
-                                                className="w-[90px] h-[90px] sm:w-[100px] sm:h-[100px] object-cover"
-                                                alt={stat.label}
-                                                src={stat.image}
-                                            />
-                                        </div>
+                            <CardContent className="flex flex-col items-center gap-3 px-0 py-[34px]">
+                                <div className="flex flex-col items-start justify-center">
+                                    <img
+                                        className="w-[92px] h-[92px] object-cover"
+                                        alt={stat.label}
+                                        src={stat.image}
+                                    />
+                                </div>
 
-                                        <h3 className="[font-family:'Manrope',Helvetica] font-semibold text-black text-3xl sm:text-4xl tracking-[0] leading-[normal]">
-                                            <AnimatedCounter target={stat.value} suffix={stat.suffix} />
+                                <div className="flex flex-col items-center gap-2.5 w-full">
+                                    <div className="flex items-center justify-center">
+                                        <h3 className="font-text-4xl font-[number:var(--text-4xl-font-weight)] text-bgToken text-[length:var(--text-4xl-font-size)] tracking-[var(--text-4xl-letter-spacing)] leading-[var(--text-4xl-line-height)] [font-style:var(--text-4xl-font-style)]">
+                                            {stat.number}
                                         </h3>
+                                    </div>
 
-                                        <p className="[font-family:'Inter',Helvetica] font-light text-black text-lg sm:text-xl tracking-[0] leading-[normal] text-center">
+                                    <div className="flex items-center justify-center w-full">
+                                        <p className="font-text-xl font-[number:var(--text-xl-font-weight)] text-gray-color-300 text-[length:var(--text-xl-font-size)] text-center tracking-[var(--text-xl-letter-spacing)] leading-[var(--text-xl-line-height)] [font-style:var(--text-xl-font-style)]">
                                             {stat.label}
                                         </p>
-                                    </CardContent>
-                                </Card>
-                            </motion.div>
-                        </motion.div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
                     ))}
                 </div>
             </section>
 
             {/** Gallery Section */}
-            <section className="flex flex-col items-center justify-center gap-8 bg-gray-200 px-6 py-[60px] w-full">
-                {/* Header */}
-                <motion.header
-                    initial={{ opacity: 0, y: -20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    viewport={{ once: true }}
-                    className="flex flex-col items-center text-center"
-                >
-                    <h3 className="font-semibold text-[#00a4e5] [font-family:'Manrope',Helvetica] text-lg">
-                        OUR GALLERY
-                    </h3>
-                    <h2 className="[font-family:'Manrope',Helvetica] font-normal text-black text- xl sm:text-2xl">
-                        Explore Our Work
-                    </h2>
-                </motion.header>
+            <section className="flex flex-col items-center gap-[26px] px-0 py-[34px] w-full">
+                <header className="flex flex-col items-center pt-[26px] pb-0 px-0 w-full translate-y-[-1rem] animate-fade-in opacity-0">
+                    <div className="inline-flex items-center justify-center gap-2.5">
+                        <h3 className="w-fit mt-[-1.00px] font-text-lg font-[number:var(--text-lg-font-weight)] text-blue-color text-[length:var(--text-lg-font-size)] text-center tracking-[var(--text-lg-letter-spacing)] leading-[var(--text-lg-line-height)] [font-style:var(--text-lg-font-style)]">
+                            OUR GALLERY
+                        </h3>
+                    </div>
 
-                {/* Gallery Grid */}
-                <motion.div
-                    className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 px-4 sm:px-10 md:px-16 lg:px-20 w-full max-w-[1300px]"
-                    variants={containerVariants}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, amount: 0.2 }}
-                >
-                    {imagePreviews.map((image, index) => {
-                        const handleDownload = async () => {
-                            try {
-                                const response = await fetch(image, { mode: "cors" });
-                                const blob = await response.blob();
-                                const blobUrl = URL.createObjectURL(blob);
-                                const link = document.createElement("a");
-                                link.href = blobUrl;
-                                link.download = `image-${index + 1}.jpg`;
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
-                                URL.revokeObjectURL(blobUrl);
-                            } catch (err) {
-                                console.error("Download failed:", err);
-                                alert("Download failed. Please try again.");
-                            }
-                        };
+                    <div className="inline-flex items-center justify-center gap-2.5">
+                        <h2 className="w-fit mt-[-1.00px] font-text-3xl font-[number:var(--text-3xl-font-weight)] text-primary-black text-[length:var(--text-3xl-font-size)] text-center tracking-[var(--text-3xl-letter-spacing)] leading-[var(--text-3xl-line-height)] [font-style:var(--text-3xl-font-style)]">
+                            Explore Our Work
+                        </h2>
+                    </div>
+                </header>
 
-                        // const handleShare = async () => {
-                        //     if (navigator.share) {
-                        //         try {
-                        //             await navigator.share({
-                        //                 title: `image-${index + 1}.jpg`,
-                        //                 text: "Check out this image!",
-                        //                 url: image,
-                        //             });
-                        //         } catch (err) {
-                        //             console.error("Error sharing:", err);
-                        //         }
-                        //     } else {
-                        //         await navigator.clipboard.writeText(image);
-                        //         alert("Image link copied to clipboard!");
-                        //     }
-                        // };
-
-                        return (
-                            <motion.div
-                                key={index}
-                                variants={itemVariants}
-                                className="relative group cursor-pointer overflow-hidden rounded-xl"
-                            >
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 px-4 sm:px-8 md:px-16 lg:px-[120px] w-full translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:200ms]">
+                    {galleryImages.map((image, index) => (
+                        <div
+                            key={index}
+                            className="flex flex-col items-start gap-2.5 w-full max-w-[291px] mx-auto transition-transform hover:scale-105 duration-300"
+                        >
+                            <div className="flex flex-col items-start gap-2.5 bg-primary-white w-full overflow-hidden rounded-sm">
                                 <img
-                                    className="w-full h-[240px] object-cover transition-transform duration-500 group-hover:scale-105"
-                                    src={image}
-                                    alt={`image-${index + 1}.jpg`}
+                                    className="w-full h-[254.73px] object-cover"
+                                    alt={image.alt}
+                                    src={image.src}
                                 />
+                            </div>
+                        </div>
+                    ))}
+                </div>
 
-                                {/* Hover Overlay */}
-                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
-                                    {/* Download Button */}
-                                    <button
-                                        onClick={handleDownload}
-                                        className="p-3 bg-white/20 hover:bg-white/30 rounded-full transition-colors"
-                                        aria-label="Download image"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            strokeWidth={2}
-                                            stroke="white"
-                                            className="w-6 h-6"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
-                                            />
-                                        </svg>
-                                    </button>
-
-                                    {/* Share Button */}
-                                    <button
-                                        // onClick={handleShare}
-                                        className="p-3 bg-white/20 hover:bg-white/30 rounded-full transition-colors"
-                                        aria-label="Share image"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            strokeWidth={2}
-                                            stroke="white"
-                                            className="w-6 h-6"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
-                                            />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </motion.div>
-                        );
-                    })}
-                </motion.div>
-
-                {/* View More Button */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.3 }}
-                    viewport={{ once: true }}
-                >
-                    <Button
-                        asChild
-                        className="px-5 py-2 bg-[#000216] rounded-[74px] hover:bg-[#000216]/90 transition-colors"
-                    >
-                        <Link href="/gallery">
-                            <span className="[font-family:'Manrope',Helvetica] font-medium text-white text-base tracking-[0] leading-[24.7px] whitespace-nowrap">
-                                View More
-                            </span>
-                        </Link>
-                    </Button>
-                </motion.div>
+                <Button className="h-auto gap-2.5 px-[30px] py-3.5 bg-gray-color rounded-[54px] hover:bg-gray-color/90 transition-colors translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:400ms]">
+                    <span className="w-fit mt-[-1.00px] font-text-md font-[number:var(--text-md-font-weight)] text-primary-white text-[length:var(--text-md-font-size)] tracking-[var(--text-md-letter-spacing)] leading-[var(--text-md-line-height)] [font-style:var(--text-md-font-style)]">
+                        View More
+                    </span>
+                </Button>
             </section>
 
             {/** Contact Section */}
-            <section className="flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-16 px-6 sm:px-12 lg:px-24 py-20 w-full bg-gradient-to-b from-white via-[#f8f8f8] to-[#f1f1f1] overflow-hidden">
-                {/* Left Section */}
-                <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    className="flex flex-col w-full lg:w-1/2 items-start justify-center gap-6"
-                >
-                    <motion.h2
-                        variants={fadeUp}
-                        custom={0}
-                        className="text-2xl sm:text-3xl font-semibold text-gray-900 font-manrope"
-                    >
-                        Let&apos;s Start a Conversation
-                    </motion.h2>
+            <section className="flex w-full items-center justify-center gap-3 px-4 md:px-[120px] py-[52px] bg-primary-white">
+                <div className="flex flex-col md:flex-row w-full max-w-[1440px] items-start justify-center gap-3">
+                    <div className="flex flex-col w-full md:w-[675px] items-start justify-center gap-6 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:200ms]">
+                        <header className="flex flex-col items-start gap-3.5 w-full">
+                            <div className="inline-flex items-center justify-center gap-2.5">
+                                <h2 className="w-fit mt-[-1.00px] font-heading-2xl font-[number:var(--heading-2xl-font-weight)] text-primary-black text-[length:var(--heading-2xl-font-size)] tracking-[var(--heading-2xl-letter-spacing)] leading-[var(--heading-2xl-line-height)] [font-style:var(--heading-2xl-font-style)]">
+                                    Let&apos;s Start a Conversation
+                                </h2>
+                            </div>
 
-                    <motion.p
-                        variants={fadeUp}
-                        custom={1}
-                        className="text-gray-700 font-light text-base sm:text-lg"
-                    >
-                        Our support team is here to guide you—no matter how big or small your concern.
-                    </motion.p>
+                            <div className="flex items-center justify-center gap-2.5 w-full">
+                                <p className="flex-1 mt-[-1.00px] font-text-md font-[number:var(--text-md-font-weight)] text-primary-black text-[length:var(--text-md-font-size)] tracking-[var(--text-md-letter-spacing)] leading-[var(--text-md-line-height)] [font-style:var(--text-md-font-style)]">
+                                    Our support team is here to guide you—no matter how big or small
+                                    your concern.
+                                </p>
+                            </div>
+                        </header>
 
-                    <div className="flex flex-col gap-5 w-full mt-4">
-                        <div className="flex flex-col gap-5">
-                            {/* Phone */}
-                            <motion.div
-                                variants={fadeUp}
-                                custom={1}
-                                className="group flex items-center gap-5 bg-white/60 backdrop-blur-sm hover:bg-white shadow-md hover:shadow-lg rounded-xl border border-gray-100 p-5 transition-all duration-300"
+                        {contactInfoData.map((item, index) => (
+                            <Card
+                                key={index}
+                                className="flex items-center justify-center gap-5 px-2.5 py-4 w-full bg-gray-color-100 rounded-lg border-0 shadow-none translate-y-[-1rem] animate-fade-in opacity-0"
+                                style={
+                                    {
+                                        "--animation-delay": `${400 + index * 200}ms`,
+                                    } as React.CSSProperties
+                                }
                             >
-                                <div className="flex items-center justify-center w-14 h-14 bg-[#000216] rounded-full p-3">
-                                    <img
-                                        className="w-7 h-7 invert transition-transform duration-300 group-hover:scale-110"
-                                        alt="Phone"
-                                        src="https://c.animaapp.com/mhd81w7aWvI44g/img/phone-fill.svg"
-                                    />
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-gray-900 text-base">Phone No.</h3>
-                                    <p className="text-gray-600 text-sm font-light">
-                                        {project?.mobile_no || "N/A"}
-                                    </p>
-                                </div>
-                            </motion.div>
+                                <CardContent className="flex items-center gap-5 p-0 w-full">
+                                    <div className="flex flex-col w-[65px] h-[65px] items-center justify-center gap-2.5 p-2.5 bg-gray-color-200 flex-shrink-0">
+                                        <img
+                                            className="w-[38px] h-[38px] object-cover"
+                                            alt={item.title}
+                                            src={item.icon}
+                                        />
+                                    </div>
 
-                            {/* Email */}
-                            <motion.div
-                                variants={fadeUp}
-                                custom={2}
-                                className="group flex items-center gap-5 bg-white/60 backdrop-blur-sm hover:bg-white shadow-md hover:shadow-lg rounded-xl border border-gray-100 p-5 transition-all duration-300"
-                            >
-                                <div className="flex items-center justify-center w-14 h-14 bg-[#000216] rounded-full p-3">
-                                    <img
-                                        className="w-7 h-7 invert transition-transform duration-300 group-hover:scale-110"
-                                        alt="Email"
-                                        src="https://c.animaapp.com/mhd81w7aWvI44g/img/phone-fill-4.svg"
-                                    />
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-gray-900 text-base">Email</h3>
-                                    <p className="text-gray-600 text-sm font-light">
-                                        {project?.email || "N/A"}
-                                    </p>
-                                </div>
-                            </motion.div>
+                                    <div className="flex flex-col h-[47px] items-start justify-center gap-3 flex-1">
+                                        <div className="mt-[-4.50px] flex items-center justify-center gap-2.5 w-full">
+                                            <h3 className="flex-1 mt-[-1.00px] font-text-semibold-lg font-[number:var(--text-semibold-lg-font-weight)] text-primary-black text-[length:var(--text-semibold-lg-font-size)] tracking-[var(--text-semibold-lg-letter-spacing)] leading-[var(--text-semibold-lg-line-height)] [font-style:var(--text-semibold-lg-font-style)]">
+                                                {item.title}
+                                            </h3>
+                                        </div>
 
-                            {/* Address */}
-                            <motion.div
-                                variants={fadeUp}
-                                custom={3}
-                                className="group flex items-center gap-5 bg-white/60 backdrop-blur-sm hover:bg-white shadow-md hover:shadow-lg rounded-xl border border-gray-100 p-5 transition-all duration-300"
-                            >
-                                <div className="flex items-center justify-center w-14 h-14 bg-[#000216] rounded-full p-3">
-                                    <img
-                                        className="w-7 h-7 invert transition-transform duration-300 group-hover:scale-110"
-                                        alt="Address"
-                                        src="https://c.animaapp.com/mhd81w7aWvI44g/img/phone-fill-1.svg"
-                                    />
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-gray-900 text-base">Address</h3>
-                                    <p className="text-gray-600 text-sm font-light">
-                                        {project?.address1 || "N/A"}
-                                    </p>
-                                </div>
-                            </motion.div>
-                        </div>
+                                        <div className="mb-[-4.50px] flex items-center justify-center gap-2.5 w-full">
+                                            <p className="flex-1 mt-[-1.00px] font-text-md font-[number:var(--text-md-font-weight)] text-primary-black text-[length:var(--text-md-font-size)] tracking-[var(--text-md-letter-spacing)] leading-[var(--text-md-line-height)] [font-style:var(--text-md-font-style)]">
+                                                {item.content}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
                     </div>
-                </motion.div>
 
-                {/* Right Section */}
-                <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={fadeUp}
-                    custom={4}
-                    className="w-full lg:w-1/2"
-                >
-                    <form className="flex flex-col gap-2 mt-4" onSubmit={handleSubmit(onSubmit)}>
+                    <Card className="flex flex-col items-center justify-center gap-[18px] pt-10 pb-[30px] px-[34px] w-full md:flex-1 bg-primary-white rounded-[14px] shadow-m3-elevation-light-1 border-0 translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:1000ms]">
+                        <CardContent className="flex flex-col gap-[18px] p-0 w-full">
+                            <Input
+                                type="text"
+                                placeholder="Full Name"
+                                className="pl-2.5 pr-0 py-4 w-full h-auto bg-primary-white rounded-sm border-[0.8px] border-solid border-black font-text-medium-md font-[number:var(--text-medium-md-font-weight)] text-gray-color-400 text-[length:var(--text-medium-md-font-size)] text-justify tracking-[var(--text-medium-md-letter-spacing)] leading-[var(--text-medium-md-line-height)] [font-style:var(--text-medium-md-font-style)] focus-visible:ring-0 focus-visible:ring-offset-0"
+                            />
 
-                        <Card className="bg-white shadow-lg hover:shadow-2xl border-0 rounded-2xl transition-shadow duration-300">
-                            <CardContent className="flex flex-col gap-1 sm:gap-4 p-6 sm:p-8">
-                                <Input
-                                    name="name"
-                                    className="bg-white-500"
-                                    placeholder="Full Name"
-                                    {...register("name")}
-                                />
-                                {errors.name && (
-                                    <p className="text-sm text-red-500">{errors.name.message}</p>
-                                )}
+                            <Input
+                                type="email"
+                                placeholder="Email"
+                                className="pl-2.5 pr-0 py-4 w-full h-auto bg-primary-white rounded-sm border-[0.8px] border-solid border-black font-text-medium-md font-[number:var(--text-medium-md-font-weight)] text-gray-color-400 text-[length:var(--text-medium-md-font-size)] text-justify tracking-[var(--text-medium-md-letter-spacing)] leading-[var(--text-medium-md-line-height)] [font-style:var(--text-medium-md-font-style)] focus-visible:ring-0 focus-visible:ring-offset-0"
+                            />
 
-                                <Input
-                                    name="email"
-                                    className="bg-white-500"
-                                    placeholder="Email"
-                                    {...register("email")}
-                                />
-                                {errors.email && (
-                                    <p className="text-sm text-red-500">{errors.email.message}</p>
-                                )}
-                                <Input
-                                    name="phone"
-                                    type="text"
-                                    placeholder="Phone"
-                                    className="bg-white-500"
-                                    {...register("mobile")}
-                                    maxLength={13}
-                                    {...register("mobile")}
-                                    onInput={(e) => {
-                                        let val = e.currentTarget.value;
+                            <Input
+                                type="tel"
+                                placeholder="Phone"
+                                className="pl-2.5 pr-0 py-4 w-full h-auto bg-primary-white rounded-sm border-[0.8px] border-solid border-black font-text-medium-md font-[number:var(--text-medium-md-font-weight)] text-gray-color-400 text-[length:var(--text-medium-md-font-size)] text-justify tracking-[var(--text-medium-md-letter-spacing)] leading-[var(--text-medium-md-line-height)] [font-style:var(--text-medium-md-font-style)] focus-visible:ring-0 focus-visible:ring-offset-0"
+                            />
 
-                                        if (val.startsWith("+")) {
-                                            val = "+" + val.slice(1).replace(/\D/g, "");
-                                        } else {
-                                            val = val.replace(/\D/g, "");
-                                        }
-                                        if (val.startsWith("+91")) {
-                                            val = "+91" + val.slice(3, 13);
-                                        }
-                                        else if (val.startsWith("91")) {
-                                            val = "91" + val.slice(2, 12);
-                                        }
-                                        else if (val.startsWith("0")) {
-                                            val = val.replace(/^0+/, "0"); // collapse multiple 0s
-                                            val = val.slice(0, 11); // 0 + 10 digits
-                                            // must not start with 0 followed by 1–5
-                                            if (/^0[1-5]/.test(val)) {
-                                                val = "0"; // reset to just "0" (invalid input beyond that)
-                                            }
-                                        }
-                                        else if (/^[6-9]/.test(val)) {
-                                            val = val.slice(0, 10);
-                                        }
-                                        else if (/^[1-5]/.test(val)) {
-                                            val = "";
-                                        }
-                                        else {
-                                            val = val.slice(0, 10);
-                                        }
+                            <Textarea
+                                placeholder="Message"
+                                className="h-[116px] pl-2.5 pr-0 py-4 w-full bg-primary-white rounded-sm border-[0.8px] border-solid border-black font-text-medium-md font-[number:var(--text-medium-md-font-weight)] text-gray-color-400 text-[length:var(--text-medium-md-font-size)] text-justify tracking-[var(--text-medium-md-letter-spacing)] leading-[var(--text-medium-md-line-height)] [font-style:var(--text-medium-md-font-style)] resize-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                            />
 
-                                        e.currentTarget.value = val;
-                                    }}
-                                    onPaste={(e) => {
-                                        e.preventDefault();
-                                        let val = e.clipboardData.getData("text");
-                                        if (val.startsWith("+")) {
-                                            val = "+" + val.slice(1).replace(/\D/g, "");
-                                        } else {
-                                            val = val.replace(/\D/g, "");
-                                        }
-
-                                        if (val.startsWith("+91")) {
-                                            val = "+91" + val.slice(3, 13);
-                                            if (/^\+91[0-5]/.test(val)) val = "+91";
-                                        } else if (val.startsWith("91")) {
-                                            val = "91" + val.slice(2, 12);
-                                            if (/^91[0-5]/.test(val)) val = "91";
-                                        } else if (val.startsWith("0")) {
-                                            val = val.replace(/^0+/, "0");
-                                            val = val.slice(0, 11);
-                                            if (/^0[1-5]/.test(val)) val = "0";
-                                        } else if (/^[6-9]/.test(val)) {
-                                            val = val.slice(0, 10);
-                                        } else if (/^[1-5]/.test(val)) {
-                                            val = "";
-                                        } else {
-                                            val = val.slice(0, 10);
-                                        }
-
-                                        e.currentTarget.value = val;
-                                    }}
-                                />
-                                {errors.mobile && (
-                                    <p className="text-sm text-red-500">{errors.mobile.message}</p>
-                                )}
-
-                                <Textarea
-                                    name="message"
-                                    placeholder="Message"
-                                    {...register("subject")}
-                                    className="resize-none"
-                                />
-                                {errors.subject && (
-                                    <p className="text-sm text-red-500">{errors.subject.message}</p>
-                                )}
-
-                                <Button
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    className="mt-4 bg-[#000216] hover:bg-[#000216]/90 text-white font-semibold rounded-lg py-3 text-sm transition-transform hover:scale-[1.02]">
-                                    {isSubmitting ? (
-                                        <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                                    ) : (
-                                        "Submit"
-                                    )}
-                                </Button>
-                            </CardContent>
-                        </Card>
-                    </form>
-                </motion.div>
+                            <Button className="px-[26px] py-3.5 w-full h-auto bg-bgToken hover:bg-bgToken/90 transition-colors rounded-none">
+                                <span className="w-fit mt-[-1.00px] font-text-bold-sm font-[number:var(--text-bold-sm-font-weight)] text-primary-white text-[length:var(--text-bold-sm-font-size)] text-justify tracking-[var(--text-bold-sm-letter-spacing)] leading-[var(--text-bold-sm-line-height)] [font-style:var(--text-bold-sm-font-style)]">
+                                    Submit
+                                </span>
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </div>
             </section>
+
         </div>
     );
 };

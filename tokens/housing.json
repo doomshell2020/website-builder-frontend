@@ -1,0 +1,343 @@
+{
+  "font": {
+    "size": {
+      "size18": {
+        "value": "18",
+        "type": "fontSizes",
+        "description": "for small text"
+      },
+      "size52": {
+        "value": "52",
+        "type": "fontSizes",
+        "description": "for h1"
+      },
+      "size20": {
+        "value": "20",
+        "type": "fontSizes",
+        "description": "for-small-pera"
+      },
+      "size30": {
+        "value": "30",
+        "type": "fontSizes",
+        "description": "for-section-heading"
+      },
+      "size22": {
+        "value": "22",
+        "type": "fontSizes",
+        "description": "section peragraph"
+      },
+      "size24": {
+        "value": "24",
+        "type": "fontSizes",
+        "description": "for footer menu"
+      },
+      "size40": {
+        "value": "40",
+        "type": "fontSizes",
+        "description": "for leadership heading"
+      }
+    },
+    "weight": {
+      "weight450": {
+        "value": "450",
+        "type": "fontWeights",
+        "description": "for menu text"
+      },
+      "weight500": {
+        "value": "500",
+        "type": "fontWeights",
+        "description": "for heading"
+      },
+      "weight350": {
+        "value": "350",
+        "type": "fontWeights",
+        "description": "for pera text"
+      }
+    },
+    "family": {
+      "poppins": {
+        "value": "Poppins",
+        "type": "fontFamilies",
+        "description": "for text"
+      },
+      "marriweather": {
+        "value": "Merriweather",
+        "type": "fontFamilies",
+        "description": "for heading"
+      }
+    }
+  },
+  "Merriweather58": {
+    "value": {
+      "fontFamily": "Merriweather",
+      "fontWeight": "Regular",
+      "letterSpacing": "-1",
+      "fontSize": "58"
+    },
+    "type": "typography",
+    "description": "heading"
+  },
+  "Interregular20": {
+    "value": {
+      "fontFamily": "Inter",
+      "fontWeight": "Regular",
+      "fontSize": "{font.size.size20}"
+    },
+    "type": "typography",
+    "description": "for small pera"
+  },
+  "Manrope34": {
+    "value": {
+      "fontFamily": "Manrope",
+      "fontWeight": "Medium",
+      "fontSize": "34"
+    },
+    "type": "typography",
+    "description": "for section heading"
+  },
+  "primary": {
+    "colorblack": {
+      "value": "#141414",
+      "type": "color",
+      "description": "for text"
+    },
+    "colorblue": {
+      "value": "#201667",
+      "type": "color",
+      "description": "for border"
+    },
+    "colorwhite": {
+      "value": "#fff",
+      "type": "color",
+      "description": "for text and bg"
+    },
+    "blue100": {
+      "value": "#00a4e520",
+      "type": "color",
+      "description": "for light text"
+    },
+    "black100": {
+      "value": "#2a2a2a",
+      "type": "color",
+      "description": "for uppercace  text "
+    }
+  },
+  "Inter20": {
+    "value": {
+      "fontFamily": "Inter",
+      "fontWeight": "Light",
+      "fontSize": "{font.size.size20}",
+      "lineHeight": "{line.height.LH36}"
+    },
+    "type": "typography",
+    "description": "for peragraph"
+  },
+  "poppinsregular52": {
+    "value": {
+      "fontFamily": "Poppins",
+      "fontWeight": "Regular",
+      "fontSize": "{font.size.size52}"
+    },
+    "type": "typography",
+    "description": "for slider"
+  },
+  "line": {
+    "height": {
+      "LH36": {
+        "value": "166%",
+        "type": "lineHeights",
+        "description": "for section text"
+      }
+    }
+  },
+  "Manrope20": {
+    "value": {
+      "fontFamily": "Manrope",
+      "fontWeight": "Medium",
+      "fontSize": "{font.size.size20}",
+      "lineHeight": "{line.height.LH36}"
+    },
+    "type": "typography",
+    "description": "for section pera"
+  },
+  "Manrope66": {
+    "value": {
+      "fontFamily": "Manrope",
+      "fontWeight": "ExtraBold",
+      "fontSize": "66",
+      "letterSpacing": "2"
+    },
+    "type": "typography",
+    "description": "for light text"
+  },
+  "Manropemedium24": {
+    "value": {
+      "fontFamily": "Manrope",
+      "fontWeight": "Medium",
+      "fontSize": "{font.size.size24}"
+    },
+    "type": "typography",
+    "description": "for footer text"
+  },
+  "inter24": {
+    "value": {
+      "fontFamily": "Inter",
+      "fontWeight": "Extra Bold",
+      "fontSize": "{font.size.size24}"
+    },
+    "type": "typography",
+    "description": "for footer heading"
+  },
+  "manropemedium22": {
+    "value": {
+      "fontFamily": "Manrope",
+      "fontWeight": "Medium",
+      "fontSize": "{font.size.size22}"
+    },
+    "type": "typography",
+    "description": "for footerr pera"
+  },
+  "gray": {
+    "color": {
+      "gray100": {
+        "value": "#f0f0f0",
+        "type": "color",
+        "description": "for bg"
+      },
+      "gray200": {
+        "value": "#1b1b1b",
+        "type": "color",
+        "description": "for footer bg"
+      },
+      "color300": {
+        "value": "#161212",
+        "type": "color",
+        "description": "for footerr"
+      },
+      "gray400": {
+        "value": "#9a9393",
+        "type": "color",
+        "description": "for form input"
+      }
+    }
+  },
+  "poppins34": {
+    "value": {
+      "fontFamily": "Poppins",
+      "fontWeight": "SemiBold",
+      "fontSize": "34"
+    },
+    "type": "typography",
+    "description": "for leadership heading"
+  },
+  "poppinsregular22": {
+    "value": {
+      "fontFamily": "Poppins",
+      "fontWeight": "Regular",
+      "fontSize": "22"
+    },
+    "type": "typography",
+    "description": "uppercace text"
+  },
+  "border": {
+    "form1": {
+      "value": {
+        "color": "#000",
+        "style": "solid",
+        "width": "1"
+      },
+      "type": "border",
+      "description": "for form section"
+    }
+  },
+  "interregular20": {
+    "value": {
+      "fontFamily": "Inter",
+      "fontWeight": "Regular",
+      "fontSize": "20"
+    },
+    "type": "typography",
+    "description": "for form input"
+  },
+  "radiousinput": {
+    "value": "2",
+    "type": "borderRadius",
+    "description": "for form input radious"
+  },
+  "formshadow": {
+    "value": {
+      "x": "1",
+      "y": "-1",
+      "blur": "6",
+      "spread": "0",
+      "color": "rgba(0,0,0,0.35)",
+      "type": "dropShadow"
+    },
+    "type": "boxShadow",
+    "description": "form main box shedow"
+  },
+  "poppins18": {
+    "value": {
+      "fontFamily": "Poppins",
+      "fontWeight": "Medium",
+      "fontSize": "18"
+    },
+    "type": "typography",
+    "description": "form heading pera"
+  },
+  "poppinssemibold22": {
+    "value": {
+      "fontFamily": "Poppins",
+      "fontWeight": "SemiBold",
+      "fontSize": "22",
+      "letterSpacing": "-1"
+    },
+    "type": "typography",
+    "description": "for  hero sec pera "
+  },
+  "Poppins22": {
+    "value": {
+      "fontFamily": "Poppins",
+      "fontWeight": "Medium",
+      "fontSize": "22"
+    },
+    "type": "typography",
+    "description": "for button"
+  },
+  "Manrope38": {
+    "value": {
+      "fontFamily": "Manrope",
+      "fontWeight": "Medium",
+      "fontSize": "38"
+    },
+    "type": "typography",
+    "description": "for image heading"
+  },
+  "poppinsregular20": {
+    "value": {
+      "fontFamily": "Poppins",
+      "fontWeight": "Regular",
+      "fontSize": "20"
+    },
+    "type": "typography",
+    "description": "for form pera"
+  },
+  "Manrope30": {
+    "value": {
+      "fontFamily": "Manrope",
+      "fontWeight": "Medium",
+      "fontSize": "30"
+    },
+    "type": "typography",
+    "description": "for about our mission heading"
+  },
+  "Poppins16": {
+    "value": {
+      "fontFamily": "Poppins",
+      "fontWeight": "SemiBold",
+      "fontSize": "16"
+    },
+    "type": "typography",
+    "description": "leader ship uppercace text"
+  }
+}

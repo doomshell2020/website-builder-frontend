@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/ui/loader";
 import { findGalleryBySlug } from "@/services/gallery.service";
-import { Card, CardContent } from "@/components/ui/card";
 import { User } from "@/types/user";
 import { motion, Variants } from "framer-motion";
 interface DefaultProps { project?: User; }
@@ -35,7 +34,9 @@ export default function HousingGallery({ project }: DefaultProps) {
                 setLoading(false);
                 return;
             }
+
             setLoading(true);
+
             try {
                 const res: any = await findGalleryBySlug(project.schema_name, "gallery");
                 const data = res?.result || res;
@@ -69,7 +70,7 @@ export default function HousingGallery({ project }: DefaultProps) {
                         }
                     }
                 }
-                setImagePreviews(imgs?.length > 0 ? imgs : fallbackImages);
+                setImagePreviews(imgs.length > 0 ? imgs : fallbackImages);
             } catch (error) {
                 console.error("❌ Error loading gallery:", error);
                 setImagePreviews(fallbackImages);
@@ -98,14 +99,18 @@ export default function HousingGallery({ project }: DefaultProps) {
     return (
         <div className="flex flex-col items-center relative bg-white">
 
-            {/* <section
-                className="flex h-[459px] w-full relative items-center justify-center gap-2.5 bg-[linear-gradient(0deg,rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('https://c.animaapp.com/miu4qofhUHi324/img/hero-gallery.png')] bg-cover bg-center">
-                <div className="inline-flex items-center justify-center gap-2.5 relative flex-[0_0_auto] translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:400ms]">
-                    <h1 className="mt-[-1px] text-white font-poppinsregular-52 text-[length:var(--poppinsregular-52-font-size)] tracking-[var(--poppinsregular-52-letter-spacing)] leading-[var(--poppinsregular-52-line-height)]">
-                        Gallery
-                    </h1>
-                </div>
-            </section>
+            <div
+                className="flex h-[450px] items-center justify-center w-full bg-cover bg-center bg-no-repeat relative"
+                style={{
+                    backgroundImage:
+                        "linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('/assest/image/gallerybanner-1.jpg')",
+                }}
+            >
+                <h1 className="text-white text-4xl md:text-5xl font-poppins">
+                    Gallery
+                </h1>
+            </div>
+
             {loading ? (<div className="min-h-[420px] flex items-center justify-center"><Loader /></div>) : (
                 <motion.div
                     className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full pb-16 pt-8 px-6 rounded-3xl shadow-2xl justify-center bg-white mb-10 -mt-12 z-50"
@@ -129,38 +134,6 @@ export default function HousingGallery({ project }: DefaultProps) {
                         </motion.div>
                     ))}
                 </motion.div>
-            )} */}
-
-            {loading ? (<div className="min-h-[420px] flex items-center justify-center"><Loader /></div>) : (
-                <main className="flex flex-col items-center justify-center relative w-full">
-                    <section
-                        className="flex h-[459px] w-full relative items-center justify-center gap-2.5 bg-[linear-gradient(0deg,rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('https://c.animaapp.com/miu4qofhUHi324/img/hero-gallery.png')] bg-cover bg-center">
-                        <div className="inline-flex items-center justify-center gap-2.5 relative flex-[0_0_auto] translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:400ms]">
-                            <h1 className="mt-[-1px] text-white font-poppinsregular-52 text-[length:var(--poppinsregular-52-font-size)] tracking-[var(--poppinsregular-52-letter-spacing)] leading-[var(--poppinsregular-52-line-height)]">
-                                Gallery
-                            </h1>
-                        </div>
-                    </section>
-
-                    <section className="flex flex-col items-center justify-center gap-6 p-20 relative w-full -mt-10 bg-white rounded-[40px_40px_0px_0px] translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:600ms]">
-                        <div className="flex flex-wrap items-center justify-center gap-[12px_12px] relative w-full">
-                            {imagePreviews.map((image, index) => (
-                                <Card
-                                    key={index}
-                                    className="w-[303.5px] border border-solid border-[#141414] bg-white transition-transform hover:scale-105"
-                                >
-                                    <CardContent className="p-1.5">
-                                        <img
-                                            className="w-full h-[194.33px] relative object-cover"
-                                            alt={image + index}
-                                            src={image}
-                                        />
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-                    </section>
-                </main>
             )}
         </div>
     );
