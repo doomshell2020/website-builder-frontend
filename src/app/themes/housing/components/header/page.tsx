@@ -24,7 +24,7 @@ export default function Header({ project }: DefaultProps) {
       <nav className="flex flex-wrap items-center justify-between gap-[0px_0px] px-[45px] py-3.5 w-full bg-white">
         <Link
           className="inline-flex flex-col items-start gap-2.5 flex-[0_0_auto] translate-y-[-1rem] animate-fade-in opacity-0"
-          href="/navvstaru45homeu45page"
+          href="/"
         >
           <img
             className="w-[86px] h-[71px] object-cover"
